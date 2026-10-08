@@ -201,7 +201,22 @@ export function WorkflowVisual({ steps, variant }) {
 export default function Home() {
   const [intentId, setIntentId] = useState('ready')
   const [routed, setRouted] = useState(false)
-  const [isLaunched, setIsLaunched] = useState(false)
+  const [launchPhase, setLaunchPhase] = useState('idle')
+  const [launchLogs, setLaunchLogs] = useState([])
+
+  const handleLaunch = () => {
+    setLaunchPhase('launching');
+    setLaunchLogs(['Initializing intent models...']);
+    setTimeout(() => setLaunchLogs(l => [...l, 'Connecting to carriers via SIP...']), 800);
+    setTimeout(() => setLaunchLogs(l => [...l, 'Optimizing latency routes (65ms)...']), 1600);
+    setTimeout(() => setLaunchLogs(l => [...l, 'Routing engine online.']), 2400);
+    setTimeout(() => setLaunchPhase('active'), 3200);
+  }
+
+  const handleReset = () => {
+    setLaunchPhase('idle');
+    setLaunchLogs([]);
+  }
   const selectedIntent = intentOptions.find((option) => option.id === intentId)
 
   const [callsRouted, setCallsRouted] = useState(2481);
@@ -340,21 +355,56 @@ export default function Home() {
             <h2>Launch your campaign<br /><span>in seconds.</span></h2>
             <p>Experience the sheer speed of Avortyx routing.</p>
           </div>
-          <div className="launch-3d-container">
-            <div className={`launch-card-wrapper ${isLaunched ? 'is-launched' : ''}`}>
-              <div className="launch-card-front">
-                <div>
-                  <h3>Campaign Readiness</h3>
-                  <p style={{ color: '#64748b', fontSize: '15px' }}>All systems go. Intent models loaded.</p>
-                </div>
-                <button className="button button-primary" onClick={() => setIsLaunched(true)} style={{ width: '100%' }}>INITIATE LAUNCH <ArrowIcon /></button>
+          <div className="launch-console">
+            <div className="console-panel">
+              <div className="console-header">
+                <strong>Campaign: Auto Insurance Q3</strong>
+                <span className={`status-badge ${launchPhase}`}>
+                  {launchPhase === 'idle' ? 'STANDBY' : launchPhase === 'launching' ? 'INITIALIZING' : 'ACTIVE'}
+                </span>
               </div>
-              <div className="launch-card-back">
-                <div>
-                  <h3 style={{ color: '#0369a1' }}>Campaign Active</h3>
-                  <p style={{ color: '#0284c7', fontSize: '15px' }}>Routing calls at 85ms latency.</p>
+              
+              <div className="console-body">
+                <div className="console-config">
+                  <div className="config-item">
+                    <span>Target ROI</span>
+                    <strong>150%</strong>
+                  </div>
+                  <div className="config-item">
+                    <span>Latency Goal</span>
+                    <strong>&lt; 90ms</strong>
+                  </div>
+                  <div className="config-item">
+                    <span>Intent AI</span>
+                    <strong>Enabled</strong>
+                  </div>
                 </div>
-                <button className="button" onClick={() => setIsLaunched(false)} style={{ width: '100%', background: 'rgba(255, 255, 255, 0.8)' }}>RESET SYSTEM</button>
+                
+                <div className="console-logs">
+                  <div className="log-window">
+                    {launchLogs.length === 0 ? (
+                      <div className="log-placeholder">System ready for deployment...</div>
+                    ) : (
+                      launchLogs.map((log, i) => (
+                        <div className="log-entry" key={i}>
+                          <span className="log-time">{new Date().toLocaleTimeString('en-US', { hour12: false, hour: "numeric", minute: "numeric", second: "numeric" })}</span>
+                          <span className="log-msg">{log}</span>
+                        </div>
+                      ))
+                    )}
+                    {launchPhase === 'launching' && <div className="log-cursor">_</div>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="console-footer">
+                {launchPhase === 'idle' ? (
+                  <button className="button button-primary console-btn" onClick={handleLaunch}>INITIATE LAUNCH <ArrowIcon /></button>
+                ) : launchPhase === 'launching' ? (
+                  <button className="button button-primary console-btn is-loading" disabled>LAUNCHING...</button>
+                ) : (
+                  <button className="button console-btn btn-active" onClick={handleReset}>SYSTEM ACTIVE - RESET</button>
+                )}
               </div>
             </div>
           </div>

@@ -69,6 +69,10 @@ function ScrollManager() {
 export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = () => setMenuOpen(false)
+  const handleBrandClick = () => {
+    setMenuOpen(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <>
@@ -76,7 +80,7 @@ export default function Layout() {
       <a className="skip-link" href="#main">Skip to content</a>
       <header className="site-header">
         <div className="nav-shell">
-          <Link className="brand" to="/" onClick={closeMenu} aria-label="Avortyx home">
+          <Link className="brand" to="/" onClick={handleBrandClick} aria-label="Avortyx home">
             <BrandMark />
             <span>AVORTYX</span>
           </Link>
@@ -112,7 +116,7 @@ export default function Layout() {
       <footer className="site-footer" id="footer">
         <div className="footer-main">
           <div className="footer-brand-col">
-            <Link className="brand footer-brand" to="/"><BrandMark /><span>AVORTYX</span></Link>
+            <Link className="brand footer-brand" to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}><BrandMark /><span>AVORTYX</span></Link>
             <p>Real-time call scoring, routing, and analytics for pay-per-call networks.</p>
             <Link className="footer-email" to="/request-access">Book a demo <ArrowIcon diagonal /></Link>
             <Link className="footer-ticket" to="/platform">Explore the platform <ArrowIcon /></Link>
