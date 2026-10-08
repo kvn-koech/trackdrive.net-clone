@@ -15,6 +15,8 @@
     el.alt = '';
     el.decoding = 'async';
     if (className) el.className = className;
+    // colored spheres are tinted to the hero blue, unless marked avx-keep
+    if (/sphere/.test(name) && !/blue/.test(name) && !/avx-keep/.test(className || '')) el.classList.add('avx-tint');
     return el;
   }
 
@@ -145,29 +147,39 @@
     return fx;
   }
 
-  function parallax(host) {
-    var px = 0, py = 0, tx = 0, ty = 0, running = false, visible = false;
+  // Eases pointer position and reports it with the host's scroll position.
+  // Frames run only while something is moving, so idle pages cost nothing.
+  function driver(host, ease, onFrame) {
+    var px = 0, py = 0, tx = 0, ty = 0, visible = false, raf = 0;
     function frame() {
-      px += (tx - px) * 0.08;
-      py += (ty - py) * 0.08;
-      host.style.setProperty('--avx-px', px.toFixed(2));
-      host.style.setProperty('--avx-py', py.toFixed(2));
-      var top = host.getBoundingClientRect().top;
-      host.style.setProperty('--avx-scroll', Math.max(-600, Math.min(600, -top)).toFixed(0));
-      if (visible) requestAnimationFrame(frame); else running = false;
+      raf = 0;
+      px += (tx - px) * ease;
+      py += (ty - py) * ease;
+      onFrame(px, py, host.getBoundingClientRect());
+      if (Math.abs(tx - px) > 0.001 || Math.abs(ty - py) > 0.001) kick();
+    }
+    function kick() {
+      if (!raf && visible) raf = requestAnimationFrame(frame);
     }
     if (finePointer) {
       host.addEventListener('pointermove', function (e) {
         var r = host.getBoundingClientRect();
-        tx = ((e.clientX - r.left) / r.width - 0.5) * 24;
-        ty = ((e.clientY - r.top) / r.height - 0.5) * 24;
+        tx = (e.clientX - r.left) / r.width - 0.5;
+        ty = (e.clientY - r.top) / r.height - 0.5;
+        kick();
       });
-      host.addEventListener('pointerleave', function () { tx = 0; ty = 0; });
+      host.addEventListener('pointerleave', function () { tx = 0; ty = 0; kick(); });
     }
-    onVisible(host, function () {
-      visible = true;
-      if (!running) { running = true; requestAnimationFrame(frame); }
-    }, function () { visible = false; }, 0);
+    window.addEventListener('scroll', kick, { passive: true });
+    onVisible(host, function () { visible = true; kick(); }, function () { visible = false; }, 0);
+  }
+
+  function parallax(host) {
+    driver(host, 0.08, function (px, py, r) {
+      host.style.setProperty('--avx-px', (px * 24).toFixed(2));
+      host.style.setProperty('--avx-py', (py * 24).toFixed(2));
+      host.style.setProperty('--avx-scroll', Math.max(-600, Math.min(600, -r.top)).toFixed(0));
+    });
   }
 
   function initHeroFx() {
@@ -206,7 +218,7 @@
       if (leads) leads.insertBefore(img('blue-sphere-120.png', 'avx-orb'), leads.firstChild);
       if (revenue) revenue.insertBefore(img('green-sphere-120.png', 'avx-orb'), revenue.firstChild);
       if (hubIcon) {
-        hubIcon.insertBefore(img('icon-sphere--green.png', 'avx-orb'), hubIcon.firstChild);
+        hubIcon.insertBefore(img('icon-sphere--blue.png', 'avx-orb'), hubIcon.firstChild);
         var orbits = document.createElement('div');
         orbits.className = 'avx-orbits';
         orbits.setAttribute('aria-hidden', 'true');
@@ -266,7 +278,7 @@
   var HEADING_FX = [
     { re: /^ping\s*\/\s*post$/i, type: 'ping', w: 340, h: 340 },
     { re: /^power dialer$/i, type: 'dialer', w: 360, h: 360 },
-    { re: /^call tracking$/i, type: 'tracking', w: 560, h: 230 },
+    { re: /^call tracking$/i, type: 'tracking', w: 560, h: 170 },
     { re: /^lead automation$/i, type: 'automation', w: 360, h: 360 },
     { re: /^agent control center$/i, type: 'gyro', w: 320, h: 320 }
   ];
@@ -337,29 +349,12 @@
       if (reduced) return;
 
       // pointer + scroll make the scene react in 3D while it is on screen
-      var hx = 0, hy = 0, tx = 0, ty = 0, visible = false, running = false;
-      function frame() {
-        hx += (tx - hx) * 0.07;
-        hy += (ty - hy) * 0.07;
-        var r = section.getBoundingClientRect();
+      driver(section, 0.07, function (hx, hy, r) {
         var sp = Math.max(-1, Math.min(1, (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight));
         fx.style.setProperty('--avx-hx', hx.toFixed(3));
         fx.style.setProperty('--avx-hy', hy.toFixed(3));
         fx.style.setProperty('--avx-sp', sp.toFixed(3));
-        if (visible) requestAnimationFrame(frame); else running = false;
-      }
-      if (finePointer) {
-        section.addEventListener('pointermove', function (e) {
-          var r = section.getBoundingClientRect();
-          tx = (e.clientX - r.left) / r.width - 0.5;
-          ty = (e.clientY - r.top) / r.height - 0.5;
-        });
-        section.addEventListener('pointerleave', function () { tx = 0; ty = 0; });
-      }
-      onVisible(section, function () {
-        visible = true;
-        if (!running) { running = true; requestAnimationFrame(frame); }
-      }, function () { visible = false; }, 0);
+      });
     });
   }
 
@@ -379,10 +374,17 @@
     mesh: { tilt: '48deg', layers: [
       ['slider-bg-ping-tree.png', 'drift', 'avx-bw-inv', { alpha: .85, speed: '20s', swell: '7s', pos: '70%' }]
     ] },
-    grid: { tilt: '0deg', layers: [
-      ['hero-bg-3840.png', 'zoom', 'avx-bw-inv-strong', { alpha: .9, speed: '8s', delay: '0s' }],
-      ['hero-bg-3840.png', 'zoom', 'avx-bw-inv-strong', { alpha: .9, speed: '8s', delay: '-4s' }]
+    grid: { tilt: '66deg', layers: [
+      [null, 'grid', '', { alpha: .9 }]
     ], noswell: true },
+    // five stacked layers swelling in sequence: a rolling 3D tide
+    tide: { tilt: '60deg', layers: [
+      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands', { alpha: .35, speed: '90s', swell: '5s', swellDelay: '0s', y: '-110px', z: '-320px' }],
+      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands avx-bw-green avx-bw-reverse avx-bw-mirror', { alpha: .5, speed: '70s', swell: '5s', swellDelay: '-1s', y: '-60px', z: '-200px' }],
+      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands', { alpha: .65, speed: '55s', swell: '5s', swellDelay: '-2s', y: '-10px', z: '-90px' }],
+      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands avx-bw-green avx-bw-mirror', { alpha: .8, speed: '42s', swell: '5s', swellDelay: '-3s', y: '40px', z: '10px' }],
+      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands avx-bw-reverse', { alpha: .95, speed: '32s', swell: '5s', swellDelay: '-4s', y: '90px', z: '110px' }]
+    ] },
     signal: { tilt: '42deg', layers: [
       ['waves-ping-tree.png', 'tile', 'avx-bw-inv avx-bw-mirror avx-bw-reverse', { alpha: .35, speed: '60s', swell: '1.9s', y: '-30px', z: '-110px' }],
       ['waves-ping-tree.png', 'tile', 'avx-bw-inv', { alpha: .85, speed: '40s', swell: '1.3s' }]
@@ -399,6 +401,7 @@
     '/pricing.html': 'mesh',
     '/careers.html': 'streak',
     '/sign_up.html': 'grid',
+    '/users/sign_in.html': 'tide',
     '/brand_assets.html': 'signal',
     '/privacy_policy.html': 'mesh',
     '/terms_of_service.html': 'ribbons'
@@ -420,11 +423,12 @@
       var layer = document.createElement('div');
       layer.className = 'avx-bw-layer' + (style.noswell ? ' avx-bw-noswell' : '');
       if (o.swell) layer.style.setProperty('--swell', o.swell);
+      if (o.swellDelay) layer.style.setProperty('--swell-delay', o.swellDelay);
       if (o.y) layer.style.setProperty('--y', o.y);
       if (o.z) layer.style.setProperty('--z', o.z);
       var im = document.createElement('div');
       im.className = 'avx-bw-img avx-bw-' + l[1] + ' ' + l[2];
-      im.style.setProperty('--src', 'url("' + ASSETS + l[0] + '")');
+      if (l[0]) im.style.setProperty('--src', 'url("' + ASSETS + l[0] + '")');
       if (o.alpha) im.style.setProperty('--alpha', o.alpha);
       if (o.speed) im.style.setProperty('--speed', o.speed);
       if (o.pos) im.style.setProperty('--pos', o.pos);
@@ -436,29 +440,12 @@
 
   function reactive(host, target) {
     if (reduced) return;
-    var hx = 0, hy = 0, tx = 0, ty = 0, visible = false, running = false;
-    function frame() {
-      hx += (tx - hx) * 0.06;
-      hy += (ty - hy) * 0.06;
-      var r = host.getBoundingClientRect();
+    driver(host, 0.06, function (hx, hy, r) {
       var sp = Math.max(-1, Math.min(1, (r.bottom - window.innerHeight) / window.innerHeight));
       target.style.setProperty('--avx-hx', hx.toFixed(3));
       target.style.setProperty('--avx-hy', hy.toFixed(3));
       target.style.setProperty('--avx-sp', sp.toFixed(3));
-      if (visible) requestAnimationFrame(frame); else running = false;
-    }
-    if (finePointer) {
-      host.addEventListener('pointermove', function (e) {
-        var r = host.getBoundingClientRect();
-        tx = (e.clientX - r.left) / r.width - 0.5;
-        ty = (e.clientY - r.top) / r.height - 0.5;
-      });
-      host.addEventListener('pointerleave', function () { tx = 0; ty = 0; });
-    }
-    onVisible(host, function () {
-      visible = true;
-      if (!running) { running = true; requestAnimationFrame(frame); }
-    }, function () { visible = false; }, 0);
+    });
   }
 
   // sections inside <main> that are not nested in another section
@@ -483,10 +470,35 @@
     var plane = document.createElement('div');
     plane.className = 'avx-bwaves-plane';
     plane.style.setProperty('--tilt', style.tilt);
+    var needsBlend = style.layers.some(function (l) { return /avx-bw-inv/.test(l[2]); });
+    if (!needsBlend) waves.classList.add('avx-noblend');
     buildWaveLayers(style, plane);
     waves.appendChild(plane);
     host.appendChild(waves);
     reactive(host, waves);
+  }
+
+  // ---------- Sign-in: one tilted ring behind the login card ----------
+
+  function initAuthRing() {
+    if (!/\/users\/sign_in(\.html)?$/.test(location.pathname)) return;
+    var card = document.querySelector('main .mktg-auth-card');
+    if (!card) return;
+    var stage = card.parentElement;
+    stage.classList.add('avx-auth-stage');
+    var section = card.closest('section');
+    if (section) section.classList.add('avx-fx-host');
+
+    var ring = sbg('avx-authring');
+    var tilt = document.createElement('div');
+    tilt.className = 'avx-authring-tilt';
+    var sway = document.createElement('div');
+    sway.className = 'avx-authring-sway';
+    sway.appendChild(img('pt-hero-rings.png'));
+    tilt.appendChild(sway);
+    ring.appendChild(tilt);
+    stage.insertBefore(ring, card);
+    if (section) reactive(section, ring);
   }
 
   // ---------- Section backgrounds ----------
@@ -560,7 +572,7 @@
   function initFlowSequences() {
     document.querySelectorAll('.flow-node-icon').forEach(function (icon) {
       var match = ORB_BY_BG.filter(function (m) { return icon.classList.contains(m[0]); })[0];
-      icon.insertBefore(img(match ? match[1] : 'purple-sphere-120.png', 'avx-orb'), icon.firstChild);
+      icon.insertBefore(img(match ? match[1] : 'purple-sphere-120.png', 'avx-orb avx-keep'), icon.firstChild);
     });
     if (reduced) return;
 
@@ -629,6 +641,7 @@
     initHeadingFx();
     initBottomWaves();
     initSectionBackgrounds();
+    initAuthRing();
     initFlowSequences();
     initHeroFx();
     initCtaFx();

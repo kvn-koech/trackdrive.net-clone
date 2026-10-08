@@ -6,6 +6,10 @@
 
 :root {
   --avx-ease: cubic-bezier(.2, .7, .2, 1);
+  /* every main 3D animation is tinted to the hero rings' cyan-blue */
+  --avx-hero-blue: #1ea0e8;
+  --avx-blue-inv: invert(1) grayscale(1) brightness(1.1) sepia(1) hue-rotate(172deg) saturate(5) contrast(1.1) brightness(1.04);
+  --avx-blue-tint: grayscale(1) sepia(1) saturate(6) hue-rotate(175deg) brightness(1.05);
   --avx-green: #6cb03d;
   --avx-blue: #4176a3;
 }
@@ -96,20 +100,24 @@ main {
   transform-style: preserve-3d;
 }
 
+img.avx-tint {
+  --tint: var(--avx-blue-tint);
+}
+
 .avx-float img {
   display: block;
   width: 100%;
   height: 100%;
   max-width: none;
   opacity: var(--alpha, .9);
-  filter: drop-shadow(0 14px 22px rgba(20, 32, 51, .18));
+  filter: var(--tint, ) drop-shadow(0 14px 22px rgba(20, 32, 51, .18));
   animation:
     avxBob var(--bob, 9s) ease-in-out var(--delay, 0s) infinite alternate,
     avxSpin var(--spin, 40s) linear infinite;
 }
 
 .avx-float.avx-soft img {
-  filter: blur(var(--blur, 18px));
+  filter: var(--tint, ) blur(var(--blur, 18px));
 }
 
 @keyframes avxBob {
@@ -258,6 +266,7 @@ main {
   height: auto;
   max-width: none;
   pointer-events: none;
+  filter: var(--tint, );
   animation: avxOrb 16s linear infinite, avxOrbPulse 3.2s ease-in-out infinite;
 }
 
@@ -291,7 +300,7 @@ main {
 .avx-orbit {
   position: absolute;
   inset: 0;
-  border: 2px dashed rgba(65, 118, 163, .45);
+  border: 2px dashed rgba(30, 160, 232, .5);
   border-radius: 50%;
   transform-style: preserve-3d;
   animation: avxOrbitSpin 9s linear infinite;
@@ -299,7 +308,7 @@ main {
 
 .avx-orbit + .avx-orbit {
   inset: 26px;
-  border-color: rgba(108, 176, 61, .55);
+  border-color: rgba(30, 120, 210, .5);
   animation-duration: 6s;
   animation-direction: reverse;
 }
@@ -316,6 +325,7 @@ main {
   height: 22px;
   margin-left: -11px;
   max-width: none;
+  filter: var(--tint, );
   transform-style: preserve-3d;
   animation: avxSatFace 9s linear infinite;
 }
@@ -343,7 +353,7 @@ main {
 /* lead "packets" travelling along the arrows */
 .avx-flow3d .hero-simple-arrow-track {
   overflow: visible;
-  background: linear-gradient(90deg, rgba(65, 118, 163, .25), rgba(108, 176, 61, .35));
+  background: linear-gradient(90deg, rgba(30, 160, 232, .2), rgba(30, 160, 232, .4));
 }
 
 .avx-flow3d .hero-simple-arrow-dot {
@@ -351,13 +361,13 @@ main {
   width: 22px;
   height: 22px;
   background: url("/assets/trackdrive_marketing/brand-assets/ringba%20assets/blue-sphere-120.png") center / cover no-repeat;
-  box-shadow: 0 0 18px rgba(65, 118, 163, .55);
+  box-shadow: 0 0 18px rgba(30, 160, 232, .6);
   animation: avxPacket 2.6s cubic-bezier(.45, 0, .3, 1) infinite;
 }
 
 .avx-flow3d .hero-simple-arrow-dot-delayed {
-  background-image: url("/assets/trackdrive_marketing/brand-assets/ringba%20assets/green-sphere-120.png");
-  box-shadow: 0 0 18px rgba(108, 176, 61, .55);
+  background-image: url("/assets/trackdrive_marketing/brand-assets/ringba%20assets/icon-sphere--blue.png");
+  box-shadow: 0 0 18px rgba(30, 160, 232, .6);
   animation-delay: 1.3s;
 }
 
@@ -459,6 +469,15 @@ main {
   z-index: 1;
 }
 
+/* soft halo keeps each heading readable over its scene */
+.avx-hfx-host > h2 {
+  text-shadow: 0 0 10px #fff, 0 0 4px #fff, 0 0 2px #fff;
+}
+
+[data-bs-theme="dark"] .avx-hfx-host > h2 {
+  text-shadow: 0 0 10px rgba(0, 0, 0, .8), 0 0 3px rgba(0, 0, 0, .8);
+}
+
 .avx-hfx {
   position: absolute;
   top: calc(50% - .5rem);
@@ -492,7 +511,7 @@ main {
 }
 
 .avx-inv {
-  filter: invert(1) hue-rotate(180deg) saturate(1.5) brightness(1.08);
+  filter: var(--avx-blue-inv);
 }
 
 .avx-round-mask {
@@ -514,7 +533,7 @@ main {
 [data-bs-theme="dark"] .avx-hfx-ping .avx-core,
 [data-bs-theme="dark"] .avx-hfx-tracking .avx-core,
 [data-bs-theme="dark"] .avx-gyro img {
-  filter: none;
+  filter: var(--avx-blue-tint);
 }
 
 /* Ping/Post — sphere sending out ping echoes */
@@ -527,20 +546,20 @@ main {
   width: 76%;
   height: 76%;
   opacity: 1;
-  filter: invert(1) hue-rotate(180deg) saturate(2.2) contrast(1.35) brightness(1.05);
+  filter: var(--avx-blue-inv) contrast(1.2);
   animation: avxSpinZ 30s linear infinite;
 }
 
 .avx-echo {
   position: absolute;
   inset: 22%;
-  border: 3px solid rgba(65, 118, 163, .9);
+  border: 3px solid rgba(30, 160, 232, .9);
   border-radius: 50%;
   animation: avxEcho 3.6s cubic-bezier(.2, .6, .3, 1) infinite;
 }
 
-.avx-echo:nth-of-type(2) { animation-delay: 1.2s; border-color: rgba(40, 170, 200, .9); }
-.avx-echo:nth-of-type(3) { animation-delay: 2.4s; border-color: rgba(108, 176, 61, .9); }
+.avx-echo:nth-of-type(2) { animation-delay: 1.2s; border-color: rgba(86, 196, 245, .9); }
+.avx-echo:nth-of-type(3) { animation-delay: 2.4s; border-color: rgba(20, 110, 200, .85); }
 
 @keyframes avxPingSway {
   from { transform: rotateX(28deg) rotateY(-18deg); }
@@ -566,7 +585,7 @@ main {
   width: 100%;
   height: 100%;
   opacity: 1;
-  filter: saturate(1.3) contrast(1.1);
+  filter: var(--avx-blue-tint) contrast(1.15);
   animation: avxDial 6s cubic-bezier(.65, 0, .35, 1) infinite;
 }
 
@@ -575,7 +594,7 @@ main {
   inset: 19%;
   border: 3px solid rgba(65, 118, 163, .55);
   border-radius: 50%;
-  box-shadow: inset 0 0 0 10px rgba(65, 118, 163, .08), 0 0 24px rgba(255, 106, 0, .25);
+  box-shadow: inset 0 0 0 10px rgba(30, 160, 232, .08), 0 0 24px rgba(30, 160, 232, .3);
 }
 
 .avx-dial-hole {
@@ -604,13 +623,13 @@ main {
   height: 34px;
   margin: -17px 0 0 -17px;
   transform: rotateZ(42deg) translateY(-124px) rotateZ(-42deg) translateZ(14px);
-  filter: drop-shadow(0 4px 10px rgba(108, 176, 61, .5));
+  filter: var(--tint, ) drop-shadow(0 4px 10px rgba(30, 160, 232, .5));
 }
 
 .avx-dial-ring {
   position: absolute;
   inset: 30%;
-  border: 3px solid rgba(108, 176, 61, .85);
+  border: 3px solid rgba(30, 160, 232, .85);
   border-radius: 50%;
   opacity: 0;
   animation: avxDialRing 2s ease-out infinite;
@@ -635,7 +654,11 @@ main {
   100% { transform: translateZ(60px) scale(1.5); opacity: 0; }
 }
 
-/* Call Tracking — voice waveform swinging in 3D */
+/* Call Tracking — voice waveform swinging in 3D, sitting under the heading */
+.avx-hfx-tracking {
+  top: calc(50% + 2.4rem);
+}
+
 .avx-hfx-tracking .avx-hfx-anim {
   animation: avxWaveSwing 8s ease-in-out infinite alternate;
 }
@@ -651,12 +674,12 @@ main {
 }
 
 .avx-hfx-tracking .avx-core {
-  opacity: .9;
-  filter: invert(1) hue-rotate(180deg) saturate(2) contrast(1.4) brightness(1.05);
+  opacity: .7;
+  filter: var(--avx-blue-inv) contrast(1.25);
 }
 
 .avx-hfx-tracking .avx-echo-wave {
-  opacity: .4;
+  opacity: .3;
   transform: translateZ(-90px) scaleX(-1.15);
   animation: avxAudioBack 1.9s ease-in-out infinite alternate;
 }
@@ -684,7 +707,7 @@ main {
 .avx-loop {
   position: absolute;
   inset: 0;
-  border: 3px dashed rgba(108, 176, 61, .75);
+  border: 3px dashed rgba(30, 160, 232, .7);
   border-radius: 50%;
   transform-style: preserve-3d;
   animation: avxSpinZ 16s linear infinite;
@@ -705,7 +728,7 @@ main {
   left: -20px;
   width: 40px;
   height: 40px;
-  filter: drop-shadow(0 6px 10px rgba(20, 32, 51, .25));
+  filter: var(--tint, ) drop-shadow(0 6px 10px rgba(20, 32, 51, .25));
   animation: avxFace 16s linear infinite;
 }
 
@@ -731,7 +754,7 @@ main {
   width: 100%;
   height: 100%;
   opacity: .9;
-  filter: invert(1) hue-rotate(180deg) saturate(2) contrast(1.4) brightness(1.05);
+  filter: var(--avx-blue-inv) contrast(1.25);
 }
 
 .avx-gyro-1 { inset: 0; animation: avxGyroX 12s linear infinite; }
@@ -815,7 +838,7 @@ main {
   inset: 0;
   transform-style: preserve-3d;
   transform: translate3d(0, var(--y, 0px), var(--z, 0px));
-  animation: avxSwell var(--swell, 6s) ease-in-out infinite alternate;
+  animation: avxSwell var(--swell, 6s) ease-in-out var(--swell-delay, 0s) infinite alternate;
 }
 
 .avx-bw-img {
@@ -827,6 +850,18 @@ main {
   background-image: var(--src);
   background-repeat: no-repeat;
   opacity: var(--alpha, .9);
+}
+
+/* fades live on each layer (in its own tilted plane) so no image edge is ever visible */
+.avx-bw-layer {
+  -webkit-mask-image:
+    linear-gradient(180deg, transparent 0%, #000 38%, #000 82%, transparent 100%),
+    linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(180deg, transparent 0%, #000 38%, #000 82%, transparent 100%),
+    linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mask-composite: intersect;
 }
 
 .avx-bw-mirror {
@@ -864,25 +899,54 @@ main {
   animation-delay: var(--delay, 0s);
 }
 
+/* grid: crisp hero-blue floor lines scrolling toward the viewer */
+.avx-bw-grid {
+  top: -60%;
+  height: 160%;
+  background:
+    linear-gradient(rgba(30, 160, 232, .6) 1.5px, transparent 1.5px) 0 0 / 64px 64px,
+    linear-gradient(90deg, rgba(30, 160, 232, .6) 1.5px, transparent 1.5px) 0 0 / 64px 64px;
+  animation: avxGridMove 2.4s linear infinite;
+}
+
+@keyframes avxGridMove {
+  to { background-position: 0 64px, 0 64px; }
+}
+
 .avx-bw-strands {
   filter: saturate(1.8) brightness(.72) hue-rotate(12deg);
 }
 
 .avx-bw-strands.avx-bw-green {
-  filter: saturate(1.6) brightness(.85) hue-rotate(-60deg);
+  filter: saturate(1.6) brightness(.6) hue-rotate(22deg);
 }
 
 .avx-bw-inv {
-  filter: invert(1) hue-rotate(180deg) saturate(1.8) contrast(1.3);
+  filter: var(--avx-blue-inv) contrast(1.15);
 }
 
 /* the grid artwork is very low-contrast; pull its faint lines apart from the background */
 .avx-bw-inv-strong {
-  filter: invert(1) hue-rotate(180deg) brightness(.62) contrast(6) saturate(2);
+  filter: invert(1) brightness(.62) contrast(6) grayscale(1) sepia(1) hue-rotate(172deg) saturate(5) brightness(1.18);
 }
 
 [data-bs-theme="dark"] .avx-bwaves {
   mix-blend-mode: screen;
+}
+
+/* transparent wave art needs no blending: much cheaper to scroll */
+.avx-bwaves.avx-noblend,
+[data-bs-theme="dark"] .avx-bwaves.avx-noblend {
+  mix-blend-mode: normal;
+}
+
+.avx-bwaves {
+  contain: layout paint;
+}
+
+.avx-bw-tile,
+.avx-bw-drift {
+  will-change: translate;
 }
 
 [data-bs-theme="dark"] .avx-bw-strands,
@@ -892,7 +956,12 @@ main {
 }
 
 [data-bs-theme="dark"] .avx-bw-strands.avx-bw-green {
-  filter: hue-rotate(-60deg);
+  filter: hue-rotate(22deg);
+}
+
+[data-bs-theme="dark"] .avx-bw-inv,
+[data-bs-theme="dark"] .avx-bw-inv-strong {
+  filter: var(--avx-blue-tint);
 }
 
 @keyframes avxFlow {
@@ -993,6 +1062,67 @@ main {
   to { transform: rotateX(48deg) rotateY(10deg); }
 }
 
+/* sign-in: one tilted, slowly turning ring behind the login card */
+.avx-auth-stage {
+  position: relative;
+}
+
+.avx-auth-stage > .mktg-auth-card {
+  position: relative;
+  z-index: 1;
+}
+
+.avx-authring {
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: min(1180px, 170vw);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  perspective: 1100px;
+}
+
+.avx-authring-tilt,
+.avx-authring-sway {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.avx-authring-tilt {
+  transform:
+    rotateX(calc(var(--avx-hy, 0) * -12deg))
+    rotateY(calc(var(--avx-hx, 0) * 16deg));
+}
+
+.avx-authring-sway {
+  animation: avxAuthSway 12s ease-in-out infinite alternate;
+}
+
+.avx-authring img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  opacity: .6;
+  filter: invert(1) hue-rotate(180deg) saturate(1.8) brightness(1.06);
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 52%, transparent 96%);
+  mask-image: radial-gradient(circle closest-side, #000 52%, transparent 96%);
+  animation: avxSpinZ 45s linear infinite;
+  will-change: transform;
+}
+
+[data-bs-theme="dark"] .avx-authring img {
+  filter: none;
+  opacity: .85;
+}
+
+@keyframes avxAuthSway {
+  from { transform: rotateX(58deg) rotateY(-8deg); }
+  to { transform: rotateX(66deg) rotateY(8deg); }
+}
+
 /* "How It Works" boxes: grid floor moving forward */
 .avx-sbg-host {
   position: relative;
@@ -1028,14 +1158,14 @@ main {
   height: 100%;
   max-width: none;
   opacity: .35;
-  filter: invert(1) hue-rotate(180deg) saturate(1.6);
+  filter: var(--avx-blue-inv);
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 50%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 50%, transparent 100%);
   animation: avxOrbTurn 26s ease-in-out infinite alternate;
 }
 
 [data-bs-theme="dark"] .avx-sbg-orb img {
-  filter: none;
+  filter: var(--avx-blue-tint);
   opacity: .5;
 }
 
@@ -1061,7 +1191,7 @@ main {
   inset: -40% 0 0;
   background:
     radial-gradient(circle, rgba(65, 118, 163, .55) 1.6px, transparent 2.2px) 0 0 / 30px 30px,
-    radial-gradient(circle, rgba(108, 176, 61, .55) 1.6px, transparent 2.2px) 15px 15px / 30px 30px;
+    radial-gradient(circle, rgba(30, 160, 232, .5) 1.6px, transparent 2.2px) 15px 15px / 30px 30px;
   opacity: .9;
   transform: rotateX(62deg);
   transform-origin: 50% 100%;
@@ -1075,6 +1205,7 @@ main {
 @media (prefers-reduced-motion: reduce) {
   .avx-bw-layer,
   .avx-bw-img,
+  .avx-bw-grid,
   .avx-sbg *,
   .avx-sbg-dots-plane {
     animation: none !important;
