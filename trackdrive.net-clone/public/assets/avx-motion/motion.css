@@ -1514,23 +1514,6 @@ img.avx-tint {
 
 /* ---------- Integrations page: same proportions as the AI subpages ---------- */
 
-.avx-integrations .avx-ihub-host {
-  min-height: 320px;
-  padding-block: 2.25rem 2.5rem !important;
-}
-
-.avx-integrations .avx-ihub-host h1 {
-  font-size: 2.25rem;
-  margin-bottom: .5rem;
-}
-
-/* the logo hub keeps its full 3D geometry, scaled to the compact hero */
-.avx-integrations .avx-ihub {
-  right: 1%;
-  transform: scale(.68);
-  transform-origin: 100% 50%;
-}
-
 /* the logo grid sits in the same narrow content column as the subpage copy */
 .avx-integrations .mktg-section .container > .row {
   --bs-gutter-x: 1rem;
@@ -1553,13 +1536,4 @@ img.avx-tint {
 
 .avx-integrations .integration-card p {
   font-size: .8rem;
-}
-
-/* hero content shares the 820px column: heading aligns with the grid, hub at its right edge */
-.avx-integrations .avx-ihub-host > .container {
-  max-width: calc(820px + 2rem);
-}
-
-.avx-integrations .avx-ihub {
-  right: -1rem;
 }
