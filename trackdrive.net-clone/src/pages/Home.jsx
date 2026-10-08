@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowIcon, BrandMark } from '../components/icons.jsx'
 import { CtaBanner, Scene3D } from '../components/Scene3D.jsx'
@@ -204,6 +204,25 @@ export default function Home() {
   const [isLaunched, setIsLaunched] = useState(false)
   const selectedIntent = intentOptions.find((option) => option.id === intentId)
 
+  const [callsRouted, setCallsRouted] = useState(2481);
+  const [matchRate, setMatchRate] = useState(76.3);
+  const [decisionTime, setDecisionTime] = useState(85);
+  const [topCampaigns, setTopCampaigns] = useState([
+    { id: 1, name: 'Solar - West Coast', type: 'Inbound', calls: 643, revenue: 12420, icon: 'S', color: 'green' },
+    { id: 2, name: 'Auto Insurance', type: 'Ping/Post', calls: 521, revenue: 9860, icon: 'I', color: 'orange' },
+    { id: 3, name: 'Home Services', type: 'Inbound', calls: 384, revenue: 7240, icon: 'H', color: 'blue' }
+  ]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCallsRouted(prev => prev + Math.floor(Math.random() * 3));
+      setMatchRate(prev => Number(Math.max(70, Math.min(99, prev + (Math.random() - 0.5) * 0.4)).toFixed(1)));
+      setDecisionTime(prev => Math.max(65, Math.min(110, prev + Math.floor((Math.random() - 0.5) * 6))));
+      setTopCampaigns(prev => prev.map(camp => Math.random() > 0.7 ? { ...camp, calls: camp.calls + 1, revenue: camp.revenue + Math.floor(Math.random() * 50 + 20) } : camp));
+    }, 1500);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
         <section className="hero-section">
@@ -248,16 +267,25 @@ export default function Home() {
               <div className="preview-main">
                 <div className="preview-title-row"><div><span className="preview-eyebrow">LIVE ROUTING OVERVIEW</span><h2>Every call. A smarter route. <span>✳</span></h2><p>Intent signals and buyer demand, in real time.</p></div><button type="button" className="range-button">Live⌄</button></div>
                 <div className="metric-grid">
-                  <div className="metric-card"><span>Calls routed</span><strong>2,481</strong><small className="metric-up">↗ 12.8% <em>this week</em></small><div className="sparkline spark-one" /></div>
-                  <div className="metric-card"><span>Buyer match rate</span><strong>76.3%</strong><small className="metric-up">↗ 8.3% <em>this week</em></small><div className="sparkline spark-two" /></div>
-                  <div className="metric-card"><span>Avg. decision time</span><strong>85ms</strong><small className="metric-up">↗ Real-time <em>routing</em></small><div className="sparkline spark-three" /></div>
+                  <div className="metric-card"><span>Calls routed</span><strong>{callsRouted.toLocaleString()}</strong><small className="metric-up">↗ 12.8% <em>this week</em></small><div className="sparkline spark-one" /></div>
+                  <div className="metric-card"><span>Buyer match rate</span><strong>{matchRate.toFixed(1)}%</strong><small className="metric-up">↗ 8.3% <em>this week</em></small><div className="sparkline spark-two" /></div>
+                  <div className="metric-card"><span>Avg. decision time</span><strong>{decisionTime}ms</strong><small className="metric-up">↗ Real-time <em>routing</em></small><div className="sparkline spark-three" /></div>
                 </div>
                 <div className="preview-bottom">
                   <div className="activity-card">
                     <div className="activity-card-header"><div><strong>Live call activity</strong><span>Calls routed in real time</span></div><span className="live-label"><i /> LIVE</span></div>
                     <div className="activity-chart"><div className="chart-y-labels"><span>60</span><span>40</span><span>20</span><span>0</span></div><div className="chart-plot"><div className="chart-gridlines"><i /><i /><i /><i /></div><svg viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#4879bd" stopOpacity=".2" /><stop offset="100%" stopColor="#4879bd" stopOpacity="0" /></linearGradient></defs><path d="M0 78 C24 73 28 54 52 61 S82 46 102 55 S136 28 158 40 S191 60 213 44 S244 53 267 26 S304 44 321 27 S350 42 369 13 S390 25 400 9 V100 H0Z" fill="url(#chart-fill)" /><path d="M0 78 C24 73 28 54 52 61 S82 46 102 55 S136 28 158 40 S191 60 213 44 S244 53 267 26 S304 44 321 27 S350 42 369 13 S390 25 400 9" fill="none" stroke="#3667ab" strokeWidth="2.5" vectorEffect="non-scaling-stroke" /></svg><div className="chart-x-labels"><span>9 AM</span><span>11 AM</span><span>1 PM</span><span>3 PM</span><span>5 PM</span></div></div></div>
                   </div>
-                  <div className="routing-card"><div className="routing-heading"><strong>Top campaigns</strong><Link to="/platform">View all <ArrowIcon /></Link></div><div className="campaign-row"><span className="campaign-icon campaign-icon-green">S</span><span><b>Solar - West Coast</b><small>Inbound · 643 calls</small></span><strong>$12,420</strong></div><div className="campaign-row"><span className="campaign-icon campaign-icon-orange">I</span><span><b>Auto Insurance</b><small>Ping/Post · 521 calls</small></span><strong>$9,860</strong></div><div className="campaign-row"><span className="campaign-icon campaign-icon-blue">H</span><span><b>Home Services</b><small>Inbound · 384 calls</small></span><strong>$7,240</strong></div></div>
+                  <div className="routing-card">
+                    <div className="routing-heading"><strong>Top campaigns</strong><Link to="/platform">View all <ArrowIcon /></Link></div>
+                    {topCampaigns.map(camp => (
+                      <div className="campaign-row" key={camp.id}>
+                        <span className={`campaign-icon campaign-icon-${camp.color}`}>{camp.icon}</span>
+                        <span><b>{camp.name}</b><small>{camp.type} · {camp.calls} calls</small></span>
+                        <strong>${camp.revenue.toLocaleString()}</strong>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
