@@ -1,3 +1,11 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [
+    { "source": "/:page(brand_assets|careers|features|pricing|privacy_policy|terms_of_service)/", "destination": "/:page.html" },
+    { "source": "/:page(brand_assets|careers|features|pricing|privacy_policy|terms_of_service)", "destination": "/:page.html" },
+    { "source": "/features/integrations/", "destination": "/features/integrations.html" },
+    { "source": "/features/integrations", "destination": "/features/integrations.html" },
+    { "source": "/p/contact/", "destination": "/p/contact.html" },
+    { "source": "/p/contact", "destination": "/p/contact.html" },
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
