@@ -61,9 +61,51 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://d15iqiuf0x41sc.cloudfront.net/assets/homepage-c8012cd3e5f36c72a6b0d84f765761516a73e1ce38de268efeca6a6833769c1d.css" media="all" />
+  <style>
+    /* Hero rings: centered behind the h1, tilted in 3D and slowly spinning */
+    .hero-heading { position: relative; }
+    .hero-heading h1 { position: relative; z-index: 1; }
+    .hero-rings {
+      position: absolute; top: 50%; left: 50%; z-index: 0;
+      width: min(1040px, 150vw); aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      perspective: 1400px;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+    .hero-rings-tilt {
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      animation: heroRingsTilt 18s ease-in-out infinite alternate;
+    }
+    .hero-rings img {
+      display: block; width: 100%; height: 100%; max-width: none;
+      opacity: .55;
+      /* invert so the navy backdrop becomes white and multiplies away on the light page */
+      filter: invert(1) hue-rotate(180deg) saturate(1.6) brightness(1.08);
+      -webkit-mask-image: radial-gradient(circle closest-side, #000 52%, transparent 96%);
+      mask-image: radial-gradient(circle closest-side, #000 52%, transparent 96%);
+      animation: heroRingsSpin 48s linear infinite;
+      will-change: transform;
+    }
+    [data-bs-theme="dark"] .hero-rings { mix-blend-mode: screen; }
+    [data-bs-theme="dark"] .hero-rings img { filter: none; opacity: .8; }
+    @keyframes heroRingsSpin { to { transform: rotateZ(360deg); } }
+    @keyframes heroRingsTilt {
+      0% { transform: rotateX(30deg) rotateY(-14deg); }
+      50% { transform: rotateX(16deg) rotateY(4deg); }
+      100% { transform: rotateX(26deg) rotateY(14deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-rings-tilt, .hero-rings img { animation: none; }
+      .hero-rings-tilt { transform: rotateX(24deg); }
+    }
+  </style>
   <script src="https://d15iqiuf0x41sc.cloudfront.net/assets/homepage-ccf194c6e49e498a071f19add478b7d9e46bbb086358e92d1b8d07c290992369.js"></script>
 
   
+  <link rel="stylesheet" href="/assets/avx-motion/motion.css" />
+  <script src="/assets/avx-motion/motion.js" defer></script>
 </head>
 
 <body class="pages home " data-domain="avortyx.com">
@@ -135,11 +177,18 @@
   <div class="container">
     <div class="row justify-content-center text-center">
       <div class="col-lg-9">
-        <h1 class="display-4 fw-bold mb-4">
-          Intelligent call routing.<br>
-          <span class="text-success">Real-time ping/post.</span><br>
-          Total visibility.
-        </h1>
+        <div class="hero-heading">
+          <div class="hero-rings" aria-hidden="true">
+            <div class="hero-rings-tilt">
+              <img alt="" src="/assets/trackdrive_marketing/brand-assets/ringba%20assets/pt-hero-rings.png" />
+            </div>
+          </div>
+          <h1 class="display-4 fw-bold mb-4">
+            Intelligent call routing.<br>
+            <span class="text-success">Real-time ping/post.</span><br>
+            Total visibility.
+          </h1>
+        </div>
         <p class="lead mb-4 mx-auto hero-lead">
           The <strong>performance marketing platform</strong> that routes calls, manages ping
           trees, transcribes conversations, and gives you analytics that actually

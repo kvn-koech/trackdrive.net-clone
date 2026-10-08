@@ -1,0 +1,1132 @@
+/*
+ * Avortyx motion layer — shared 3D / scroll animations for every page.
+ * Paired with motion.js, which adds the avx-* classes and injects the
+ * decorative layers built from /assets/trackdrive_marketing/brand-assets/ringba assets.
+ */
+
+:root {
+  --avx-ease: cubic-bezier(.2, .7, .2, 1);
+  --avx-green: #6cb03d;
+  --avx-blue: #4176a3;
+}
+
+/* ---------- Page entrance + scroll progress ---------- */
+
+main {
+  animation: avxPageIn .6s ease both;
+}
+
+@keyframes avxPageIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.avx-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--avx-blue), #56d5e7, var(--avx-green));
+  transform: scaleX(var(--avx-progress, 0));
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+
+/* ---------- Pointer tilt for cards and visuals ---------- */
+
+.avx-tilt {
+  transition: transform .5s var(--avx-ease), box-shadow .25s ease, opacity .2s ease;
+}
+
+.avx-tilt.avx-tilting {
+  transform:
+    perspective(900px)
+    rotateX(var(--avx-rx, 0deg))
+    rotateY(var(--avx-ry, 0deg))
+    scale(1.025);
+  transition: transform .12s ease-out, box-shadow .25s ease, opacity .2s ease;
+  box-shadow: 0 18px 40px rgba(20, 32, 51, .12);
+}
+
+/* ---------- Scroll reveal (3D rise) ----------
+   motion.js removes .avx-reveal once the entrance finishes so each
+   element's own hover styles take over again. */
+
+.avx-stage {
+  perspective: 1100px;
+}
+
+.avx-reveal {
+  transform-origin: 50% 100%;
+  transition:
+    opacity .8s ease var(--avx-delay, 0ms),
+    transform .95s var(--avx-ease) var(--avx-delay, 0ms);
+}
+
+.avx-reveal:not(.avx-in) {
+  opacity: 0;
+  transform: translate3d(0, 34px, -40px) rotateX(14deg) scale(.97);
+}
+
+/* ---------- Floating sphere layer (page heroes, CTA bands) ---------- */
+
+.avx-fx-host {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.avx-fx {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  perspective: 900px;
+}
+
+.avx-float {
+  position: absolute;
+  width: var(--size, 80px);
+  aspect-ratio: 1;
+  translate:
+    calc(var(--avx-px, 0) * var(--depth, 1) * 1px)
+    calc(var(--avx-py, 0) * var(--depth, 1) * 1px + var(--avx-scroll, 0) * var(--depth, 1) * -.25px);
+  transform-style: preserve-3d;
+}
+
+.avx-float img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  opacity: var(--alpha, .9);
+  filter: drop-shadow(0 14px 22px rgba(20, 32, 51, .18));
+  animation:
+    avxBob var(--bob, 9s) ease-in-out var(--delay, 0s) infinite alternate,
+    avxSpin var(--spin, 40s) linear infinite;
+}
+
+.avx-float.avx-soft img {
+  filter: blur(var(--blur, 18px));
+}
+
+@keyframes avxBob {
+  0% { translate: 0 0 0; }
+  50% { translate: 10px -18px 40px; }
+  100% { translate: -8px 10px -30px; }
+}
+
+@keyframes avxSpin {
+  to { rotate: 360deg; }
+}
+
+.marketing-cta-band .avx-waves {
+  position: absolute;
+  inset: -20% -10%;
+  width: 120%;
+  height: 140%;
+  max-width: none;
+  object-fit: cover;
+  opacity: .35;
+  mix-blend-mode: screen;
+  animation: avxWaves 22s ease-in-out infinite alternate;
+}
+
+@keyframes avxWaves {
+  from { transform: perspective(800px) rotateX(18deg) translate3d(-4%, 0, 0); }
+  to { transform: perspective(800px) rotateX(8deg) translate3d(4%, -3%, 40px); }
+}
+
+@media (max-width: 767.98px) {
+  .avx-float {
+    --size: 44px !important;
+  }
+
+  .avx-float.avx-hide-sm {
+    display: none;
+  }
+}
+
+/* ---------- "Everything you need to convert" — 3D lead-flow scene ---------- */
+
+.avx-convert-bg .avx-float {
+  --alpha: .14;
+}
+
+.mktg-lead-flow.avx-flow3d {
+  perspective: 1100px;
+  padding: 40px 0 30px;
+}
+
+.avx-flow3d .hero-simple-flow {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.avx-flow3d .hero-simple-node,
+.avx-flow3d .hero-simple-hub,
+.avx-flow3d .hero-simple-arrow {
+  transform-style: preserve-3d;
+}
+
+/* drop the original flow animations; motion.js drives the 3D entrance instead */
+.avx-flow3d .hero-simple-node,
+.avx-flow3d .hero-simple-hub,
+.avx-flow3d .hero-simple-arrow {
+  animation: none;
+  opacity: 1;
+}
+
+.avx-flow3d .hero-simple-flow {
+  opacity: 0;
+}
+
+.avx-flow3d.avx-seen .hero-simple-flow {
+  opacity: 1;
+  transition: opacity .9s ease;
+}
+
+/* spheres replace the original glass tiles */
+.avx-flow3d .hero-simple-node-icon,
+.avx-flow3d .hero-simple-node-icon-success,
+.avx-flow3d .hero-simple-hub-icon {
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  animation: none !important;
+  transition: none;
+}
+
+.avx-flow3d .hero-simple-node-icon:hover,
+.avx-flow3d .hero-simple-hub-icon:hover {
+  transform: translateZ(30px);
+}
+
+.avx-flow3d .hero-simple-hub-icon:hover {
+  transform: translateZ(50px);
+}
+
+.avx-flow3d .hero-simple-node-icon,
+.avx-flow3d .hero-simple-hub-icon {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  overflow: visible;
+  transform: translateZ(30px);
+}
+
+.avx-flow3d .hero-simple-hub-icon {
+  width: 108px;
+  height: 108px;
+  transform: translateZ(50px);
+}
+
+.avx-flow3d .hero-simple-node {
+  width: 140px;
+  gap: 20px;
+}
+
+.avx-flow3d .hero-simple-hub {
+  gap: 24px;
+}
+
+.avx-flow3d .hero-simple-node-sources {
+  margin-top: -12px;
+}
+
+.avx-flow3d .hero-simple-hub-icon i {
+  color: #0d5a43 !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, .9) !important;
+}
+
+.avx-flow3d .hero-simple-node-icon i,
+.avx-flow3d .hero-simple-hub-icon i {
+  position: relative;
+  color: #fff !important;
+  text-shadow: 0 2px 8px rgba(10, 20, 40, .55);
+}
+
+.avx-orb {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: auto;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  animation: avxOrb 16s linear infinite, avxOrbPulse 3.2s ease-in-out infinite;
+}
+
+.hero-simple-hub-icon .avx-orb {
+  inset: -8%;
+  animation-duration: 22s, 3s;
+}
+
+@keyframes avxOrb {
+  to { rotate: 360deg; }
+}
+
+@keyframes avxOrbPulse {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.08; }
+}
+
+/* orbit system around the Avortyx hub */
+.avx-orbits {
+  position: absolute;
+  top: 54px;
+  left: 50%;
+  width: 250px;
+  height: 250px;
+  margin: -125px 0 0 -125px;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  transform: rotateX(64deg);
+}
+
+.avx-orbit {
+  position: absolute;
+  inset: 0;
+  border: 2px dashed rgba(65, 118, 163, .45);
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  animation: avxOrbitSpin 9s linear infinite;
+}
+
+.avx-orbit + .avx-orbit {
+  inset: 26px;
+  border-color: rgba(108, 176, 61, .55);
+  animation-duration: 6s;
+  animation-direction: reverse;
+}
+
+.avx-orbit:first-child {
+  box-shadow: 0 0 30px rgba(86, 213, 231, .18), inset 0 0 30px rgba(86, 213, 231, .12);
+}
+
+.avx-sat {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  max-width: none;
+  transform-style: preserve-3d;
+  animation: avxSatFace 9s linear infinite;
+}
+
+.avx-orbit + .avx-orbit .avx-sat {
+  top: auto;
+  bottom: -9px;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  animation-duration: 6s;
+  animation-direction: reverse;
+}
+
+@keyframes avxOrbitSpin {
+  to { transform: rotateZ(360deg); }
+}
+
+/* counter-rotate so satellites keep facing the viewer */
+@keyframes avxSatFace {
+  from { transform: rotateZ(0deg) rotateX(-64deg); }
+  to { transform: rotateZ(-360deg) rotateX(-64deg); }
+}
+
+/* lead "packets" travelling along the arrows */
+.avx-flow3d .hero-simple-arrow-track {
+  overflow: visible;
+  background: linear-gradient(90deg, rgba(65, 118, 163, .25), rgba(108, 176, 61, .35));
+}
+
+.avx-flow3d .hero-simple-arrow-dot {
+  top: -9px;
+  width: 22px;
+  height: 22px;
+  background: url("/assets/trackdrive_marketing/brand-assets/ringba%20assets/blue-sphere-120.png") center / cover no-repeat;
+  box-shadow: 0 0 18px rgba(65, 118, 163, .55);
+  animation: avxPacket 2.6s cubic-bezier(.45, 0, .3, 1) infinite;
+}
+
+.avx-flow3d .hero-simple-arrow-dot-delayed {
+  background-image: url("/assets/trackdrive_marketing/brand-assets/ringba%20assets/green-sphere-120.png");
+  box-shadow: 0 0 18px rgba(108, 176, 61, .55);
+  animation-delay: 1.3s;
+}
+
+@keyframes avxPacket {
+  0% { left: 0; opacity: 0; transform: translate3d(0, 0, 0) scale(.6); }
+  12% { opacity: 1; }
+  50% { transform: translate3d(0, -22px, 60px) scale(1.15); }
+  88% { opacity: 1; }
+  100% { left: calc(100% - 22px); opacity: 0; transform: translate3d(0, 0, 0) scale(.6); }
+}
+
+.avx-flow3d .hero-simple-node-label,
+.avx-flow3d .hero-simple-hub-name,
+.avx-flow3d .hero-simple-node-sources,
+.avx-flow3d .hero-simple-step-labels {
+  position: relative;
+  transform: translateZ(60px);
+}
+
+.avx-flow3d .hero-simple-node-label,
+.avx-flow3d .hero-simple-hub-name {
+  font-size: 1.05rem;
+  text-shadow: 0 0 6px rgba(255, 255, 255, .9), 0 0 2px rgba(255, 255, 255, .9) !important;
+}
+
+[data-bs-theme="dark"] .avx-flow3d .hero-simple-node-label,
+[data-bs-theme="dark"] .avx-flow3d .hero-simple-hub-name {
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .8) !important;
+}
+
+/* ---------- Spotlight + feature flow diagrams: step-by-step highlight ---------- */
+
+.spotlight-flow-step,
+.flow-node-icon {
+  transition: transform .45s var(--avx-ease), box-shadow .45s ease, border-color .45s ease;
+}
+
+.spotlight-flow-step.avx-active {
+  border-color: rgba(108, 176, 61, .55);
+  box-shadow: 0 10px 26px rgba(108, 176, 61, .22);
+  transform: perspective(700px) translateZ(26px) rotateX(6deg);
+}
+
+.spotlight-flow-step.avx-active i {
+  color: #fff;
+  background: var(--avx-green);
+  box-shadow: 0 0 0 6px rgba(108, 176, 61, .15);
+}
+
+.spotlight-flow-arrow.avx-active,
+.flow-arrow.avx-active {
+  color: var(--avx-green);
+  animation: avxNudge .7s ease;
+}
+
+@keyframes avxNudge {
+  50% { translate: 0 4px; scale: 1.25; }
+}
+
+.flow-arrow.avx-active {
+  animation-name: avxNudgeX;
+}
+
+.flow-arrow-down.avx-active {
+  color: var(--avx-green);
+  animation: avxNudge .7s ease;
+}
+
+@keyframes avxNudgeX {
+  50% { translate: 4px 0; scale: 1.25; }
+}
+
+.flow-node-icon .avx-orb {
+  inset: -15%;
+  opacity: .95;
+}
+
+.flow-node-icon.avx-active {
+  transform: perspective(600px) translateZ(30px) rotateY(18deg);
+  box-shadow: 0 14px 30px rgba(20, 32, 51, .22);
+}
+
+/* ---------- Spotlight headings: unique 3D scene behind each heading ----------
+   Same treatment as the hero rings: dark artwork is inverted and multiplied
+   into the light page, or screen-blended on the dark theme. */
+
+.avx-clip {
+  overflow-x: clip;
+}
+
+.avx-hfx-host {
+  position: relative;
+  display: inline-block;
+}
+
+.avx-hfx-host > h2,
+.avx-hfx-host ~ * {
+  position: relative;
+  z-index: 1;
+}
+
+.avx-hfx {
+  position: absolute;
+  top: calc(50% - .5rem);
+  left: 50%;
+  z-index: 0;
+  width: min(var(--w), 92vw);
+  height: var(--h);
+  transform: translate(-50%, -50%);
+  perspective: 900px;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.avx-hfx-stage,
+.avx-hfx-anim {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.avx-hfx-stage {
+  transform:
+    rotateX(calc(var(--avx-hy, 0) * -16deg + var(--avx-sp, 0) * 16deg))
+    rotateY(calc(var(--avx-hx, 0) * 22deg));
+}
+
+.avx-hfx img {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+}
+
+.avx-inv {
+  filter: invert(1) hue-rotate(180deg) saturate(1.5) brightness(1.08);
+}
+
+.avx-round-mask {
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 55%, transparent 98%);
+  mask-image: radial-gradient(circle closest-side, #000 55%, transparent 98%);
+}
+
+/* keep only the dial's outer teeth; the dark centre is cut away */
+.avx-teeth-mask {
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 76%, #000 86%);
+  mask-image: radial-gradient(circle closest-side, transparent 76%, #000 86%);
+}
+
+[data-bs-theme="dark"] .avx-hfx {
+  mix-blend-mode: screen;
+}
+
+[data-bs-theme="dark"] .avx-inv,
+[data-bs-theme="dark"] .avx-hfx-ping .avx-core,
+[data-bs-theme="dark"] .avx-hfx-tracking .avx-core,
+[data-bs-theme="dark"] .avx-gyro img {
+  filter: none;
+}
+
+/* Ping/Post — sphere sending out ping echoes */
+.avx-hfx-ping .avx-hfx-anim {
+  animation: avxPingSway 10s ease-in-out infinite alternate;
+}
+
+.avx-hfx-ping .avx-core {
+  inset: 12%;
+  width: 76%;
+  height: 76%;
+  opacity: 1;
+  filter: invert(1) hue-rotate(180deg) saturate(2.2) contrast(1.35) brightness(1.05);
+  animation: avxSpinZ 30s linear infinite;
+}
+
+.avx-echo {
+  position: absolute;
+  inset: 22%;
+  border: 3px solid rgba(65, 118, 163, .9);
+  border-radius: 50%;
+  animation: avxEcho 3.6s cubic-bezier(.2, .6, .3, 1) infinite;
+}
+
+.avx-echo:nth-of-type(2) { animation-delay: 1.2s; border-color: rgba(40, 170, 200, .9); }
+.avx-echo:nth-of-type(3) { animation-delay: 2.4s; border-color: rgba(108, 176, 61, .9); }
+
+@keyframes avxPingSway {
+  from { transform: rotateX(28deg) rotateY(-18deg); }
+  to { transform: rotateX(48deg) rotateY(16deg); }
+}
+
+@keyframes avxEcho {
+  from { transform: translateZ(0) scale(.45); opacity: .95; }
+  to { transform: translateZ(70px) scale(1.55); opacity: 0; }
+}
+
+@keyframes avxSpinZ {
+  to { transform: rotateZ(360deg); }
+}
+
+/* Power Dialer — rotary dial: turns in steps, rings at each stop */
+.avx-hfx-dialer .avx-hfx-anim {
+  animation: avxDialTilt 9s ease-in-out infinite alternate;
+}
+
+.avx-hfx-dialer .avx-core {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  filter: saturate(1.3) contrast(1.1);
+  animation: avxDial 6s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+
+.avx-dial-face {
+  position: absolute;
+  inset: 19%;
+  border: 3px solid rgba(65, 118, 163, .55);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 10px rgba(65, 118, 163, .08), 0 0 24px rgba(255, 106, 0, .25);
+}
+
+.avx-dial-hole {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid rgba(65, 118, 163, .6);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .5);
+  transform: rotateZ(var(--a)) translateY(-88px);
+}
+
+.avx-dial-holes {
+  position: absolute;
+  inset: 0;
+  animation: avxDial 6s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+
+.avx-dial-stop {
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  transform: rotateZ(42deg) translateY(-124px) rotateZ(-42deg) translateZ(14px);
+  filter: drop-shadow(0 4px 10px rgba(108, 176, 61, .5));
+}
+
+.avx-dial-ring {
+  position: absolute;
+  inset: 30%;
+  border: 3px solid rgba(108, 176, 61, .85);
+  border-radius: 50%;
+  opacity: 0;
+  animation: avxDialRing 2s ease-out infinite;
+}
+
+@keyframes avxDialTilt {
+  from { transform: rotateX(34deg) rotateY(-12deg); }
+  to { transform: rotateX(22deg) rotateY(12deg); }
+}
+
+/* three turns with a pause after each — the ring pulse fires on every pause */
+@keyframes avxDial {
+  0% { transform: rotateZ(0deg); }
+  22%, 33.3% { transform: rotateZ(120deg); }
+  55%, 66.6% { transform: rotateZ(240deg); }
+  89%, 100% { transform: rotateZ(360deg); }
+}
+
+@keyframes avxDialRing {
+  0%, 60% { transform: translateZ(0) scale(.6); opacity: 0; }
+  66% { opacity: 1; }
+  100% { transform: translateZ(60px) scale(1.5); opacity: 0; }
+}
+
+/* Call Tracking — voice waveform swinging in 3D */
+.avx-hfx-tracking .avx-hfx-anim {
+  animation: avxWaveSwing 8s ease-in-out infinite alternate;
+}
+
+.avx-hfx-tracking img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent 100%);
+  animation: avxAudio 1.4s ease-in-out infinite alternate;
+}
+
+.avx-hfx-tracking .avx-core {
+  opacity: .9;
+  filter: invert(1) hue-rotate(180deg) saturate(2) contrast(1.4) brightness(1.05);
+}
+
+.avx-hfx-tracking .avx-echo-wave {
+  opacity: .4;
+  transform: translateZ(-90px) scaleX(-1.15);
+  animation: avxAudioBack 1.9s ease-in-out infinite alternate;
+}
+
+@keyframes avxWaveSwing {
+  from { transform: rotateX(14deg) rotateY(-30deg); }
+  to { transform: rotateX(4deg) rotateY(30deg); }
+}
+
+@keyframes avxAudio {
+  from { scale: 1 .78; }
+  to { scale: 1 1.18; }
+}
+
+@keyframes avxAudioBack {
+  from { scale: 1 1.15; }
+  to { scale: 1 .8; }
+}
+
+/* Lead Automation — sphere "leads" travelling a 3D orbit */
+.avx-hfx-automation .avx-hfx-anim {
+  animation: avxOrbitTilt 11s ease-in-out infinite alternate;
+}
+
+.avx-loop {
+  position: absolute;
+  inset: 0;
+  border: 3px dashed rgba(108, 176, 61, .75);
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  animation: avxSpinZ 16s linear infinite;
+}
+
+.avx-slot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateZ(var(--a)) translateY(calc(var(--r) * -1));
+}
+
+.avx-slot img {
+  top: -20px;
+  left: -20px;
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 6px 10px rgba(20, 32, 51, .25));
+  animation: avxFace 16s linear infinite;
+}
+
+@keyframes avxOrbitTilt {
+  from { transform: rotateX(66deg) rotateY(-8deg); }
+  to { transform: rotateX(56deg) rotateY(8deg); }
+}
+
+/* counter-rotate so each sphere keeps facing the viewer */
+@keyframes avxFace {
+  from { transform: rotateZ(calc(var(--a) * -1)) rotateX(-62deg); }
+  to { transform: rotateZ(calc(var(--a) * -1 - 360deg)) rotateX(-62deg); }
+}
+
+/* Agent Control Center — gyroscope of rings around a core */
+.avx-gyro {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.avx-gyro img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .9;
+  filter: invert(1) hue-rotate(180deg) saturate(2) contrast(1.4) brightness(1.05);
+}
+
+.avx-gyro-1 { inset: 0; animation: avxGyroX 12s linear infinite; }
+.avx-gyro-2 { inset: 12%; animation: avxGyroY 9s linear infinite; }
+.avx-gyro-3 { inset: 24%; animation: avxGyroZ 7s linear infinite; }
+
+.avx-hfx-gyro .avx-gyro-core {
+  top: 50%;
+  left: 50%;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  opacity: .9;
+  animation: avxOrbPulse 3s ease-in-out infinite;
+}
+
+[data-bs-theme="dark"] .avx-hfx-gyro .avx-gyro-core {
+  opacity: 1;
+}
+
+@keyframes avxGyroX {
+  from { transform: rotateX(70deg) rotateZ(0deg); }
+  to { transform: rotateX(70deg) rotateZ(360deg); }
+}
+
+@keyframes avxGyroY {
+  from { transform: rotateY(0deg) rotateX(20deg); }
+  to { transform: rotateY(360deg) rotateX(20deg); }
+}
+
+@keyframes avxGyroZ {
+  from { transform: rotateX(-40deg) rotateY(50deg) rotateZ(0deg); }
+  to { transform: rotateX(-40deg) rotateY(50deg) rotateZ(-360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-hfx * {
+    animation: none !important;
+  }
+}
+
+/* ---------- Bottom-of-page 3D wave floors (one style per page) ---------- */
+
+.avx-bwaves-host {
+  padding-bottom: 210px !important;
+}
+
+.avx-bwaves {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  height: 340px;
+  pointer-events: none;
+  perspective: 700px;
+  perspective-origin: 50% 0%;
+  mix-blend-mode: multiply;
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent),
+    linear-gradient(180deg, transparent, #000 30%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent),
+    linear-gradient(180deg, transparent, #000 30%);
+  mask-composite: intersect;
+}
+
+.avx-bwaves-plane {
+  position: absolute;
+  inset: 0 -10%;
+  transform-style: preserve-3d;
+  transform:
+    rotateX(calc(var(--tilt, 52deg) + var(--avx-hy, 0) * 10deg + var(--avx-sp, 0) * 10deg))
+    rotateY(calc(var(--avx-hx, 0) * 8deg));
+  transform-origin: 50% 100%;
+}
+
+.avx-bw-layer {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: translate3d(0, var(--y, 0px), var(--z, 0px));
+  animation: avxSwell var(--swell, 6s) ease-in-out infinite alternate;
+}
+
+.avx-bw-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: var(--src);
+  background-repeat: no-repeat;
+  opacity: var(--alpha, .9);
+}
+
+.avx-bw-mirror {
+  transform: scaleX(-1);
+}
+
+/* tile: seamless horizontal flow */
+.avx-bw-tile {
+  width: 200%;
+  background-repeat: repeat-x;
+  background-position: 0 50%;
+  background-size: 50% 100%;
+  animation: avxFlow var(--speed, 40s) linear infinite;
+}
+
+.avx-bw-reverse {
+  animation-direction: reverse;
+}
+
+/* drift: large artwork sliding back and forth */
+.avx-bw-drift {
+  left: -8%;
+  width: 116%;
+  background-size: cover;
+  background-position: 50% var(--pos, 60%);
+  animation: avxDrift var(--speed, 18s) ease-in-out infinite alternate;
+}
+
+/* zoom: a floor rushing toward the viewer, two copies offset for a seamless loop */
+.avx-bw-zoom {
+  background-size: cover;
+  background-position: 50% 100%;
+  transform-origin: 50% 40%;
+  animation: avxZoom var(--speed, 8s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.avx-bw-strands {
+  filter: saturate(1.8) brightness(.72) hue-rotate(12deg);
+}
+
+.avx-bw-strands.avx-bw-green {
+  filter: saturate(1.6) brightness(.85) hue-rotate(-60deg);
+}
+
+.avx-bw-inv {
+  filter: invert(1) hue-rotate(180deg) saturate(1.8) contrast(1.3);
+}
+
+/* the grid artwork is very low-contrast; pull its faint lines apart from the background */
+.avx-bw-inv-strong {
+  filter: invert(1) hue-rotate(180deg) brightness(.62) contrast(6) saturate(2);
+}
+
+[data-bs-theme="dark"] .avx-bwaves {
+  mix-blend-mode: screen;
+}
+
+[data-bs-theme="dark"] .avx-bw-strands,
+[data-bs-theme="dark"] .avx-bw-inv,
+[data-bs-theme="dark"] .avx-bw-inv-strong {
+  filter: none;
+}
+
+[data-bs-theme="dark"] .avx-bw-strands.avx-bw-green {
+  filter: hue-rotate(-60deg);
+}
+
+@keyframes avxFlow {
+  from { translate: 0 0; }
+  to { translate: -50% 0; }
+}
+
+@keyframes avxDrift {
+  from { translate: -5% 0; }
+  to { translate: 5% 0; }
+}
+
+@keyframes avxZoom {
+  0% { scale: 1; opacity: 0; }
+  20% { opacity: var(--alpha, .9); }
+  80% { opacity: var(--alpha, .9); }
+  100% { scale: 1.6; opacity: 0; }
+}
+
+@keyframes avxSwell {
+  from { scale: 1 .75; }
+  to { scale: 1 1.3; }
+}
+
+.avx-bw-noswell {
+  animation: none;
+}
+
+@media (max-width: 767.98px) {
+  .avx-bwaves-host {
+    padding-bottom: 150px !important;
+  }
+
+  .avx-bwaves {
+    height: 240px;
+  }
+}
+
+/* ---------- Section backgrounds ---------- */
+
+.avx-sbg {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+[data-bs-theme="dark"] .avx-sbg {
+  mix-blend-mode: screen;
+}
+
+/* page-hero titles: tilted portal rings, like the landing page hero */
+.avx-h1wrap {
+  position: relative;
+}
+
+.avx-h1wrap > h1 {
+  position: relative;
+  z-index: 1;
+}
+
+.avx-sbg-rings {
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: min(620px, 130vw);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  perspective: 1000px;
+}
+
+.avx-sbg-rings-tilt {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: avxPortalTilt 14s ease-in-out infinite alternate;
+}
+
+.avx-sbg-rings img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  opacity: .5;
+  filter: invert(1) hue-rotate(180deg) saturate(1.8) brightness(1.06);
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 52%, transparent 96%);
+  mask-image: radial-gradient(circle closest-side, #000 52%, transparent 96%);
+  animation: avxSpinZ 40s linear infinite;
+}
+
+[data-bs-theme="dark"] .avx-sbg-rings img {
+  filter: none;
+  opacity: .8;
+}
+
+@keyframes avxPortalTilt {
+  from { transform: rotateX(62deg) rotateY(-10deg); }
+  to { transform: rotateX(48deg) rotateY(10deg); }
+}
+
+/* "How It Works" boxes: grid floor moving forward */
+.avx-sbg-host {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.avx-sbg-floor {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 70%;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 45%);
+  mask-image: linear-gradient(180deg, transparent, #000 45%);
+}
+
+.avx-sbg-floor .avx-bw-img {
+  --alpha: .4;
+}
+
+/* integration logos: slowly turning glow orb */
+.avx-sbg-orb {
+  top: 50%;
+  left: 50%;
+  width: min(760px, 120vw);
+  aspect-ratio: 1266 / 1084;
+  transform: translate(-50%, -50%);
+  perspective: 1000px;
+}
+
+.avx-sbg-orb img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  opacity: .35;
+  filter: invert(1) hue-rotate(180deg) saturate(1.6);
+  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 50%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side, #000 50%, transparent 100%);
+  animation: avxOrbTurn 26s ease-in-out infinite alternate;
+}
+
+[data-bs-theme="dark"] .avx-sbg-orb img {
+  filter: none;
+  opacity: .5;
+}
+
+@keyframes avxOrbTurn {
+  from { transform: rotateX(18deg) rotateY(-24deg) rotateZ(0deg) scale(.95); }
+  to { transform: rotateX(-12deg) rotateY(24deg) rotateZ(40deg) scale(1.05); }
+}
+
+/* card grids / pricing: dot-matrix floor */
+.avx-sbg-dots {
+  right: -20%;
+  bottom: 0;
+  left: -20%;
+  height: 420px;
+  perspective: 600px;
+  perspective-origin: 50% 0%;
+  -webkit-mask-image: radial-gradient(ellipse 60% 90% at 50% 100%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 90% at 50% 100%, #000 30%, transparent 75%);
+}
+
+.avx-sbg-dots-plane {
+  position: absolute;
+  inset: -40% 0 0;
+  background:
+    radial-gradient(circle, rgba(65, 118, 163, .55) 1.6px, transparent 2.2px) 0 0 / 30px 30px,
+    radial-gradient(circle, rgba(108, 176, 61, .55) 1.6px, transparent 2.2px) 15px 15px / 30px 30px;
+  opacity: .9;
+  transform: rotateX(62deg);
+  transform-origin: 50% 100%;
+  animation: avxDots 6s linear infinite;
+}
+
+@keyframes avxDots {
+  to { background-position: 0 30px, 15px 45px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-bw-layer,
+  .avx-bw-img,
+  .avx-sbg *,
+  .avx-sbg-dots-plane {
+    animation: none !important;
+  }
+}
+
+/* ---------- Count-up stats + button shine ---------- */
+
+.avx-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-td-green,
+.btn-outline-td-green {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-td-green::after,
+.btn-outline-td-green::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .45), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+
+.btn-td-green:hover::after,
+.btn-outline-td-green:hover::after {
+  left: 130%;
+  transition: left .7s ease;
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  main,
+  .avx-float img,
+  .avx-waves,
+  .avx-orb,
+  .avx-orbit,
+  .avx-sat,
+  .avx-flow3d .hero-simple-arrow-dot {
+    animation: none !important;
+  }
+
+  .avx-reveal:not(.avx-in) {
+    opacity: 1;
+    transform: none;
+  }
+}
