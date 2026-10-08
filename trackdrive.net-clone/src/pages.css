@@ -294,7 +294,7 @@ h3,
   opacity: 0.85;
   animation: beam-pulse 2s infinite alternate;
 }
-.intelligence-intro .scene3d { margin-top: 24px; min-height: 300px; }
+.intelligence-intro .scene3d { margin-top: 80px; min-height: 380px; }
 
 @keyframes cube-spin { 
   0% { transform: rotateX(-20deg) rotateY(0deg); } 
