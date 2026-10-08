@@ -4,6 +4,7 @@ import { ArrowIcon, BrandMark, MenuIcon } from './icons.jsx'
 
 const navItems = [
   ['Platform', '/platform'],
+  ['Features', '/features'],
   ['Solutions', '/solutions'],
   ['Pricing', '/pricing'],
   ['Integrations', '/integrations'],
@@ -15,6 +16,7 @@ const footerColumns = [
     title: 'Product',
     links: [
       ['Platform', '/platform'],
+      ['Features', '/features'],
       ['Solutions', '/solutions'],
       ['Pricing', '/pricing'],
       ['Integrations', '/integrations'],
