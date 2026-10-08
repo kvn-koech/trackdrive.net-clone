@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import Home from './pages/Home.jsx'
 import Platform from './pages/Platform.jsx'
+import Features from './pages/Features.jsx'
 import Solutions from './pages/Solutions.jsx'
 import Pricing from './pages/Pricing.jsx'
 import Integrations from './pages/Integrations.jsx'
@@ -20,6 +21,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="platform" element={<Platform />} />
+        <Route path="features" element={<Features />} />
         <Route path="solutions" element={<Solutions />} />
         <Route path="pricing" element={<Pricing />} />
         <Route path="integrations" element={<Integrations />} />
