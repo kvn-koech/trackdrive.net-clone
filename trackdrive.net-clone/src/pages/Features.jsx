@@ -1,4 +1,4 @@
-import { PageHero } from '../components/Scene3D.jsx'
+import PageHero from '../components/PageHero.jsx'
 import { ArrowIcon } from '../components/icons.jsx'
 import { Link } from 'react-router-dom'
 
