@@ -9,14 +9,33 @@
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
+  var BAKED = '/assets/avx-baked/';
+  var DARK = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+  // colored spheres that have a pre-tinted blue twin in /assets/avx-baked
+  var BLUE_TWIN = /^(green-sphere-120|orange_sphere-120|pink-sphere-120|purple-sphere-120|icon-sphere--green|icon-sphere--pink|icon-sphere--orange)\.png$/;
+
   function img(name, className) {
     var el = document.createElement('img');
-    el.src = ASSETS + name;
+    var twin = BLUE_TWIN.test(name) && !/avx-keep/.test(className || '');
+    el.src = twin ? BAKED + name.replace('.png', '-b.png') : ASSETS + name;
     el.alt = '';
     el.decoding = 'async';
     if (className) el.className = className;
     // colored spheres are tinted to the hero blue, unless marked avx-keep
-    if (/sphere/.test(name) && !/blue/.test(name) && !/avx-keep/.test(className || '')) el.classList.add('avx-tint');
+    return el;
+  }
+
+  // theme-matched pre-rendered art: <base>-l.png (light) or <base>-d.png (dark)
+  function baked(base, className) {
+    return bakedFile(base + (DARK ? '-d' : '-l') + '.png', className);
+  }
+
+  function bakedFile(file, className) {
+    var el = document.createElement('img');
+    el.src = BAKED + file;
+    el.alt = '';
+    el.decoding = 'async';
+    if (className) el.className = className;
     return el;
   }
 
@@ -37,15 +56,20 @@
     bar.className = 'avx-progress';
     bar.setAttribute('aria-hidden', 'true');
     document.body.appendChild(bar);
-    var ticking = false;
+    if (window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()')) return; // runs in CSS
+    var max = 1, ticking = false;
+    function measure() { max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight); }
     function update() {
-      var max = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(window.scrollY / max, 1) : 0).toFixed(4) + ')';
+      bar.style.transform = 'scaleX(' + Math.min(window.scrollY / max, 1).toFixed(4) + ')';
       ticking = false;
     }
     window.addEventListener('scroll', function () {
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
     }, { passive: true });
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
+    if ('ResizeObserver' in window) new ResizeObserver(measure).observe(document.body);
+    measure();
     update();
   }
 
@@ -139,11 +163,11 @@
       wrap.style.setProperty('--spin', s.spin || '40s');
       wrap.style.setProperty('--delay', s.delay || '0s');
       if (s.alpha) wrap.style.setProperty('--alpha', s.alpha);
-      wrap.appendChild(img(s.src));
+      wrap.appendChild(s.baked ? bakedFile(s.baked) : img(s.src));
       fx.appendChild(wrap);
     });
     host.insertBefore(fx, host.firstChild);
-    if (!reduced) parallax(host);
+    if (!reduced) parallax(host, fx);
     return fx;
   }
 
@@ -157,37 +181,79 @@
   }
 
   // Eases pointer position and reports it with the host's scroll position.
-  // Frames run only while something is moving, so idle pages cost nothing.
+  // All drivers share one rAF: every position is read first, then all styles are
+  // written, so a frame never interleaves reads and writes (no layout thrashing).
+  // Frames run only while something is moving.
+  var drivers = [], driverRaf = 0;
+
+  function scheduleDrivers() {
+    if (!driverRaf) driverRaf = requestAnimationFrame(runDrivers);
+  }
+
+  function runDrivers() {
+    driverRaf = 0;
+    var active = drivers.filter(function (d) { return d.visible && d.dirty; });
+    var y = window.scrollY;
+    active.forEach(function (d) {          // read phase: cached geometry, no layout reads
+      d.dirty = false;
+      d.px += (d.tx - d.px) * d.ease;
+      d.py += (d.ty - d.py) * d.ease;
+      d.rect = d.pointerOnly ? null
+        : { top: d.docTop - y, bottom: d.docTop + d.height - y, height: d.height };
+    });
+    active.forEach(function (d) {          // write phase
+      d.onFrame(d.px, d.py, d.rect);
+      if (Math.abs(d.tx - d.px) > 0.001 || Math.abs(d.ty - d.py) > 0.001) d.dirty = true;
+    });
+    if (drivers.some(function (d) { return d.visible && d.dirty; })) scheduleDrivers();
+  }
+
+  // section geometry is measured once (and on resize), never during scroll frames
+  function measureDriver(d) {
+    var r = d.host.getBoundingClientRect();
+    d.docTop = r.top + window.scrollY;
+    d.height = r.height;
+  }
+
+  function measureDrivers() {
+    drivers.forEach(measureDriver);
+    drivers.forEach(function (d) { d.dirty = true; });
+    scheduleDrivers();
+  }
+
+  window.addEventListener('resize', measureDrivers);
+  window.addEventListener('load', measureDrivers);
+  if ('ResizeObserver' in window) {
+    var resizeTimer = 0;
+    new ResizeObserver(function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(measureDrivers, 120);
+    }).observe(document.documentElement);
+  }
+
   function driver(host, ease, onFrame, pointerOnly) {
-    var px = 0, py = 0, tx = 0, ty = 0, visible = false, raf = 0;
-    function frame() {
-      raf = 0;
-      px += (tx - px) * ease;
-      py += (ty - py) * ease;
-      onFrame(px, py, host.getBoundingClientRect());
-      if (Math.abs(tx - px) > 0.001 || Math.abs(ty - py) > 0.001) kick();
-    }
-    function kick() {
-      if (!raf && visible) raf = requestAnimationFrame(frame);
-    }
+    var d = { host: host, ease: ease, onFrame: onFrame, pointerOnly: !!pointerOnly,
+      px: 0, py: 0, tx: 0, ty: 0, visible: false, dirty: false, rect: null, docTop: 0, height: 0 };
+    drivers.push(d);
+    measureDriver(d);
     if (finePointer) {
       host.addEventListener('pointermove', function (e) {
         var r = host.getBoundingClientRect();
-        tx = (e.clientX - r.left) / r.width - 0.5;
-        ty = (e.clientY - r.top) / r.height - 0.5;
-        kick();
+        d.tx = (e.clientX - r.left) / r.width - 0.5;
+        d.ty = (e.clientY - r.top) / r.height - 0.5;
+        d.dirty = true;
+        scheduleDrivers();
       });
-      host.addEventListener('pointerleave', function () { tx = 0; ty = 0; kick(); });
+      host.addEventListener('pointerleave', function () { d.tx = 0; d.ty = 0; d.dirty = true; scheduleDrivers(); });
     }
-    if (!pointerOnly) window.addEventListener('scroll', kick, { passive: true });
-    onVisible(host, function () { visible = true; kick(); }, function () { visible = false; }, 0);
+    onVisible(host, function () { measureDriver(d); d.visible = true; d.dirty = true; scheduleDrivers(); },
+      function () { d.visible = false; }, 0);
   }
 
-  function parallax(host) {
+  function parallax(host, target) {
     driver(host, 0.08, function (px, py, r) {
-      setVar(host, '--avx-px', (px * 24).toFixed(2));
-      setVar(host, '--avx-py', (py * 24).toFixed(2));
-      setVar(host, '--avx-scroll', Math.max(-600, Math.min(600, -r.top)).toFixed(0));
+      setVar(target, '--avx-px', (px * 24).toFixed(2));
+      setVar(target, '--avx-py', (py * 24).toFixed(2));
     });
   }
 
@@ -209,7 +275,7 @@
         { src: 'blue-sphere-120.png', top: '18%', left: '8%', size: 70, depth: 1.4, alpha: .8 },
         { src: 'icon-sphere--green.png', bottom: '12%', right: '9%', size: 90, depth: 2, delay: '-4s', alpha: .85 }
       ]);
-      fx.insertBefore(img('green-waves.png', 'avx-waves'), fx.firstChild);
+      fx.insertBefore(bakedFile('cta-glow.png', 'avx-waves'), fx.firstChild);
     });
   }
 
@@ -243,42 +309,29 @@
       var section = flowWrap.closest('section');
       if (section) {
         addFloats(section, [
-          { src: 'blue-sphere-312.png', top: '4%', left: '-6%', size: 360, depth: 1.2, soft: true, bob: '14s', spin: '90s' },
-          { src: 'green-sphere-312.png', bottom: '-12%', right: '-5%', size: 320, depth: 1.8, soft: true, bob: '12s', spin: '80s', delay: '-6s' }
+          { baked: 'blue-sphere-soft.png', top: '4%', left: '-6%', size: 360, depth: 1.2, bob: '14s', spin: '90s' },
+          { baked: 'green-sphere-soft-b.png', bottom: '-12%', right: '-5%', size: 320, depth: 1.8, bob: '12s', spin: '80s', delay: '-6s' }
         ], 'avx-convert-bg');
       }
 
-      if (reduced) { flowWrap.classList.add('avx-seen'); return; }
+      // tilt wrapper: the entrance and pointer tilt live here (updated only while the
+      // pointer moves); the idle sway is a pure CSS animation on the flow itself
+      var tilt = document.createElement('div');
+      tilt.className = 'avx-flow-tilt';
+      flow.parentNode.insertBefore(tilt, flow);
+      tilt.appendChild(flow);
 
-      // entrance + idle sway + pointer tilt, driven per frame while visible
-      var visible = false, running = false, start = 0;
-      var px = 0, py = 0, tx = 0, ty = 0;
-      function ease(t) { return 1 - Math.pow(1 - t, 3); }
-      function frame(now) {
-        if (!start) start = now;
-        var e = ease(Math.min((now - start) / 1400, 1));
-        px += (tx - px) * 0.06;
-        py += (ty - py) * 0.06;
-        var rx = (1 - e) * 50 + 6 + py * 8;
-        var ry = Math.sin(now / 2600) * 6 + px * 14;
-        flow.style.transform =
-          'translate3d(0,' + ((1 - e) * 60).toFixed(1) + 'px,' + ((1 - e) * -160).toFixed(1) + 'px) ' +
-          'rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
-        if (visible) requestAnimationFrame(frame); else running = false;
-      }
-      if (finePointer) {
-        flowWrap.addEventListener('pointermove', function (ev) {
-          var r = flowWrap.getBoundingClientRect();
-          tx = (ev.clientX - r.left) / r.width - 0.5;
-          ty = (ev.clientY - r.top) / r.height - 0.5;
-        });
-        flowWrap.addEventListener('pointerleave', function () { tx = 0; ty = 0; });
-      }
+      if (reduced) { flowWrap.classList.add('avx-seen', 'avx-settled'); return; }
+
+      driver(flowWrap, 0.06, function (hx, hy) {
+        setVar(tilt, '--avx-hx', hx.toFixed(3));
+        setVar(tilt, '--avx-hy', hy.toFixed(3));
+      }, true);
       onVisible(flowWrap, function () {
+        if (flowWrap.classList.contains('avx-seen')) return;
         flowWrap.classList.add('avx-seen');
-        visible = true;
-        if (!running) { running = true; requestAnimationFrame(frame); }
-      }, function () { visible = false; }, 0.2);
+        setTimeout(function () { flowWrap.classList.add('avx-settled'); }, 1500);
+      }, null, 0.2);
     });
   }
 
@@ -299,10 +352,10 @@
     function div(cls) { var d = document.createElement('div'); d.className = cls; return d; }
 
     if (type === 'ping') {
-      add(img('pt-hero-shine.png', 'avx-core avx-inv avx-round-mask'));
+      add(baked('shine', 'avx-core'));
       for (var i = 0; i < 3; i++) add(div('avx-echo'));
     } else if (type === 'dialer') {
-      add(img('platform-bg.png', 'avx-core avx-teeth-mask'));
+      add(baked('dial', 'avx-core'));
       add(div('avx-dial-face'));
       var holes = add(div('avx-dial-holes'));
       for (var k = 0; k < 10; k++) {
@@ -313,8 +366,8 @@
       add(img('green-sphere-120.png', 'avx-dial-stop'));
       add(div('avx-dial-ring'));
     } else if (type === 'tracking') {
-      add(img('waves-ping-tree.png', 'avx-echo-wave avx-inv'));
-      add(img('waves-ping-tree.png', 'avx-core avx-inv'));
+      add(baked('voice', 'avx-echo-wave'));
+      add(baked('voice', 'avx-core'));
     } else if (type === 'automation') {
       var loop = add(div('avx-loop'));
       ['blue-sphere-120.png', 'green-sphere-120.png', 'orange_sphere-120.png', 'pink-sphere-120.png', 'purple-sphere-120.png']
@@ -328,7 +381,7 @@
     } else if (type === 'gyro') {
       [1, 2, 3].forEach(function (n) {
         var g = add(div('avx-gyro avx-gyro-' + n));
-        g.appendChild(img('pt-hero-rings.png', 'avx-inv avx-round-mask'));
+        g.appendChild(baked('gyro'));
       });
       add(img('blue-sphere-120.png', 'avx-gyro-core'));
     }
@@ -359,10 +412,8 @@
 
       // pointer + scroll make the scene react in 3D while it is on screen
       driver(section, 0.07, function (hx, hy, r) {
-        var sp = Math.max(-1, Math.min(1, (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight));
         setVar(fx, '--avx-hx', hx.toFixed(3));
         setVar(fx, '--avx-hy', hy.toFixed(3));
-        setVar(fx, '--avx-sp', sp.toFixed(2));
       });
     });
   }
@@ -372,35 +423,35 @@
   // layer: [image, mode (tile|drift|zoom), extra classes, {alpha, speed, swell, y, z, pos, delay}]
   var WAVE_STYLES = {
     strands: { tilt: '52deg', layers: [
-      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands', { alpha: .45, speed: '70s', swell: '7s', y: '-40px', z: '-120px' }],
-      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands avx-bw-green avx-bw-reverse avx-bw-mirror', { alpha: .7, speed: '52s', swell: '5.5s' }],
-      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands', { alpha: .95, speed: '34s', swell: '4.5s', y: '50px', z: '80px' }]
+      ['strands', 'tile', '', { alpha: .45, speed: '70s', swell: '7s', y: '-40px', z: '-120px' }],
+      ['strands2', 'tile', 'avx-bw-reverse avx-bw-mirror', { alpha: .7, speed: '52s', swell: '5.5s' }],
+      ['strands', 'tile', '', { alpha: .95, speed: '34s', swell: '4.5s', y: '50px', z: '80px' }]
     ] },
     ribbons: { tilt: '38deg', layers: [
-      ['bg-waves-1920%20copy.png', 'drift', 'avx-bw-inv avx-bw-mirror', { alpha: .35, speed: '22s', swell: '9s', y: '-30px', z: '-140px', pos: '55%' }],
-      ['bg-waves-1920%20copy.png', 'drift', 'avx-bw-inv', { alpha: .6, speed: '16s', swell: '6s', pos: '62%' }]
+      ['ribbons', 'drift', 'avx-bw-mirror', { alpha: .35, speed: '22s', swell: '9s', y: '-30px', z: '-140px', pos: '55%' }],
+      ['ribbons', 'drift', '', { alpha: .6, speed: '16s', swell: '6s', pos: '62%' }]
     ] },
     mesh: { tilt: '48deg', layers: [
-      ['slider-bg-ping-tree.png', 'drift', 'avx-bw-inv', { alpha: .85, speed: '20s', swell: '7s', pos: '70%' }]
+      ['mesh', 'drift', '', { alpha: .85, speed: '20s', swell: '7s', pos: '70%' }]
     ] },
     grid: { tilt: '66deg', layers: [
       [null, 'grid', '', { alpha: .9 }]
     ], noswell: true },
     // five stacked layers swelling in sequence: a rolling 3D tide
     tide: { tilt: '60deg', layers: [
-      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands', { alpha: .35, speed: '90s', swell: '5s', swellDelay: '0s', y: '-110px', z: '-320px' }],
-      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands avx-bw-green avx-bw-reverse avx-bw-mirror', { alpha: .5, speed: '70s', swell: '5s', swellDelay: '-1s', y: '-60px', z: '-200px' }],
-      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands', { alpha: .65, speed: '55s', swell: '5s', swellDelay: '-2s', y: '-10px', z: '-90px' }],
-      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands avx-bw-green avx-bw-mirror', { alpha: .8, speed: '42s', swell: '5s', swellDelay: '-3s', y: '40px', z: '10px' }],
-      ['waves-slider-blue-4374.png', 'tile', 'avx-bw-strands avx-bw-reverse', { alpha: .95, speed: '32s', swell: '5s', swellDelay: '-4s', y: '90px', z: '110px' }]
+      ['strands', 'tile', '', { alpha: .35, speed: '90s', swell: '5s', swellDelay: '0s', y: '-110px', z: '-320px' }],
+      ['strands2', 'tile', 'avx-bw-reverse avx-bw-mirror', { alpha: .5, speed: '70s', swell: '5s', swellDelay: '-1s', y: '-60px', z: '-200px' }],
+      ['strands', 'tile', '', { alpha: .65, speed: '55s', swell: '5s', swellDelay: '-2s', y: '-10px', z: '-90px' }],
+      ['strands2', 'tile', 'avx-bw-mirror', { alpha: .8, speed: '42s', swell: '5s', swellDelay: '-3s', y: '40px', z: '10px' }],
+      ['strands', 'tile', 'avx-bw-reverse', { alpha: .95, speed: '32s', swell: '5s', swellDelay: '-4s', y: '90px', z: '110px' }]
     ] },
     signal: { tilt: '42deg', layers: [
-      ['waves-ping-tree.png', 'tile', 'avx-bw-inv avx-bw-mirror avx-bw-reverse', { alpha: .35, speed: '60s', swell: '1.9s', y: '-30px', z: '-110px' }],
-      ['waves-ping-tree.png', 'tile', 'avx-bw-inv', { alpha: .85, speed: '40s', swell: '1.3s' }]
+      ['signal', 'tile', 'avx-bw-mirror avx-bw-reverse', { alpha: .35, speed: '60s', swell: '1.9s', y: '-30px', z: '-110px' }],
+      ['signal', 'tile', '', { alpha: .85, speed: '40s', swell: '1.3s' }]
     ] },
     streak: { tilt: '46deg', layers: [
-      ['trading-waves--bottom-1700.png', 'drift', 'avx-bw-inv avx-bw-mirror', { alpha: .5, speed: '20s', swell: '8s', y: '-30px', z: '-120px', pos: '70%' }],
-      ['trading-waves--top-1900.png', 'drift', 'avx-bw-inv', { alpha: .7, speed: '14s', swell: '6s', y: '30px', z: '60px', pos: '40%' }]
+      ['streak-bot', 'drift', 'avx-bw-mirror', { alpha: .5, speed: '20s', swell: '8s', y: '-30px', z: '-120px', pos: '70%' }],
+      ['streak-top', 'drift', '', { alpha: .7, speed: '14s', swell: '6s', y: '30px', z: '60px', pos: '40%' }]
     ] }
   };
 
@@ -438,7 +489,7 @@
       if (o.z) layer.style.setProperty('--z', o.z);
       var im = document.createElement('div');
       im.className = 'avx-bw-img avx-bw-' + l[1] + ' ' + l[2];
-      if (l[0]) im.style.setProperty('--src', 'url("' + ASSETS + l[0] + '")');
+      if (l[0]) im.style.setProperty('--src', 'url("' + BAKED + l[0] + (DARK ? '-d' : '-l') + '.png")');
       if (o.alpha) im.style.setProperty('--alpha', o.alpha);
       if (o.speed) im.style.setProperty('--speed', o.speed);
       if (o.pos) im.style.setProperty('--pos', o.pos);
@@ -454,10 +505,6 @@
     driver(host, 0.06, function (hx, hy, r) {
       setVar(target, '--avx-hx', hx.toFixed(3));
       setVar(target, '--avx-hy', hy.toFixed(3));
-      if (!pointerOnly) {
-        var sp = Math.max(-1, Math.min(1, (r.bottom - window.innerHeight) / window.innerHeight));
-        setVar(target, '--avx-sp', sp.toFixed(2));
-      }
     }, pointerOnly);
   }
 
@@ -483,8 +530,6 @@
     var plane = document.createElement('div');
     plane.className = 'avx-bwaves-plane';
     plane.style.setProperty('--tilt', style.tilt);
-    var needsBlend = style.layers.some(function (l) { return /avx-bw-inv/.test(l[2]); });
-    if (!needsBlend) waves.classList.add('avx-noblend');
     buildWaveLayers(style, plane);
     waves.appendChild(plane);
     host.appendChild(waves);
@@ -507,7 +552,7 @@
     tilt.className = 'avx-authring-tilt';
     var sway = document.createElement('div');
     sway.className = 'avx-authring-sway';
-    sway.appendChild(img('pt-hero-rings.png'));
+    sway.appendChild(baked('rings'));
     tilt.appendChild(sway);
     ring.appendChild(tilt);
     stage.insertBefore(ring, card);
@@ -581,14 +626,14 @@
     floor.className = 'avx-ibg-floor';
     var ribbon = document.createElement('div');
     ribbon.className = 'avx-ibg-ribbon';
-    ribbon.appendChild(document.createElement('div'));
+    ribbon.appendChild(baked('ribbons'));
     var grid = document.createElement('div');
     grid.className = 'avx-ibg-grid';
     floor.appendChild(grid);
     bg.appendChild(floor);
     bg.appendChild(ribbon);
-    bg.appendChild(img('blue-sphere-312.png', 'avx-ibg-glow avx-ibg-glow-1'));
-    bg.appendChild(img('icon-sphere--blue.png', 'avx-ibg-glow avx-ibg-glow-2'));
+    bg.appendChild(bakedFile('blue-sphere-soft.png', 'avx-ibg-glow avx-ibg-glow-1'));
+    bg.appendChild(bakedFile('icon-sphere-blue-soft.png', 'avx-ibg-glow avx-ibg-glow-2'));
     section.insertBefore(bg, section.firstChild);
     reactive(section, bg, true);
   }
@@ -611,7 +656,7 @@
       var rings = sbg('avx-sbg-rings');
       var tilt = document.createElement('div');
       tilt.className = 'avx-sbg-rings-tilt';
-      tilt.appendChild(img('pt-hero-rings.png'));
+      tilt.appendChild(baked('rings'));
       rings.appendChild(tilt);
       wrap.appendChild(rings);
       wrap.appendChild(h1);
@@ -633,7 +678,7 @@
       if (section.querySelectorAll('.integration-logo-card').length < 3) return;
       section.classList.add('avx-fx-host');
       var orb = sbg('avx-sbg-orb');
-      orb.appendChild(img('green-waves.png'));
+      orb.appendChild(baked('orb'));
       section.insertBefore(orb, section.firstChild);
     });
 
@@ -683,8 +728,13 @@
         var isArrow = /arrow/.test(item.className);
         var t = target(item);
         if (isArrow) {
-          t.classList.remove('avx-active');
-          void t.offsetWidth; // restart nudge animation
+          // Web Animations run on the compositor and restart without forcing a reflow
+          var down = !item.classList.contains('flow-arrow'); // only .flow-arrow points sideways
+          if (t.animate) {
+            t.animate([{ translate: '0 0', scale: '1' },
+              { translate: down ? '0 4px' : '4px 0', scale: '1.25' },
+              { translate: '0 0', scale: '1' }], { duration: 700, easing: 'ease' });
+          }
           t.classList.add('avx-active');
           setTimeout(function () { t.classList.remove('avx-active'); }, 700);
         } else {
@@ -727,8 +777,26 @@
     });
   }
 
+  // ---------- Pause animations in off-screen sections ----------
+
+  function initOffscreenPause() {
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { e.target.classList.toggle('avx-offscreen', !e.isIntersecting); });
+    }, { rootMargin: '200px 0px' });
+    topSections().concat(Array.prototype.slice.call(document.querySelectorAll('footer'))).forEach(function (sec) {
+      io.observe(sec);
+    });
+  }
+
+  function initHeroRings() {
+    var rings = document.querySelector('.hero-rings img');
+    if (rings) rings.src = BAKED + 'rings-' + (DARK ? 'd' : 'l') + '.png';
+  }
+
   function init() {
     initProgress();
+    initHeroRings();
     initLeadFlow();
     initHeadingFx();
     initBottomWaves();
@@ -740,6 +808,7 @@
     initHeroFx();
     initCtaFx();
     initCounters();
+    initOffscreenPause();
     if (!reduced) {
       initReveal();
       initTilt();

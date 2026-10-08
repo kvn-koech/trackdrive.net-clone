@@ -395,13 +395,22 @@ main a:not([class]):hover,
   color: var(--avx-primary-hover);
 }
 
-/* landing hero constellation: green network turned brand blue */
-.hero-constellation-bg .hero-home__bg img {
-  filter: hue-rotate(115deg) saturate(1.3);
-}
 
 /* card header icons (e.g. "More ways to win the call") are brand accents: blue */
 .card .card-body > .text-success:first-child,
 .card .card-body > .text-success:first-child i {
   color: var(--avx-primary) !important;
+}
+
+/* card actions (e.g. "Explore …" under "More ways to win the call") use the primary blue */
+.card .btn-outline-td-green {
+  color: var(--avx-primary);
+  border-color: var(--avx-primary);
+}
+
+.card .btn-outline-td-green:hover,
+.card .btn-outline-td-green:focus {
+  color: #fff;
+  background-color: var(--avx-primary);
+  border-color: var(--avx-primary);
 }
