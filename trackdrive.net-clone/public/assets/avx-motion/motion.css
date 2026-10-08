@@ -10,7 +10,7 @@
   --avx-hero-blue: #1ea0e8;
   --avx-blue-inv: invert(1) grayscale(1) brightness(1.1) sepia(1) hue-rotate(172deg) saturate(5) contrast(1.1) brightness(1.04);
   --avx-blue-tint: grayscale(1) sepia(1) saturate(6) hue-rotate(175deg) brightness(1.05);
-  --avx-green: #16a34a;
+  --avx-green: #3b82f6;
   --avx-active: #2563eb;
   --avx-blue: #4176a3;
 }

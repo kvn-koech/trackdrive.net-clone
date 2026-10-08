@@ -2,7 +2,7 @@
  * Avortyx color theme — loaded on every page after the site stylesheet.
  *   Backgrounds: clean bright white, subtle off-white/gray card surfaces
  *   Primary:     royal blue — buttons, active states, key headlines, brand accents
- *   Accent:      crisp green — badges, status pills, success highlights, secondary tags
+ *   Accent:      blue as well — badges, status pills, success highlights, secondary tags
  *   Text:        dark slate
  */
 
@@ -14,9 +14,9 @@
   --avx-primary-soft: rgba(37, 99, 235, .14);
   --avx-headline: #1d4ed8;
 
-  --avx-accent: #16a34a;
-  --avx-accent-hover: #15803d;
-  --avx-accent-tint: #dcfce7;
+  --avx-accent: #2563eb;
+  --avx-accent-hover: #1d4ed8;
+  --avx-accent-tint: #dbeafe;
 
   --avx-ink: #0f172a;
   --avx-text: #1e293b;
@@ -31,11 +31,20 @@
   --bs-link-color-rgb: 37, 99, 235;
   --bs-link-hover-color: #1d4ed8;
   --bs-link-hover-color-rgb: 29, 78, 216;
-  --bs-success: #16a34a;
-  --bs-success-rgb: 22, 163, 74;
-  --bs-green: #16a34a;
-  --bs-form-valid-color: #16a34a;
-  --bs-form-valid-border-color: #16a34a;
+  --bs-success: #2563eb;
+  --bs-success-rgb: 37, 99, 235;
+  --bs-green: #2563eb;
+  --bs-form-valid-color: #2563eb;
+  --bs-form-valid-border-color: #2563eb;
+  /* the site's own green scale, remapped to the blue scale */
+  --td-green-100: #dbeafe;
+  --td-green-200: #bfdbfe;
+  --td-green-300: #93c5fd;
+  --td-green-400: #3b82f6;
+  --td-green-500: #2563eb;
+  --td-green-600: #1d4ed8;
+  --td-green-700: #1e40af;
+  --td-green-800: #1e3a8a;
 }
 
 [data-bs-theme="light"] {
@@ -51,8 +60,8 @@
   --bs-link-color-rgb: 37, 99, 235;
   --bs-link-hover-color: #1d4ed8;
   --bs-link-hover-color-rgb: 29, 78, 216;
-  --bs-success: #16a34a;
-  --bs-success-rgb: 22, 163, 74;
+  --bs-success: #2563eb;
+  --bs-success-rgb: 37, 99, 235;
 }
 
 /* ---------- Backgrounds: white sections, off-white surfaces ---------- */
@@ -326,7 +335,7 @@
   color: #93c5fd;
 }
 
-/* ---------- Accent: crisp green ---------- */
+/* ---------- Accent: blue ---------- */
 
 .btn-outline-td-green {
   color: var(--avx-accent);
@@ -354,7 +363,7 @@
 .formula-type-badge {
   color: var(--avx-accent-hover);
   background-color: var(--avx-accent-tint);
-  border: 1px solid rgba(22, 163, 74, .25);
+  border: 1px solid rgba(37, 99, 235, .25);
   border-radius: 999px;
 }
 
@@ -413,4 +422,33 @@ main a:not([class]):hover,
   color: #fff;
   background-color: var(--avx-primary);
   border-color: var(--avx-primary);
+}
+
+/* ---------- Remaining site greens ---------- */
+
+.feature-modal-fullpage,
+.feature-modal .feature-modal-fullpage,
+[data-bs-theme="dark"] .feature-modal-fullpage {
+  color: var(--avx-primary);
+}
+
+.text-success {
+  color: var(--avx-primary) !important;
+}
+
+.spinner-border.text-success {
+  color: var(--avx-primary) !important;
+}
+
+/* brand kit swatches follow the new palette */
+.color-palette.primary-gradient {
+  background: linear-gradient(134deg, #1e40af 0%, #2563eb 55%, #3b82f6 100%);
+}
+
+.color-palette.primary-color {
+  background: #2563eb;
+}
+
+.color-palette.accent-color {
+  background: #3b82f6;
 }
