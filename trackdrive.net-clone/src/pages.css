@@ -1,7 +1,7 @@
 /* ---------- Typography ---------- */
 body {
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
 }
 
@@ -20,7 +20,7 @@ h3,
 .integration-copy h2,
 .workflow-copy h3 { letter-spacing: -.8px; }
 .demo-content h2 { letter-spacing: -1px; }
-.brand { letter-spacing: 1.5px !important; font-size: 15px !important; }
+.brand { letter-spacing: 1.5px !important; font-size: 17px !important; }
 
 /* Readable minimum sizes (replaces miniature 6-10px text) */
 .announcement,
@@ -44,14 +44,14 @@ h3,
 .demo-email,
 .hero-footnote,
 .stat > span:last-child {
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: .6px;
 }
 
 .footer-column a,
-.footer-brand-col > p { font-size: 15px; letter-spacing: 0; }
+.footer-brand-col > p { font-size: 17px; letter-spacing: 0; }
 
-.principle-card h3 { font-size: 17px; }
+.principle-card h3 { font-size: 19px; }
 .principle-card p,
 .principle-card > span,
 .simulator-header p,
@@ -67,17 +67,17 @@ h3,
 .buyer-payout small,
 .intent-score > strong small,
 .route-call-button {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .workflow-copy li,
-.workflow-copy li > span { font-size: 16px; }
+.workflow-copy li > span { font-size: 18px; }
 .workflow-live,
 .workflow-foot,
 .step-status,
 .workflow-step-copy small,
-.workflow-step-icon { font-size: 12px; }
-.workflow-step-copy strong { font-size: 14px; }
+.workflow-step-icon { font-size: 14px; }
+.workflow-step-copy strong { font-size: 16px; }
 
 /* Hero dashboard preview */
 .preview-topbar,
@@ -103,7 +103,7 @@ h3,
 .campaign-row small,
 .campaign-row > strong,
 .avatar-stack i {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 @media (max-width: 700px) {
@@ -115,9 +115,9 @@ h3,
   .demo-content > p,
   .workflow-copy li,
   .stat > span:last-child {
-    font-size: 14px;
+    font-size: 16px;
   }
-  .announcement { font-size: 12px; letter-spacing: .3px; }
+  .announcement { font-size: 14px; letter-spacing: .3px; }
 }
 
 /* ---------- Skip link & header actives ---------- */
@@ -150,8 +150,8 @@ h3,
 .demo-card::before { display: none; }
 .demo-kicker { color: #1d4ed8; }
 .demo-content h2 { color: #0b1528; font-size: clamp(32px, 5vw, 54px); line-height: 1.08; }
-.demo-content > p { color: #3d4b63; font-size: 18px; max-width: 520px; }
-.demo-email { color: #1d4ed8; font-weight: 600; font-size: 15px; }
+.demo-content > p { color: #3d4b63; font-size: 20px; max-width: 520px; }
+.demo-email { color: #1d4ed8; font-weight: 600; font-size: 17px; }
 .demo-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
 .nav-login, .nav-cta, .main-nav a { white-space: nowrap; }
 .nav-shell { gap: 12px; }
@@ -305,7 +305,7 @@ h3,
   letter-spacing: -1.5px;
   color: #0b1528;
 }
-.page-hero p { margin: 0; max-width: 560px; font-size: 18px; color: #3d4b63; }
+.page-hero p { margin: 0; max-width: 560px; font-size: 20px; color: #3d4b63; }
 .page-hero .section-kicker { color: #1d4ed8; }
 .page-hero .scene3d { min-height: 300px; }
 
@@ -332,16 +332,16 @@ h3,
   transition: transform .25s ease, box-shadow .25s ease;
 }
 .info-card:hover { transform: translateY(-4px) rotateX(2deg); box-shadow: 0 18px 40px rgba(20, 40, 90, .12); }
-.info-card h3 { margin: 0 0 10px; font-size: 20px; color: #0b1528; }
-.info-card p { margin: 0 0 12px; font-size: 15px; color: #3d4b63; }
+.info-card h3 { margin: 0 0 10px; font-size: 22px; color: #0b1528; }
+.info-card p { margin: 0 0 12px; font-size: 17px; color: #3d4b63; }
 .step-number { display: inline-block; margin-bottom: 12px; font: 700 14px var(--font-heading); color: #2563eb; }
 
-.check-list { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 15px; }
+.check-list { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 17px; }
 .check-list li { position: relative; padding-left: 26px; }
 .check-list li::before { content: "✓"; position: absolute; left: 0; color: #2563eb; font-weight: 700; }
 
 .pill-row { display: flex; flex-wrap: wrap; gap: 12px; }
-.pill { padding: 10px 18px; font-size: 15px; font-weight: 600; color: #1d4ed8; background: #fff; border: 1px solid #c9d8f5; border-radius: 999px; }
+.pill { padding: 10px 18px; font-size: 17px; font-weight: 600; color: #1d4ed8; background: #fff; border: 1px solid #c9d8f5; border-radius: 999px; }
 .center-row { display: flex; justify-content: center; margin-top: 32px; }
 .page-section .text-link { color: #1d4ed8; }
 
@@ -349,14 +349,14 @@ h3,
 .price-card.is-featured { border-color: #2563eb; box-shadow: 0 20px 50px rgba(37, 99, 235, .2); }
 .price-card .check-list { flex: 1; margin-bottom: 24px; }
 .price { display: flex; align-items: baseline; gap: 4px; margin: 4px 0 !important; }
-.price strong { font-size: 44px; color: #0b1528; }
+.price strong { font-size: 46px; color: #0b1528; }
 .price span, .price-note { color: #5a6881; }
-.badge { position: absolute; top: 16px; right: 16px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 999px; }
+.badge { position: absolute; top: 16px; right: 16px; padding: 4px 10px; font-size: 14px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 999px; }
 .button-outline { color: #1d4ed8; background: #fff; border: 1px solid #2563eb; }
 .button-outline:hover { background: #eef4ff; }
 
 .table-wrap { overflow-x: auto; }
-.compare-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; font-size: 15px; }
+.compare-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; font-size: 17px; }
 .compare-table th, .compare-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #e3eaf6; }
 .compare-table th { color: #0b1528; background: #eaf0fc; }
 .compare-table td:nth-child(2) { font-weight: 700; color: #1d4ed8; }
@@ -364,26 +364,26 @@ h3,
 .faq-list { display: grid; gap: 12px; max-width: 820px; }
 .faq-item { background: #fff; border: 1px solid #dbe4f3; border-radius: 14px; }
 .faq-item button { display: flex; justify-content: space-between; width: 100%; padding: 18px 22px; font: 600 17px var(--font-body); color: #0b1528; text-align: left; background: none; border: 0; cursor: pointer; }
-.faq-item p { margin: 0; padding: 0 22px 20px; font-size: 15px; color: #3d4b63; }
+.faq-item p { margin: 0; padding: 0 22px 20px; font-size: 17px; color: #3d4b63; }
 .role-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; background: #fff; border: 1px solid #dbe4f3; border-radius: 14px; }
-.role-row strong { display: block; font-size: 17px; color: #0b1528; }
-.role-row span { font-size: 14px; color: #5a6881; }
+.role-row strong { display: block; font-size: 19px; color: #0b1528; }
+.role-row span { font-size: 16px; color: #5a6881; }
 
 .code-sample { margin: 32px 0 0; padding: 20px 24px; overflow-x: auto; font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; color: #d6e4ff; background: #0b1528; border-radius: 14px; }
 
 .legal-doc { max-width: 820px; margin: 0 auto; }
-.legal-doc h2 { margin: 28px 0 8px; font-size: 22px; color: #0b1528; }
-.legal-doc p { margin: 0; font-size: 16px; color: #3d4b63; }
+.legal-doc h2 { margin: 28px 0 8px; font-size: 24px; color: #0b1528; }
+.legal-doc p { margin: 0; font-size: 18px; color: #3d4b63; }
 
 .form-section { display: flex; justify-content: center; padding-top: 16px; }
 .form-card { display: grid; gap: 18px; width: 100%; max-width: 560px; padding: 32px; background: #fff; border: 1px solid #dbe4f3; border-radius: 18px; box-shadow: 0 18px 50px rgba(20, 40, 90, .1); }
-.form-card label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; color: #0b1528; }
+.form-card label { display: grid; gap: 6px; font-size: 16px; font-weight: 600; color: #0b1528; }
 .form-card input, .form-card textarea, .form-card select { padding: 12px 14px; font: 400 16px var(--font-body); color: #0b1528; background: #fff; border: 1px solid #b9c7e0; border-radius: 10px; }
 .form-card [aria-invalid="true"] { border-color: #d92d20; }
-.field-error { font-size: 13px; font-style: normal; font-weight: 500; color: #d92d20; }
-.form-alt { margin: 0; font-size: 14px; color: #3d4b63; }
+.field-error { font-size: 15px; font-style: normal; font-weight: 500; color: #d92d20; }
+.form-alt { margin: 0; font-size: 16px; color: #3d4b63; }
 .form-alt a, .form-success a { color: #1d4ed8; }
-.form-success h3 { margin: 0 0 8px; font-size: 24px; }
+.form-success h3 { margin: 0 0 8px; font-size: 26px; }
 
 @media (max-width: 900px) {
   .page-hero { grid-template-columns: 1fr; padding-top: 48px; }

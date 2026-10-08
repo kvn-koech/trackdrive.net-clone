@@ -1,0 +1,165 @@
+/* --- Trusted By Marquee --- */
+.trusted-section {
+  padding: 40px 0;
+  border-bottom: 1px solid rgba(26, 39, 31, .08);
+  overflow: hidden;
+  text-align: center;
+  background: #f8fbfc;
+}
+.trusted-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+.trusted-marquee {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+}
+.trusted-track {
+  display: flex;
+  gap: 48px;
+  animation: marquee 30s linear infinite;
+  padding: 0 24px;
+}
+.trusted-logo {
+  display: flex;
+  align-items: center;
+  color: #94a3b8;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 24px)); }
+}
+
+/* --- Launch Campaign Demo 3D --- */
+.launch-demo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(circle at 50% -20%, rgba(86, 213, 231, 0.1), transparent 70%);
+}
+.launch-3d-container {
+  margin-top: 50px;
+  perspective: 1500px;
+}
+.launch-card-wrapper {
+  width: 320px;
+  height: 220px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+@media (max-width: 400px) {
+  .launch-card-wrapper {
+    width: 280px;
+    height: 200px;
+  }
+}
+.launch-card-wrapper:hover:not(.is-launched) {
+  transform: rotateX(10deg) rotateY(-10deg) translateZ(20px);
+}
+.launch-card-wrapper.is-launched {
+  transform: rotateY(180deg) scale(1.05) translateZ(40px);
+}
+.launch-card-front, .launch-card-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 32px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.02);
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.launch-card-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(145deg, #f0f9ff, #bae6fd);
+  border-color: #7dd3fc;
+  box-shadow: 0 30px 60px rgba(2, 132, 199, 0.15), inset 0 0 0 1px rgba(255,255,255,0.5);
+}
+
+/* --- Feedback Animated Marquee --- */
+.feedback-marquee {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  overflow: hidden;
+  display: flex;
+  padding: 40px 0;
+  perspective: 1000px;
+}
+.feedback-track {
+  display: flex;
+  gap: 30px;
+  animation: feedback-scroll 40s linear infinite;
+  padding: 0 20px;
+  transform-style: preserve-3d;
+}
+.feedback-track:hover {
+  animation-play-state: paused;
+}
+.feedback-card-anim {
+  width: 380px;
+  flex: none;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: rotateY(-5deg) translateZ(0);
+  transition: transform 0.4s;
+}
+@media (max-width: 600px) {
+  .feedback-card-anim {
+    width: 300px;
+    padding: 24px;
+  }
+}
+.feedback-card-anim:hover {
+  transform: rotateY(0) scale(1.05) translateZ(30px);
+  z-index: 10;
+}
+@keyframes feedback-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 15px)); }
+}
+
+.fb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.fb-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.fb-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+}
+.fb-social {
+  color: #1da1f2;
+}
+.fb-social.linkedin {
+  color: #0a66c2;
+}
+.fb-social svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
