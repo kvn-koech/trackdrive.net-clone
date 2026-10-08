@@ -10,7 +10,8 @@
   --avx-hero-blue: #1ea0e8;
   --avx-blue-inv: invert(1) grayscale(1) brightness(1.1) sepia(1) hue-rotate(172deg) saturate(5) contrast(1.1) brightness(1.04);
   --avx-blue-tint: grayscale(1) sepia(1) saturate(6) hue-rotate(175deg) brightness(1.05);
-  --avx-green: #6cb03d;
+  --avx-green: #16a34a;
+  --avx-active: #2563eb;
   --avx-blue: #4176a3;
 }
 
@@ -32,9 +33,10 @@ main {
   z-index: 2000;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, var(--avx-blue), #56d5e7, var(--avx-green));
-  transform: scaleX(var(--avx-progress, 0));
+  background: linear-gradient(90deg, var(--avx-active), #3b82f6, var(--avx-green));
+  transform: scaleX(0);
   transform-origin: 0 50%;
+  will-change: transform;
   pointer-events: none;
 }
 
@@ -406,20 +408,20 @@ img.avx-tint {
 }
 
 .spotlight-flow-step.avx-active {
-  border-color: rgba(108, 176, 61, .55);
-  box-shadow: 0 10px 26px rgba(108, 176, 61, .22);
+  border-color: rgba(37, 99, 235, .45);
+  box-shadow: 0 10px 26px rgba(37, 99, 235, .18);
   transform: perspective(700px) translateZ(26px) rotateX(6deg);
 }
 
 .spotlight-flow-step.avx-active i {
   color: #fff;
-  background: var(--avx-green);
-  box-shadow: 0 0 0 6px rgba(108, 176, 61, .15);
+  background: var(--avx-active);
+  box-shadow: 0 0 0 6px rgba(37, 99, 235, .14);
 }
 
 .spotlight-flow-arrow.avx-active,
 .flow-arrow.avx-active {
-  color: var(--avx-green);
+  color: var(--avx-active);
   animation: avxNudge .7s ease;
 }
 
@@ -432,7 +434,7 @@ img.avx-tint {
 }
 
 .flow-arrow-down.avx-active {
-  color: var(--avx-green);
+  color: var(--avx-active);
   animation: avxNudge .7s ease;
 }
 
@@ -910,7 +912,7 @@ img.avx-tint {
 }
 
 @keyframes avxGridMove {
-  to { background-position: 0 64px, 0 64px; }
+  to { translate: 0 64px; }
 }
 
 .avx-bw-strands {
@@ -1199,7 +1201,7 @@ img.avx-tint {
 }
 
 @keyframes avxDots {
-  to { background-position: 0 30px, 15px 45px; }
+  to { translate: 0 30px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1208,6 +1210,273 @@ img.avx-tint {
   .avx-bw-grid,
   .avx-sbg *,
   .avx-sbg-dots-plane {
+    animation: none !important;
+  }
+}
+
+/* Integrations page: 3D hub with integration logos orbiting beside the heading */
+.avx-ihub-host {
+  display: flex;
+  align-items: center;
+  min-height: 440px;
+}
+
+.avx-ihub-host > .container {
+  position: relative;
+  width: 100%;
+}
+
+.avx-ihub-host .avx-fx {
+  display: none;
+}
+
+.avx-ihub-host .mktg-section-header {
+  position: relative;
+  z-index: 1;
+}
+
+.avx-ihub-host h1 {
+  text-shadow: 0 0 12px #f8f9fa, 0 0 4px #f8f9fa;
+}
+
+.avx-ihub {
+  position: absolute;
+  top: 50%;
+  right: 2%;
+  width: 400px;
+  height: 400px;
+  margin-top: -200px;
+  pointer-events: none;
+  perspective: 1000px;
+}
+
+.avx-ihub-stage {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform:
+    rotateX(calc(var(--avx-hy, 0) * -10deg))
+    rotateY(calc(var(--avx-hx, 0) * 14deg));
+}
+
+.avx-ihub-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  max-width: none;
+  filter: drop-shadow(0 10px 24px rgba(30, 160, 232, .35));
+  animation: avxOrbPulse 3s ease-in-out infinite;
+}
+
+.avx-ihub-orbit {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(68deg);
+}
+
+.avx-ihub-spin {
+  position: absolute;
+  inset: 0;
+  border: 2px dashed rgba(30, 160, 232, .45);
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  animation: avxSpinZ 30s linear infinite;
+}
+
+/* spoke from each tile to the hub, with a packet flowing inward */
+.avx-ihub-spoke {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 2px;
+  height: 50%;
+  margin-left: -1px;
+  transform-origin: 50% 100%;
+  transform: rotateZ(var(--a));
+  background: linear-gradient(180deg, rgba(30, 160, 232, .45), rgba(30, 160, 232, .05));
+}
+
+.avx-ihub-spoke::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1ea0e8;
+  box-shadow: 0 0 10px rgba(30, 160, 232, .9);
+  animation: avxSpokePacket 2.4s ease-in infinite;
+  animation-delay: var(--pd, 0s);
+}
+
+@keyframes avxSpokePacket {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(192px); opacity: 0; }
+}
+
+.avx-ihub-slot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateZ(var(--a)) translateY(-200px);
+}
+
+.avx-ihub-tile {
+  position: absolute;
+  top: -32px;
+  left: -32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgba(30, 160, 232, .25);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 10px 24px rgba(20, 32, 51, .14);
+  animation: avxIhubFace 30s linear infinite;
+}
+
+.avx-ihub-tile img {
+  width: 40px;
+  height: 40px;
+  max-width: none;
+  object-fit: contain;
+}
+
+/* counter-rotate so every tile keeps facing the viewer */
+@keyframes avxIhubFace {
+  from { transform: rotateZ(calc(var(--a) * -1)) rotateX(-68deg); }
+  to { transform: rotateZ(calc(var(--a) * -1 - 360deg)) rotateX(-68deg); }
+}
+
+[data-bs-theme="dark"] .avx-ihub-tile {
+  background: rgba(255, 255, 255, .95);
+}
+
+@media (max-width: 991.98px) {
+  .avx-ihub-host {
+    min-height: 0;
+  }
+
+  .avx-ihub {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-ihub * ,
+  .avx-ihub-spoke::after {
+    animation: none !important;
+  }
+}
+
+/* Integrations heading: 3D environment behind the top section */
+.avx-ibg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 900px;
+  perspective-origin: 50% 10%;
+}
+
+.avx-ibg-floor {
+  position: absolute;
+  right: -60%;
+  bottom: -20%;
+  left: -60%;
+  height: 170%;
+  overflow: hidden;
+  transform-origin: 50% 100%;
+  transform:
+    rotateX(calc(74deg + var(--avx-hy, 0) * 6deg))
+    rotateZ(calc(var(--avx-hx, 0) * 6deg));
+  -webkit-mask-image: radial-gradient(ellipse 50% 60% at 50% 70%, #000 35%, transparent 80%);
+  mask-image: radial-gradient(ellipse 50% 60% at 50% 70%, #000 35%, transparent 80%);
+}
+
+/* the grid layer is one cell taller than the floor and slides by one cell: a seamless, GPU-only loop */
+.avx-ibg-grid {
+  position: absolute;
+  top: -80px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    linear-gradient(rgba(30, 160, 232, .32) 1.5px, transparent 1.5px) 0 0 / 80px 80px,
+    linear-gradient(90deg, rgba(30, 160, 232, .32) 1.5px, transparent 1.5px) 0 0 / 80px 80px;
+  will-change: transform;
+  animation: avxIbgGrid 4s linear infinite;
+}
+
+@keyframes avxIbgGrid {
+  to { transform: translateY(80px); }
+}
+
+.avx-ibg-ribbon {
+  position: absolute;
+  top: 8%;
+  left: -10%;
+  width: 120%;
+  height: 70%;
+  mix-blend-mode: multiply;
+  transform-style: preserve-3d;
+  transform: rotateY(calc(var(--avx-hx, 0) * 10deg));
+}
+
+.avx-ibg-ribbon div {
+  position: absolute;
+  inset: 0;
+  background: url("/assets/trackdrive_marketing/brand-assets/ringba%20assets/bg-waves-1920%20copy.png") 50% 55% / cover no-repeat;
+  opacity: .28;
+  filter: var(--avx-blue-inv) contrast(1.15);
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, transparent 100%);
+  will-change: transform;
+  animation: avxIbgRibbon 18s ease-in-out infinite alternate;
+}
+
+@keyframes avxIbgRibbon {
+  from { transform: rotateX(18deg) rotateY(-14deg) translate3d(-3%, 0, -60px); }
+  to { transform: rotateX(8deg) rotateY(14deg) translate3d(3%, -2%, 40px); }
+}
+
+.avx-ibg-glow {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  max-width: none;
+  opacity: .16;
+  filter: blur(26px);
+  animation: avxBob 14s ease-in-out infinite alternate;
+}
+
+.avx-ibg-glow-1 { top: 6%; left: -140px; }
+.avx-ibg-glow-2 { right: -140px; bottom: 18%; animation-delay: -6s; }
+
+[data-bs-theme="dark"] .avx-ibg-ribbon {
+  mix-blend-mode: screen;
+}
+
+[data-bs-theme="dark"] .avx-ibg-ribbon div {
+  filter: var(--avx-blue-tint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-ibg *,
+  .avx-ibg-grid {
     animation: none !important;
   }
 }

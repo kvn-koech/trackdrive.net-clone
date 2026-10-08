@@ -1,0 +1,407 @@
+/*
+ * Avortyx color theme — loaded on every page after the site stylesheet.
+ *   Backgrounds: clean bright white, subtle off-white/gray card surfaces
+ *   Primary:     royal blue — buttons, active states, key headlines, brand accents
+ *   Accent:      crisp green — badges, status pills, success highlights, secondary tags
+ *   Text:        dark slate
+ */
+
+:root {
+  --avx-primary: #2563eb;
+  --avx-primary-hover: #1d4ed8;
+  --avx-primary-active: #1e40af;
+  --avx-primary-tint: #eff6ff;
+  --avx-primary-soft: rgba(37, 99, 235, .14);
+  --avx-headline: #1d4ed8;
+
+  --avx-accent: #16a34a;
+  --avx-accent-hover: #15803d;
+  --avx-accent-tint: #dcfce7;
+
+  --avx-ink: #0f172a;
+  --avx-text: #1e293b;
+  --avx-muted: #475569;
+  --avx-surface: #f8fafc;
+  --avx-border: #e2e8f0;
+  --avx-bg: #fff;
+
+  --bs-primary: #2563eb;
+  --bs-primary-rgb: 37, 99, 235;
+  --bs-link-color: #2563eb;
+  --bs-link-color-rgb: 37, 99, 235;
+  --bs-link-hover-color: #1d4ed8;
+  --bs-link-hover-color-rgb: 29, 78, 216;
+  --bs-success: #16a34a;
+  --bs-success-rgb: 22, 163, 74;
+  --bs-green: #16a34a;
+  --bs-form-valid-color: #16a34a;
+  --bs-form-valid-border-color: #16a34a;
+}
+
+[data-bs-theme="light"] {
+  --bs-body-bg: #fff;
+  --bs-body-color: #1e293b;
+  --bs-body-color-rgb: 30, 41, 59;
+  --bs-secondary-color: #475569;
+  --bs-light-rgb: 248, 250, 252;
+  --bs-border-color: #e2e8f0;
+  --bs-primary: #2563eb;
+  --bs-primary-rgb: 37, 99, 235;
+  --bs-link-color: #2563eb;
+  --bs-link-color-rgb: 37, 99, 235;
+  --bs-link-hover-color: #1d4ed8;
+  --bs-link-hover-color-rgb: 29, 78, 216;
+  --bs-success: #16a34a;
+  --bs-success-rgb: 22, 163, 74;
+}
+
+/* ---------- Backgrounds: white sections, off-white surfaces ---------- */
+
+[data-bs-theme="light"] body,
+[data-bs-theme="light"] main {
+  background-color: var(--avx-bg);
+}
+
+[data-bs-theme="light"] .mktg-section:nth-of-type(even),
+[data-bs-theme="light"] .pricing-hero,
+[data-bs-theme="light"] .mktg-auth-section,
+[data-bs-theme="light"] .mktg-subpage-hero {
+  background: var(--avx-bg);
+}
+
+[data-bs-theme="light"] .marketing-footer {
+  background-color: var(--avx-surface);
+  border-top: 1px solid var(--avx-border);
+}
+
+[data-bs-theme="light"] .card,
+[data-bs-theme="light"] .feature-card,
+[data-bs-theme="light"] .features-grid-card,
+[data-bs-theme="light"] .integration-card,
+[data-bs-theme="light"] .spotlight-flow-step,
+[data-bs-theme="light"] .mktg-auth-card,
+[data-bs-theme="light"] .mktg-brand-card,
+[data-bs-theme="light"] .pricing-highlight-card {
+  --bs-card-bg: var(--avx-surface);
+  background-color: var(--avx-surface);
+  border-color: var(--avx-border);
+}
+
+[data-bs-theme="light"] .mktg-auth-card {
+  border: 1px solid var(--avx-border);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .06);
+}
+
+[data-bs-theme="light"] .integration-logo-card {
+  background: var(--avx-surface);
+  border: 1px solid var(--avx-border);
+}
+
+/* ---------- Typography: dark slate ---------- */
+
+[data-bs-theme="light"] body {
+  color: var(--avx-text);
+}
+
+[data-bs-theme="light"] h1,
+[data-bs-theme="light"] h3,
+[data-bs-theme="light"] h4,
+[data-bs-theme="light"] h5,
+[data-bs-theme="light"] h6,
+[data-bs-theme="light"] .mktg-section h3.fw-bold,
+[data-bs-theme="light"] .mktg-section-sm h3.fw-bold,
+[data-bs-theme="light"] .bg-light h3.fw-bold,
+[data-bs-theme="light"] .marketing-subpage-content h3,
+[data-bs-theme="light"] .mktg-legal-content h4,
+[data-bs-theme="light"] .hero-simple-node-label,
+[data-bs-theme="light"] .mktg-lead-flow .hero-simple-hub-name,
+[data-bs-theme="light"] .mktg-lead-flow .hero-simple-step-labels span {
+  color: var(--avx-ink);
+}
+
+[data-bs-theme="light"] .text-muted,
+[data-bs-theme="light"] .lead,
+[data-bs-theme="light"] .mktg-lead-flow .hero-simple-node-sources {
+  color: var(--avx-muted) !important;
+}
+
+/* key headlines in royal blue */
+[data-bs-theme="light"] .mktg-section h2.fw-bold,
+[data-bs-theme="light"] .mktg-section .fw-bold.h2,
+[data-bs-theme="light"] .bg-light h2.fw-bold,
+[data-bs-theme="light"] .bg-light h1.fw-bold,
+[data-bs-theme="light"] .marketing-subpage-content h2,
+[data-bs-theme="light"] .mktg-subpage-hero h1,
+[data-bs-theme="light"] .mktg-legal-content h1,
+[data-bs-theme="light"] .pricing-hero h1,
+[data-bs-theme="light"] main section h2.fw-bold {
+  color: var(--avx-headline);
+}
+
+/* the landing headline keeps dark slate, with its accent line in blue */
+[data-bs-theme="light"] .marketing-hero-simple h1 {
+  color: var(--avx-ink);
+}
+
+.marketing-hero-simple h1 .text-success {
+  color: var(--avx-primary) !important;
+}
+
+/* ---------- Primary: buttons, links, active states ---------- */
+
+.btn-td-green,
+.btn-primary,
+.marketing-hero-simple .btn-outline-td-green {
+  color: #fff;
+  background-color: var(--avx-primary);
+  border-color: var(--avx-primary);
+}
+
+.btn-td-green:hover,
+.btn-td-green:focus,
+.marketing-hero-simple .btn-td-green:focus,
+.btn-primary:hover,
+.btn-primary:focus,
+.marketing-hero-simple .btn-outline-td-green:hover,
+.marketing-hero-simple .btn-outline-td-green:focus {
+  color: #fff;
+  background-color: var(--avx-primary-hover);
+  border-color: var(--avx-primary-hover);
+}
+
+.btn-td-green:active,
+.btn-primary:active {
+  background-color: var(--avx-primary-active) !important;
+  border-color: var(--avx-primary-active) !important;
+}
+
+.btn-td-green:focus-visible,
+.btn-primary:focus-visible,
+.btn-outline-td-green:focus-visible {
+  box-shadow: 0 0 0 .25rem var(--avx-primary-soft);
+}
+
+.mktg-link-green,
+.mktg-link-green:focus {
+  color: var(--avx-primary);
+  text-decoration-color: rgba(37, 99, 235, .4);
+}
+
+.mktg-link-green:hover {
+  color: var(--avx-primary-hover);
+  text-decoration-color: var(--avx-primary-hover);
+}
+
+.marketing-navbar.navbar .navbar-nav .nav-link:hover,
+.marketing-navbar.navbar .navbar-nav .nav-link:focus,
+.marketing-navbar.navbar .navbar-nav .nav-link.active {
+  color: var(--avx-primary);
+  background-color: var(--avx-primary-tint);
+}
+
+[data-bs-theme="light"] .marketing-navbar.navbar .navbar-nav .nav-link {
+  color: var(--avx-text);
+}
+
+.mktg-subpage-hero {
+  border-bottom-color: var(--avx-primary) !important;
+}
+
+.mktg-subpage-hero .mktg-subpage-hero-eyebrow,
+[data-bs-theme="dark"] .mktg-subpage-hero .mktg-subpage-hero-eyebrow {
+  color: var(--avx-primary);
+}
+
+.mktg-subpage-back {
+  color: var(--avx-primary);
+}
+
+.marketing-subpage-header {
+  border-bottom-color: var(--avx-primary);
+}
+
+.feature-card:hover,
+.features-grid-card:hover,
+.integration-card:hover,
+.mktg-brand-card:hover {
+  border-color: rgba(37, 99, 235, .35);
+}
+
+.mktg-compact-feature-item:hover {
+  color: var(--avx-primary);
+  background-color: var(--avx-primary-tint);
+}
+
+.marketing-code-tabs .nav-tabs .nav-link.active {
+  color: var(--avx-primary);
+}
+
+.pricing-highlight-card {
+  border-color: var(--avx-primary) !important;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, .12) !important;
+}
+
+.pricing-calculator-breakdown .pricing-calculator-row-total {
+  background: var(--avx-primary-tint);
+}
+
+.flow-center-box {
+  background: var(--avx-primary-tint);
+  border-color: rgba(37, 99, 235, .35);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, .12);
+}
+
+.flow-arrows-column {
+  color: var(--avx-primary);
+}
+
+.hero-proof-stats .fs-3,
+.mktg-stats .stat-value {
+  color: var(--avx-primary) !important;
+}
+
+.spotlight-flow-step i {
+  color: var(--avx-primary);
+  background: var(--avx-primary-tint);
+}
+
+/* form focus and checked states */
+.form-control:focus,
+.form-select:focus,
+.mktg-auth-card .form-control:focus,
+.contact-form .form-control:focus,
+.signup-form .form-control:focus,
+.pricing-calculator .form-select:focus {
+  border-color: var(--avx-primary);
+  box-shadow: 0 0 0 .25rem var(--avx-primary-soft);
+}
+
+.form-check-input:checked {
+  background-color: var(--avx-primary);
+  border-color: var(--avx-primary);
+}
+
+.form-check-input:focus {
+  border-color: var(--avx-primary);
+  box-shadow: 0 0 0 .25rem var(--avx-primary-soft);
+}
+
+.signup-form__terms .form-check-input,
+.signup-form__interest .form-check-input {
+  accent-color: var(--avx-primary);
+}
+
+.pricing-accordion .accordion-button:focus {
+  box-shadow: 0 0 0 .25rem var(--avx-primary-soft);
+}
+
+.pricing-accordion .accordion-button:not(.collapsed) {
+  color: var(--avx-primary);
+  background-color: var(--avx-primary-tint);
+}
+
+/* call-to-action band: brand blue */
+.marketing-cta-band {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #3b82f6 100%);
+}
+
+.btn-cta-primary,
+.btn-cta-primary:hover,
+.marketing-cta-band .btn-cta-primary:focus {
+  color: var(--avx-primary-hover);
+}
+
+/* cookie notice */
+#okCookie #okClose {
+  background-color: var(--avx-primary);
+  text-shadow: none;
+  box-shadow: none;
+}
+
+#okCookie #okClose:hover {
+  background-color: var(--avx-primary-hover);
+}
+
+#okCookie span a {
+  color: #93c5fd;
+}
+
+/* ---------- Accent: crisp green ---------- */
+
+.btn-outline-td-green {
+  color: var(--avx-accent);
+  border-color: var(--avx-accent);
+}
+
+.btn-outline-td-green:hover,
+.btn-outline-td-green:focus {
+  color: #fff;
+  background-color: var(--avx-accent);
+  border-color: var(--avx-accent);
+}
+
+.btn-success {
+  --bs-btn-bg: var(--avx-accent);
+  --bs-btn-border-color: var(--avx-accent);
+  --bs-btn-hover-bg: var(--avx-accent-hover);
+  --bs-btn-hover-border-color: var(--avx-accent-hover);
+  --bs-btn-active-bg: var(--avx-accent-hover);
+  --bs-btn-active-border-color: var(--avx-accent-hover);
+}
+
+.badge,
+.pricing-footnote-badge,
+.formula-type-badge {
+  color: var(--avx-accent-hover);
+  background-color: var(--avx-accent-tint);
+  border: 1px solid rgba(22, 163, 74, .25);
+  border-radius: 999px;
+}
+
+.bg-success {
+  background-color: var(--avx-accent) !important;
+}
+
+.border-success {
+  border-color: var(--avx-accent) !important;
+}
+
+/* ---------- Overrides for the site's more specific green rules ---------- */
+
+.mktg-subpage-hero .mktg-subpage-back,
+[data-bs-theme="dark"] .mktg-subpage-hero .mktg-subpage-back {
+  color: var(--avx-primary);
+}
+
+main a:not([class]),
+.marketing-subpage-content a:not(.btn) {
+  color: var(--avx-primary);
+}
+
+main a:not([class]):hover,
+.marketing-subpage-content a:not(.btn):hover {
+  color: var(--avx-primary-hover);
+}
+
+.mktg-auth-card .form-check-input:checked,
+.signup-form .form-check-input:checked {
+  background-color: var(--avx-primary);
+  border-color: var(--avx-primary);
+}
+
+.marketing-cta-band .btn-cta-primary,
+.marketing-cta-band .btn-cta-primary:hover,
+.marketing-cta-band .btn-cta-primary:focus {
+  color: var(--avx-primary-hover);
+}
+
+/* landing hero constellation: green network turned brand blue */
+.hero-constellation-bg .hero-home__bg img {
+  filter: hue-rotate(115deg) saturate(1.3);
+}
+
+/* card header icons (e.g. "More ways to win the call") are brand accents: blue */
+.card .card-body > .text-success:first-child,
+.card .card-body > .text-success:first-child i {
+  color: var(--avx-primary) !important;
+}

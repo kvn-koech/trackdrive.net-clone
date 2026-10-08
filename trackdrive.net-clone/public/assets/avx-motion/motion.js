@@ -40,7 +40,7 @@
     var ticking = false;
     function update() {
       var max = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.setProperty('--avx-progress', max > 0 ? Math.min(window.scrollY / max, 1) : 0);
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(window.scrollY / max, 1) : 0).toFixed(4) + ')';
       ticking = false;
     }
     window.addEventListener('scroll', function () {
@@ -147,9 +147,18 @@
     return fx;
   }
 
+  // Writes a custom property only when its value changes (avoids needless style recalcs).
+  function setVar(el, name, value) {
+    var key = '_avx' + name;
+    if (el[key] !== value) {
+      el[key] = value;
+      el.style.setProperty(name, value);
+    }
+  }
+
   // Eases pointer position and reports it with the host's scroll position.
   // Frames run only while something is moving, so idle pages cost nothing.
-  function driver(host, ease, onFrame) {
+  function driver(host, ease, onFrame, pointerOnly) {
     var px = 0, py = 0, tx = 0, ty = 0, visible = false, raf = 0;
     function frame() {
       raf = 0;
@@ -170,15 +179,15 @@
       });
       host.addEventListener('pointerleave', function () { tx = 0; ty = 0; kick(); });
     }
-    window.addEventListener('scroll', kick, { passive: true });
+    if (!pointerOnly) window.addEventListener('scroll', kick, { passive: true });
     onVisible(host, function () { visible = true; kick(); }, function () { visible = false; }, 0);
   }
 
   function parallax(host) {
     driver(host, 0.08, function (px, py, r) {
-      host.style.setProperty('--avx-px', (px * 24).toFixed(2));
-      host.style.setProperty('--avx-py', (py * 24).toFixed(2));
-      host.style.setProperty('--avx-scroll', Math.max(-600, Math.min(600, -r.top)).toFixed(0));
+      setVar(host, '--avx-px', (px * 24).toFixed(2));
+      setVar(host, '--avx-py', (py * 24).toFixed(2));
+      setVar(host, '--avx-scroll', Math.max(-600, Math.min(600, -r.top)).toFixed(0));
     });
   }
 
@@ -351,9 +360,9 @@
       // pointer + scroll make the scene react in 3D while it is on screen
       driver(section, 0.07, function (hx, hy, r) {
         var sp = Math.max(-1, Math.min(1, (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight));
-        fx.style.setProperty('--avx-hx', hx.toFixed(3));
-        fx.style.setProperty('--avx-hy', hy.toFixed(3));
-        fx.style.setProperty('--avx-sp', sp.toFixed(3));
+        setVar(fx, '--avx-hx', hx.toFixed(3));
+        setVar(fx, '--avx-hy', hy.toFixed(3));
+        setVar(fx, '--avx-sp', sp.toFixed(2));
       });
     });
   }
@@ -402,6 +411,7 @@
     '/careers.html': 'streak',
     '/sign_up.html': 'grid',
     '/users/sign_in.html': 'tide',
+    '/features/integrations.html': 'strands',
     '/brand_assets.html': 'signal',
     '/privacy_policy.html': 'mesh',
     '/terms_of_service.html': 'ribbons'
@@ -438,14 +448,17 @@
     });
   }
 
-  function reactive(host, target) {
+  // pointerOnly: the target ignores scroll position, so scrolling never touches it
+  function reactive(host, target, pointerOnly) {
     if (reduced) return;
     driver(host, 0.06, function (hx, hy, r) {
-      var sp = Math.max(-1, Math.min(1, (r.bottom - window.innerHeight) / window.innerHeight));
-      target.style.setProperty('--avx-hx', hx.toFixed(3));
-      target.style.setProperty('--avx-hy', hy.toFixed(3));
-      target.style.setProperty('--avx-sp', sp.toFixed(3));
-    });
+      setVar(target, '--avx-hx', hx.toFixed(3));
+      setVar(target, '--avx-hy', hy.toFixed(3));
+      if (!pointerOnly) {
+        var sp = Math.max(-1, Math.min(1, (r.bottom - window.innerHeight) / window.innerHeight));
+        setVar(target, '--avx-sp', sp.toFixed(2));
+      }
+    }, pointerOnly);
   }
 
   // sections inside <main> that are not nested in another section
@@ -498,7 +511,86 @@
     tilt.appendChild(sway);
     ring.appendChild(tilt);
     stage.insertBefore(ring, card);
-    if (section) reactive(section, ring);
+    if (section) reactive(section, ring, true);
+  }
+
+  // ---------- Integrations page: 3D hub of orbiting integration logos ----------
+
+  function initIntegrationsHub() {
+    if (!/\/features\/integrations(\.html)?$/.test(location.pathname)) return;
+    var h1 = document.querySelector('main section h1');
+    var section = h1 && h1.closest('section');
+    var container = section && section.querySelector('.container');
+    if (!container) return;
+    var logos = Array.prototype.slice.call(document.querySelectorAll('main .integration-card img'), 0, 8);
+    if (logos.length < 4) return;
+    section.classList.add('avx-ihub-host');
+
+    var hub = document.createElement('div');
+    hub.className = 'avx-ihub';
+    hub.setAttribute('aria-hidden', 'true');
+    var stage = document.createElement('div');
+    stage.className = 'avx-ihub-stage';
+    var orbit = document.createElement('div');
+    orbit.className = 'avx-ihub-orbit';
+    var spin = document.createElement('div');
+    spin.className = 'avx-ihub-spin';
+
+    logos.forEach(function (logo, i) {
+      var a = (360 / logos.length * i) + 'deg';
+      var spoke = document.createElement('div');
+      spoke.className = 'avx-ihub-spoke';
+      spoke.style.setProperty('--a', a);
+      spoke.style.setProperty('--pd', (-i * 0.3) + 's');
+      spin.appendChild(spoke);
+
+      var slot = document.createElement('div');
+      slot.className = 'avx-ihub-slot';
+      slot.style.setProperty('--a', a);
+      var tile = document.createElement('div');
+      tile.className = 'avx-ihub-tile';
+      var copy = document.createElement('img');
+      copy.src = logo.currentSrc || logo.src;
+      copy.alt = '';
+      tile.appendChild(copy);
+      slot.appendChild(tile);
+      spin.appendChild(slot);
+    });
+
+    orbit.appendChild(spin);
+    stage.appendChild(img('icon-sphere--blue.png', 'avx-ihub-core'));
+    stage.appendChild(orbit);
+    hub.appendChild(stage);
+    container.appendChild(hub);
+    reactive(section, hub, true);
+  }
+
+  // ---------- Integrations heading: 3D environment behind the top section ----------
+
+  function initIntegrationsBackdrop() {
+    if (!/\/features\/integrations(\.html)?$/.test(location.pathname)) return;
+    var h1 = document.querySelector('main section h1');
+    var section = h1 && h1.closest('section');
+    if (!section) return;
+    section.classList.add('avx-fx-host');
+
+    var bg = document.createElement('div');
+    bg.className = 'avx-ibg';
+    bg.setAttribute('aria-hidden', 'true');
+    var floor = document.createElement('div');
+    floor.className = 'avx-ibg-floor';
+    var ribbon = document.createElement('div');
+    ribbon.className = 'avx-ibg-ribbon';
+    ribbon.appendChild(document.createElement('div'));
+    var grid = document.createElement('div');
+    grid.className = 'avx-ibg-grid';
+    floor.appendChild(grid);
+    bg.appendChild(floor);
+    bg.appendChild(ribbon);
+    bg.appendChild(img('blue-sphere-312.png', 'avx-ibg-glow avx-ibg-glow-1'));
+    bg.appendChild(img('icon-sphere--blue.png', 'avx-ibg-glow avx-ibg-glow-2'));
+    section.insertBefore(bg, section.firstChild);
+    reactive(section, bg, true);
   }
 
   // ---------- Section backgrounds ----------
@@ -642,6 +734,8 @@
     initBottomWaves();
     initSectionBackgrounds();
     initAuthRing();
+    initIntegrationsHub();
+    initIntegrationsBackdrop();
     initFlowSequences();
     initHeroFx();
     initCtaFx();
