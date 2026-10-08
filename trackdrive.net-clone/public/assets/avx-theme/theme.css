@@ -452,3 +452,102 @@ main a:not([class]):hover,
 .color-palette.accent-color {
   background: #3b82f6;
 }
+
+/* ---------- Hover / focus states (light and dark) ---------- */
+
+a:hover {
+  color: var(--avx-primary-hover);
+}
+
+.marketing-navbar.navbar .navbar-nav .nav-link:hover,
+.marketing-navbar.navbar .navbar-nav .nav-link:focus,
+[data-bs-theme="dark"] .marketing-navbar.navbar .navbar-nav .nav-link:hover,
+[data-bs-theme="dark"] .marketing-navbar.navbar .navbar-nav .nav-link:focus {
+  color: var(--avx-primary);
+  background-color: var(--avx-primary-tint);
+}
+
+.marketing-navbar .dropdown-menu .dropdown-item:hover,
+.marketing-navbar .dropdown-menu .dropdown-item:focus,
+.marketing-navbar .dropdown-menu .dropdown-item.active,
+[data-bs-theme="dark"] .marketing-navbar .dropdown-menu .dropdown-item:hover,
+[data-bs-theme="dark"] .marketing-navbar .dropdown-menu .dropdown-item:focus {
+  color: var(--avx-primary);
+  background-color: var(--avx-primary-tint);
+}
+
+[data-bs-theme="dark"] .marketing-navbar.navbar .navbar-nav .nav-link:hover,
+[data-bs-theme="dark"] .marketing-navbar .dropdown-menu .dropdown-item:hover {
+  background-color: rgba(37, 99, 235, .18);
+}
+
+.mktg-compact-feature-item:hover,
+[data-bs-theme="dark"] .mktg-compact-feature-item:hover {
+  color: var(--avx-primary);
+  background-color: var(--avx-primary-tint);
+}
+
+.feature-card:hover,
+.integration-card:hover,
+.features-grid-card:hover,
+.mktg-brand-card:hover,
+[data-bs-theme="dark"] .feature-card:hover,
+[data-bs-theme="dark"] .integration-card:hover,
+[data-bs-theme="dark"] .features-grid-card:hover {
+  border-color: rgba(37, 99, 235, .35);
+}
+
+.mktg-contact-links a:hover,
+[data-bs-theme="dark"] .mktg-contact-links a:hover,
+.contact-info a:hover,
+.signup-box__links a:hover,
+.breadcrumbs a:hover,
+.nav > li a:hover,
+.nav > li a.active {
+  color: var(--avx-primary);
+}
+
+[data-bs-theme="dark"] .mktg-link-green:hover,
+[data-bs-theme="dark"] .mktg-link-green:focus {
+  color: var(--avx-primary-hover);
+}
+
+.marketing-hero-simple .btn-td-green:hover,
+.marketing-hero-simple .btn-td-green:focus,
+.marketing-hero-simple .btn-outline-td-green:hover,
+.marketing-hero-simple .btn-outline-td-green:focus,
+.mktg-lead-flow .hero-simple-hub-cta:hover {
+  color: #fff;
+  background-color: var(--avx-primary-hover);
+  border-color: var(--avx-primary-hover);
+}
+
+[data-bs-theme="dark"] .btn-success:hover {
+  background: var(--avx-primary-hover);
+}
+
+.signup-form .form-control:focus,
+.signup-form .form-check-input:focus,
+[data-bs-theme="dark"] .mktg-auth-card .form-control:focus:not(.is-invalid):not(.is-valid),
+[data-bs-theme="dark"] .pricing-calculator .form-select:focus,
+[data-bs-theme="dark"] .pricing-calculator .form-control:focus,
+[data-bs-theme="dark"] .contact-form .form-control:focus,
+[data-bs-theme="dark"] .contact-form .form-select:focus {
+  border-color: var(--avx-primary);
+  box-shadow: 0 0 0 .25rem var(--avx-primary-soft);
+}
+
+[data-bs-theme="dark"] .pricing-accordion .accordion-button:focus {
+  box-shadow: 0 0 0 .25rem var(--avx-primary-soft);
+}
+
+/* the site's base link color (and a few specific link styles) were green */
+a,
+.title--desc a,
+.signup-form__terms a,
+.single-how-to a,
+.onepage a,
+.pagination a,
+.pagination span {
+  color: var(--avx-primary);
+}
