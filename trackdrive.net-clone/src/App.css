@@ -2677,3 +2677,22 @@ a:hover .arrow-icon-diagonal {
     transition-duration: .01ms !important;
   }
 }
+
+
+.hero-rings-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  pointer-events: none;
+  animation: spinRings 60s linear infinite;
+  opacity: 0.5;
+  width: 1000px;
+  max-width: none;
+}
+
+@keyframes spinRings {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}

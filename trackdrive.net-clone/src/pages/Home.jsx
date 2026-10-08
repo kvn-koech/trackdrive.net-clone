@@ -207,7 +207,8 @@ export default function Home() {
     <>
         <section className="hero-section">
           <div className="hero-glow" />
-          <div className="hero-content">
+          <div className="hero-content" style={{ position: "relative" }}>
+            <img src="/assets/trackdrive_marketing/brand-assets/ringba%20assets/pt-hero-rings.png" alt="" className="hero-rings-bg" />
             <Link className="announcement" to="/platform">
               <span className="announcement-dot" />
               PAY-PER-CALL INTELLIGENCE PLATFORM
