@@ -313,8 +313,6 @@
       if (!flow) return;
       flowWrap.classList.add('avx-flow3d');
 
-      var leads = flowWrap.querySelector('.hero-simple-node-leads .hero-simple-node-icon');
-      var revenue = flowWrap.querySelector('.hero-simple-node-revenue .hero-simple-node-icon');
       var hubIcon = flowWrap.querySelector('.hero-simple-hub-icon');
       flowWrap.classList.add('avx-lf2');
       // the scene canvas reaches past the content edges: keep it from widening the page
@@ -334,29 +332,9 @@
       tilt.appendChild(flow);
       leadScene(tilt, flow);
 
-      // 3D: each node becomes a thick coin turning gently above its own holographic platform
-      flowWrap.classList.add('avx-lf3');
-      [leads, hubIcon, revenue].forEach(function (icon, n) {
-        if (!icon) return;
-        var edge = '';
-        for (var k = 1; k <= 4; k++) edge += '<b class="avx-lf-edge" style="transform:translateZ(' + (-k * 1.5) + 'px)"></b>';
-        icon.insertAdjacentHTML('afterbegin', edge);
-        icon.style.animationDelay = (-n * 1.3) + 's';
-        var plat = el('div', 'avx-lfp' + (icon === hubIcon ? ' avx-lfp-hub' : ''),
-          '<div class="avx-lfp-floor"><img src="/assets/avx-ringba/pt-hero-rings-blue.webp" alt="" decoding="async">' +
-          (icon === hubIcon ? '<img class="avx-lfp-dots" src="/assets/avx-ringba/platform-ring-blue.webp" alt="" decoding="async">' : '') +
-          '<i class="avx-lfp-pulse"></i></div>');
-        plat.setAttribute('aria-hidden', 'true');
-        icon.parentNode.insertBefore(plat, icon.nextSibling);
-        // centre the platform just under the coin, from the coin's real layout position
-        function place() {
-          var h = plat.offsetHeight;
-          plat.style.top = Math.round(icon.offsetTop + icon.offsetHeight + 6 - h / 2) + 'px';
-        }
-        place();
-        window.addEventListener('resize', place);
-        if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
-      });
+      // 3D: each node is a glass sphere floating over its platform, drawn by leadScene;
+      // the icon glyphs ride on top of them
+      flowWrap.classList.add('avx-lf3', 'avx-lf-sph');
 
       if (reduced) { flowWrap.classList.add('avx-seen', 'avx-settled'); return; }
 
@@ -372,7 +350,7 @@
     });
   }
 
-  // calls travel as beads on 3D arcs: Leads -> Avortyx hub -> Revenue, over a perspective floor
+  // three glass spheres on platforms; calls travel between them as glossy beads on 3D arcs
   function leadScene(tilt, flow) {
     var canvas = el('canvas', 'avx-lf-canvas');
     canvas.setAttribute('aria-hidden', 'true');
@@ -387,7 +365,7 @@
     if (!nodes.leads || !nodes.hub || !nodes.revenue) return;
     var PAD_X = 60, PAD_T = 80, PAD_B = 110;
     var W = 0, H = 0, dpr = 1, pos = {}, raf = 0, visible = false, clock = 0, last = 0, lastDraw = 0;
-    var beads = [], nextBead = 0.2, labels = [], rings = [];
+    var beads = [], nextBead = 0.2, rings = [];
 
     function centre(elm) {
       var x = elm.offsetWidth / 2, y = elm.offsetHeight / 2, n = elm;
@@ -395,7 +373,7 @@
       return { x: x + PAD_X, y: y + PAD_T, r: elm.offsetWidth / 2 };
     }
     function measure() {
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = tilt.offsetWidth + PAD_X * 2;
       H = tilt.offsetHeight + PAD_T + PAD_B;
       canvas.width = Math.round(W * dpr);
@@ -405,70 +383,84 @@
       pos.leads = centre(nodes.leads);
       pos.hub = centre(nodes.hub);
       pos.revenue = centre(nodes.revenue);
+      buildSprites();
     }
 
     // quadratic arc lifted towards the viewer: a bead looks larger at the crest
     function arc(a, b, t) {
-      var cx = (a.x + b.x) / 2, cy = Math.min(a.y, b.y) - 78, u = 1 - t;
-      return { x: u * u * a.x + 2 * u * t * cx + t * t * b.x, y: u * u * a.y + 2 * u * t * cy + t * t * b.y, s: 1 + Math.sin(t * Math.PI) * 0.45 };
+      var cx = (a.x + b.x) / 2, cy = Math.min(a.y, b.y) - 64, u = 1 - t;
+      return { x: u * u * a.x + 2 * u * t * cx + t * t * b.x, y: u * u * a.y + 2 * u * t * cy + t * t * b.y, s: 1 + Math.sin(t * Math.PI) * 0.35 };
     }
     function hit(name, t) {
       var n = nodes[name];
       n.classList.add('avx-hit');
       setTimeout(function () { n.classList.remove('avx-hit'); }, 380);
-      rings.push({ at: pos[name], t: t });
+      rings.push({ name: name, t: t });
+      if (name !== 'hub') sweeps.push({ name: name, t: t });
     }
 
-    function drawFloor() {
-      var y0 = Math.max(pos.leads.y, pos.revenue.y) + pos.leads.r + 86, cx = W / 2;
-      // a soft pool of light on the floor (an ellipse, so it has no edges)
-      ctx.save();
-      ctx.translate(cx, y0 + 40);
-      ctx.scale(1, 0.28);
-      var g = ctx.createRadialGradient(0, 0, 0, 0, 0, W * 0.46);
-      g.addColorStop(0, 'rgba(59,130,246,.16)');
-      g.addColorStop(1, 'rgba(59,130,246,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(0, 0, W * 0.46, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-      ctx.lineWidth = 1;
-      // lines running into the distance, fading in from the horizon
-      for (var i = -12; i <= 12; i++) {
-        var xb = cx + i * (W / 14), xt = cx + i * (W / 60);
-        var a = 0.13 * (1 - Math.abs(i) / 13);
-        var lg = ctx.createLinearGradient(0, y0 - 26, 0, H);
-        lg.addColorStop(0, 'rgba(96,165,250,0)');
-        lg.addColorStop(0.35, 'rgba(96,165,250,' + a.toFixed(3) + ')');
-        ctx.strokeStyle = lg;
-        ctx.beginPath(); ctx.moveTo(xt, y0 - 26); ctx.lineTo(xb, H); ctx.stroke();
+    // ---- the nodes are glass spheres: shading is baked once per size, the dot
+    // lattice turns every frame, orbits pass behind and in front of each sphere ----
+    var SPH = {}, LAT = fibSphere(150), TILT = 0.38, ROLL = 0.2;
+    var sweeps = [], hubFlash = -9;
+
+    function fibSphere(n) {
+      var pts = [], ga = Math.PI * (3 - Math.sqrt(5));
+      for (var i = 0; i < n; i++) {
+        var y = 1 - (i + 0.5) / n * 2, rr = Math.sqrt(1 - y * y), a = i * ga;
+        pts.push([Math.cos(a) * rr, y, Math.sin(a) * rr]);
       }
-      for (var r = 1; r < 7; r++) {
-        var k = r / 6, y = y0 - 26 + (H - y0 + 26) * k * k;
-        var grad = ctx.createLinearGradient(0, 0, W, 0);
-        var al = (0.03 + 0.1 * k).toFixed(3);
-        grad.addColorStop(0, 'rgba(96,165,250,0)');
-        grad.addColorStop(0.5, 'rgba(96,165,250,' + al + ')');
-        grad.addColorStop(1, 'rgba(96,165,250,0)');
-        ctx.strokeStyle = grad;
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-      }
+      return pts;
     }
-
-    function drawPedestal(p, big) {
-      var y = p.y + p.r + 5, rx = p.r * (big ? 1.05 : 0.95), ry = rx * 0.2;
-      var sh = ctx.createRadialGradient(p.x, y, 2, p.x, y, rx);
-      sh.addColorStop(0, 'rgba(0,0,0,.55)');
-      sh.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.save(); ctx.translate(p.x, y); ctx.scale(1, ry / rx); ctx.translate(-p.x, -y);
-      ctx.fillStyle = sh; ctx.beginPath(); ctx.arc(p.x, y, rx, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-      ctx.strokeStyle = 'rgba(96,165,250,.35)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.ellipse(p.x, y, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
-      ctx.strokeStyle = 'rgba(96,165,250,.14)';
-      ctx.beginPath(); ctx.ellipse(p.x, y, rx * 1.35, ry * 1.35, 0, 0, Math.PI * 2); ctx.stroke();
+    function sprite(r) {
+      var s = Math.ceil(r * 2 + 6), c = document.createElement('canvas');
+      c.width = c.height = Math.round(s * dpr);
+      var g = c.getContext('2d');
+      g.setTransform(dpr, 0, 0, dpr, s * dpr / 2, s * dpr / 2);
+      return { c: c, g: g, s: s };
     }
+    function shadeBody(r, hub) {
+      var o = sprite(r), g = o.g;
+      g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.clip();
+      var b = g.createRadialGradient(-r * 0.38, -r * 0.42, r * 0.04, -r * 0.12, -r * 0.12, r * 1.25);
+      var st = hub ? ['#3567cc', '#16347c', '#0b1a44', '#050a1c'] : ['#78a9ff', '#2d68e2', '#173f9e', '#081646'];
+      b.addColorStop(0, st[0]); b.addColorStop(0.36, st[1]); b.addColorStop(0.72, st[2]); b.addColorStop(1, st[3]);
+      g.fillStyle = b; g.fillRect(-r, -r, r * 2, r * 2);
+      // light bouncing back up from the platform
+      var u = g.createRadialGradient(r * 0.12, r * 0.98, 0, r * 0.12, r * 0.98, r * 0.95);
+      u.addColorStop(0, 'rgba(96,165,250,.42)'); u.addColorStop(1, 'rgba(96,165,250,0)');
+      g.fillStyle = u; g.fillRect(-r, -r, r * 2, r * 2);
+      // fresnel rim
+      var f = g.createRadialGradient(0, 0, r * 0.62, 0, 0, r);
+      f.addColorStop(0, 'rgba(147,197,253,0)'); f.addColorStop(0.82, 'rgba(147,197,253,.07)'); f.addColorStop(1, 'rgba(191,219,254,.42)');
+      g.fillStyle = f; g.fillRect(-r, -r, r * 2, r * 2);
+      return o;
+    }
+    function shadeSpec(r) {
+      var o = sprite(r), g = o.g;
+      g.save(); g.translate(-r * 0.36, -r * 0.46); g.rotate(-0.62); g.scale(1, 0.58);
+      var h = g.createRadialGradient(0, 0, 0, 0, 0, r * 0.46);
+      h.addColorStop(0, 'rgba(255,255,255,.62)'); h.addColorStop(0.45, 'rgba(255,255,255,.16)'); h.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = h; g.beginPath(); g.arc(0, 0, r * 0.46, 0, Math.PI * 2); g.fill();
+      g.restore();
+      var hs = g.createRadialGradient(-r * 0.42, -r * 0.5, 0, -r * 0.42, -r * 0.5, r * 0.1);
+      hs.addColorStop(0, 'rgba(255,255,255,.9)'); hs.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = hs; g.fillRect(-r, -r, r * 2, r * 2);
+      // a thin back-light catching the lower right edge
+      g.lineWidth = 1.1;
+      g.strokeStyle = 'rgba(191,219,254,.38)';
+      g.beginPath(); g.arc(0, 0, r - 0.7, 0.12, 1.25); g.stroke();
+      return o;
+    }
+    function buildSprites() {
+      ['leads', 'hub', 'revenue'].forEach(function (n) {
+        var r = pos[n].r;
+        SPH[n] = { body: shadeBody(r, n === 'hub'), spec: shadeSpec(r) };
+      });
+    }
+    function blit(o, x, y) { ctx.drawImage(o.c, x - o.s / 2, y - o.s / 2, o.s, o.s); }
 
+    // the dotted route a call takes between two spheres
     function drawTrack(a, b, t) {
       ctx.save();
       ctx.setLineDash([2, 7]);
@@ -484,111 +476,194 @@
       ctx.restore();
     }
 
-    // two tilted orbits around the hub; satellites dim as they pass behind it
-    function drawHubOrbits(t, front) {
-      var h = pos.hub;
-      [[1.95, 0.42, -0.3, 0.9], [1.7, 0.36, 0.4, -1.3]].forEach(function (o, k) {
-        var rx = h.r * o[0], ry = h.r * o[1];
-        if (!front) {
-          ctx.strokeStyle = 'rgba(96,165,250,.22)';
-          ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.ellipse(h.x, h.y, rx, ry, o[2], 0, Math.PI * 2); ctx.stroke();
-        }
-        var a = t * o[3] + k * 2.1, ca = Math.cos(o[2]), sa = Math.sin(o[2]);
-        var ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
-        var inFront = Math.sin(a) > 0;
-        if (inFront !== front) return;
-        var x = h.x + ex * ca - ey * sa, y = h.y + ex * sa + ey * ca;
-        var rr = inFront ? 4.2 : 2.6;
-        var g = ctx.createRadialGradient(x - 1, y - 1, 0, x, y, rr * 2.2);
-        g.addColorStop(0, inFront ? '#ffffff' : '#bfdbfe');
-        g.addColorStop(0.45, inFront ? '#93c5fd' : 'rgba(96,165,250,.6)');
-        g.addColorStop(1, 'rgba(59,130,246,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(x, y, rr * 2.2, 0, Math.PI * 2); ctx.fill();
+    // a small glossy sphere (orbiting moons and the calls themselves)
+    function mini(x, y, r, glow) {
+      if (glow) {
+        var gl = ctx.createRadialGradient(x, y, 0, x, y, r * 3.4);
+        gl.addColorStop(0, 'rgba(96,165,250,' + (0.3 * glow).toFixed(3) + ')'); gl.addColorStop(1, 'rgba(96,165,250,0)');
+        ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(x, y, r * 3.4, 0, Math.PI * 2); ctx.fill();
+      }
+      var g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, 0, x, y, r);
+      g.addColorStop(0, '#ffffff'); g.addColorStop(0.28, '#cfe1ff'); g.addColorStop(0.65, '#5b8def'); g.addColorStop(1, '#1b3a8c');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    }
+
+    function bob(name, t) {
+      if (reduced) return 0;
+      var ph = { leads: 0, hub: 2.1, revenue: 4.2 }[name];
+      return Math.sin(t * 0.75 + ph) * (name === 'hub' ? 2.5 : 3.5);
+    }
+
+    function drawPlatform(name, p, t, lift) {
+      var y = p.y + p.r + 16, rx = p.r * (name === 'hub' ? 1.4 : 1.45), ry = rx * 0.22;
+      ctx.save(); ctx.translate(p.x, y); ctx.scale(1, 0.22);
+      // contact shadow tightens as the sphere sinks; a pool of its own light around it
+      var sh = ctx.createRadialGradient(0, 0, 0, 0, 0, rx * 0.75);
+      sh.addColorStop(0, 'rgba(0,0,0,' + (0.5 - lift * 0.03).toFixed(3) + ')'); sh.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = sh; ctx.beginPath(); ctx.arc(0, 0, rx * 0.75, 0, Math.PI * 2); ctx.fill();
+      var pl = ctx.createRadialGradient(0, 0, rx * 0.4, 0, 0, rx * 1.25);
+      pl.addColorStop(0, 'rgba(59,130,246,.16)'); pl.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.fillStyle = pl; ctx.beginPath(); ctx.arc(0, 0, rx * 1.25, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(96,165,250,.26)';
+      ctx.beginPath(); ctx.ellipse(p.x, y, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(96,165,250,.12)';
+      ctx.beginPath(); ctx.ellipse(p.x, y, rx * 0.7, ry * 0.7, 0, 0, Math.PI * 2); ctx.stroke();
+      // a dotted outer ring turning slowly
+      ctx.save();
+      ctx.setLineDash([1.5, 7]);
+      ctx.lineDashOffset = -t * 9;
+      ctx.lineWidth = 1.4;
+      ctx.strokeStyle = 'rgba(147,197,253,.3)';
+      ctx.beginPath(); ctx.ellipse(p.x, y, rx * 1.22, ry * 1.22, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+      rings.forEach(function (rg) {
+        if (rg.name !== name) return;
+        var a = (t - rg.t) / 1.1;
+        if (a < 0 || a > 1) return;
+        ctx.strokeStyle = 'rgba(147,197,253,' + (0.5 * (1 - a) * (1 - a)).toFixed(3) + ')';
+        ctx.lineWidth = 1.3;
+        ctx.beginPath(); ctx.ellipse(p.x, y, rx * (0.6 + a * 0.85), ry * (0.6 + a * 0.85), 0, 0, Math.PI * 2); ctx.stroke();
       });
     }
 
-    function bead(p, warm) {
-      var r = 2.6 * p.s;
-      var g = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.3, 0, p.x, p.y, r * 2.4);
-      g.addColorStop(0, '#ffffff');
-      g.addColorStop(0.35, warm ? '#dbeafe' : '#93c5fd');
-      g.addColorStop(1, 'rgba(59,130,246,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(p.x, p.y, r * 2.4, 0, Math.PI * 2); ctx.fill();
+    // the turning dot lattice, seen through the glass: back dots faint, front dots bright
+    function drawLattice(x, y, r, t, spin, k) {
+      var a = t * spin, ca = Math.cos(a), sa = Math.sin(a), ct = Math.cos(TILT), stt = Math.sin(TILT), cr = Math.cos(ROLL), sr = Math.sin(ROLL);
+      var B = [[], [], [], []];
+      for (var i = 0; i < LAT.length; i++) {
+        var P = LAT[i], x1 = P[0] * ca + P[2] * sa, z1 = -P[0] * sa + P[2] * ca, y1 = P[1];
+        var y2 = y1 * ct + z1 * stt, z2 = z1 * ct - y1 * stt;
+        var px = x1 * cr - y2 * sr, py = x1 * sr + y2 * cr;
+        B[z2 < 0 ? 0 : z2 < 0.45 ? 1 : z2 < 0.8 ? 2 : 3].push(x + px * r * 0.96, y + py * r * 0.96);
+      }
+      var AL = [0.07, 0.2, 0.36, 0.55], SZ = [0.75, 0.95, 1.15, 1.35];
+      for (var b = 0; b < 4; b++) {
+        var L = B[b];
+        if (!L.length) continue;
+        ctx.fillStyle = 'rgba(191,219,254,' + (AL[b] * k).toFixed(3) + ')';
+        ctx.beginPath();
+        for (var j = 0; j < L.length; j += 2) { ctx.moveTo(L[j] + SZ[b], L[j + 1]); ctx.arc(L[j], L[j + 1], SZ[b], 0, Math.PI * 2); }
+        ctx.fill();
+      }
     }
+
+    // a ring of light sweeping down the surface when a call lands
+    function drawSweeps(name, x, y, r, t) {
+      sweeps.forEach(function (sw) {
+        if (sw.name !== name) return;
+        var a = (t - sw.t) / 1.0;
+        if (a < 0 || a > 1) return;
+        var e = a * a * (3 - 2 * a), yy = -0.92 + 1.84 * e, rx = Math.sqrt(1 - yy * yy) * r, ry = rx * Math.sin(TILT);
+        var cy = y + yy * Math.cos(TILT) * r, al = Math.sin(a * Math.PI) * 0.75;
+        ctx.lineWidth = 1.6;
+        ctx.strokeStyle = 'rgba(191,219,254,' + al.toFixed(3) + ')';
+        ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, ROLL, 0, Math.PI); ctx.stroke();
+        ctx.strokeStyle = 'rgba(191,219,254,' + (al * 0.3).toFixed(3) + ')';
+        ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, ROLL, Math.PI, Math.PI * 2); ctx.stroke();
+      });
+    }
+
+    // orbit list per node: [radius x, radius y, tilt, speed, phase, kind]
+    var ORBITS = {
+      leads: [[1.6, 0.42, -0.32, 0.8, 0, 'moon'], [1.85, 0.3, 0.42, -0.55, 2.4, 'moon']],
+      hub: [[1.72, 0.4, -0.2, 0.42, 0, 'ring']],
+      revenue: [[1.65, 0.36, 0.3, -0.62, 1.2, 'moon']]
+    };
+    function drawOrbits(name, x, y, r, t, front) {
+      ORBITS[name].forEach(function (o) {
+        var rx = r * o[0], ry = r * o[1], rot = o[2], cr = Math.cos(rot), sr = Math.sin(rot);
+        if (o[5] === 'ring') {
+          var fl = Math.max(0, 1 - (t - hubFlash) / 0.9);
+          ctx.lineWidth = 5;
+          ctx.strokeStyle = 'rgba(96,165,250,' + ((front ? 0.07 : 0.035) + fl * 0.08).toFixed(3) + ')';
+          ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot, front ? 0 : Math.PI, front ? Math.PI : Math.PI * 2); ctx.stroke();
+          ctx.lineWidth = 1.1;
+          ctx.strokeStyle = 'rgba(147,197,253,' + ((front ? 0.5 : 0.18) + fl * 0.4).toFixed(3) + ')';
+          ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot, front ? 0 : Math.PI, front ? Math.PI : Math.PI * 2); ctx.stroke();
+          for (var i = 0; i < 3; i++) {
+            var th = t * o[3] + i * 2.094, inF = Math.sin(th) > 0;
+            if (inF !== front) continue;
+            var ex = Math.cos(th) * rx, ey = Math.sin(th) * ry, d = 1 + Math.sin(th) * 0.25;
+            mini(x + ex * cr - ey * sr, y + ex * sr + ey * cr, 2.6 * d, front ? 0.8 : 0.3);
+          }
+          return;
+        }
+        // a faint orbit path, its front half a touch brighter
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = front ? 'rgba(147,197,253,.16)' : 'rgba(147,197,253,.07)';
+        ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot, front ? 0 : Math.PI, front ? Math.PI : Math.PI * 2); ctx.stroke();
+        var a = t * o[3] + o[4], inFront = Math.sin(a) > 0;
+        if (inFront !== front) return;
+        var ex2 = Math.cos(a) * rx, ey2 = Math.sin(a) * ry, s = 1 + Math.sin(a) * 0.3;
+        if (!front) ctx.globalAlpha = 0.55;
+        mini(x + ex2 * cr - ey2 * sr, y + ex2 * sr + ey2 * cr, 3.4 * s, front ? 1 : 0.4);
+        ctx.globalAlpha = 1;
+      });
+    }
+
+    function drawSphere(name, t, off) {
+      var p = pos[name], x = p.x, y = p.y + off, r = p.r, S2 = SPH[name];
+      drawOrbits(name, x, y, r, t, false);
+      blit(S2.body, x, y);
+      ctx.save();
+      ctx.beginPath(); ctx.arc(x, y, r - 0.5, 0, Math.PI * 2); ctx.clip();
+      drawLattice(x, y, r, t, name === 'hub' ? -0.22 : 0.3, name === 'hub' ? 0.5 : 1);
+      drawSweeps(name, x, y, r, t);
+      ctx.restore();
+      blit(S2.spec, x, y);
+      drawOrbits(name, x, y, r, t, true);
+    }
+
+    // the call: a glossy bead on a 3D arc, fading in as it leaves one sphere and out into the next
+    function drawCall(a, b, e, warm) {
+      for (var k = 6; k >= 1; k--) {
+        var tr = arc(a, b, Math.max(0, e - k * 0.022));
+        ctx.globalAlpha = 0.05 * (7 - k) * edgeFade(e);
+        mini(tr.x, tr.y, 2.2 * tr.s, 0);
+      }
+      var q = arc(a, b, e);
+      ctx.globalAlpha = edgeFade(e);
+      mini(q.x, q.y, (warm ? 4 : 3.6) * q.s, 1);
+      ctx.globalAlpha = 1;
+    }
+    function edgeFade(e) { return Math.min(1, e / 0.08, (1 - e) / 0.08); }
 
     function draw(t) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
-      drawTrack(pos.leads, pos.hub, t);
-      drawTrack(pos.hub, pos.revenue, t);
+      var off = { leads: bob('leads', t), hub: bob('hub', t), revenue: bob('revenue', t) };
+      Object.keys(off).forEach(function (n) { nodes[n].style.translate = '0 ' + off[n].toFixed(2) + 'px'; });
+      var L = { x: pos.leads.x + pos.leads.r * 0.92, y: pos.leads.y + off.leads };
+      var Hin = { x: pos.hub.x - pos.hub.r * 0.92, y: pos.hub.y + off.hub };
+      var Hout = { x: pos.hub.x + pos.hub.r * 0.92, y: pos.hub.y + off.hub };
+      var R = { x: pos.revenue.x - pos.revenue.r * 0.92, y: pos.revenue.y + off.revenue };
+      drawTrack(L, Hin, t);
+      drawTrack(Hout, R, t);
+      ['leads', 'hub', 'revenue'].forEach(function (n) { drawPlatform(n, pos[n], t, off[n]); });
+      ['leads', 'hub', 'revenue'].forEach(function (n) { drawSphere(n, t, off[n]); });
 
-      // a new call every ~0.9s while running
       if (!reduced && !motionPaused() && t > nextBead) {
         beads.push({ t0: t });
         hit('leads', t);
-        nextBead = t + 1.5 + Math.random() * 0.8;
+        nextBead = t + 2.2 + Math.random() * 1.1;
       }
-      var LEG = 1.6;
+      var LEG = 1.7;
       beads = beads.filter(function (b) {
         var age = t - b.t0;
-        if (age < LEG) {
-          var u = age / LEG, e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
-          for (var k = 5; k >= 1; k--) {
-            var tr = arc(pos.leads, pos.hub, Math.max(0, e - k * 0.025));
-            ctx.globalAlpha = 0.07 * (6 - k);
-            bead({ x: tr.x, y: tr.y, s: tr.s * 0.6 }, false);
-          }
-          ctx.globalAlpha = 1;
-          bead(arc(pos.leads, pos.hub, e), false);
-          return true;
-        }
-        if (!b.inHub) { b.inHub = true; hit('hub', t); }
-        var age2 = age - LEG - 0.25;
-        if (age2 < 0) return true; // a beat inside the hub
-        if (age2 < LEG) {
-          var v = age2 / LEG, e2 = v < 0.5 ? 2 * v * v : 1 - Math.pow(-2 * v + 2, 2) / 2;
-          for (var j = 5; j >= 1; j--) {
-            var tr2 = arc(pos.hub, pos.revenue, Math.max(0, e2 - j * 0.025));
-            ctx.globalAlpha = 0.07 * (6 - j);
-            bead({ x: tr2.x, y: tr2.y, s: tr2.s * 0.6 }, true);
-          }
-          ctx.globalAlpha = 1;
-          bead(arc(pos.hub, pos.revenue, e2), true);
-          return true;
-        }
+        if (age < LEG) { drawCall(L, Hin, ease(age / LEG), false); return true; }
+        if (!b.inHub) { b.inHub = true; hit('hub', t); hubFlash = t; }
+        var age2 = age - LEG - 0.35;
+        if (age2 < 0) return true; // a beat inside the hub while it routes the call
+        if (age2 < LEG) { drawCall(Hout, R, ease(age2 / LEG), true); return true; }
         hit('revenue', t);
         return false;
       });
-
-      // (pulse rings are kept off in the calm design)
-      rings = [];
-      rings = rings.filter(function (r) {
-        var a = (t - r.t) / 0.9;
-        if (a > 1) return false;
-        var y = r.at.y + r.at.r + 5, rx = r.at.r * (0.95 + a * 0.9);
-        ctx.strokeStyle = 'rgba(147,197,253,' + (0.6 * (1 - a)).toFixed(3) + ')';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.ellipse(r.at.x, y, rx, rx * 0.22, 0, 0, Math.PI * 2); ctx.stroke();
-        return true;
-      });
-
-
-      // payout labels rising off the revenue disc
-      ctx.font = '600 12px "JetBrains Mono", ui-monospace, monospace';
-      ctx.textAlign = 'center';
-      labels = labels.filter(function (l) {
-        var a = (t - l.t) / 1.4;
-        if (a > 1) return false;
-        ctx.globalAlpha = a < 0.15 ? a / 0.15 : 1 - (a - 0.15) / 0.85;
-        ctx.fillStyle = '#bfdbfe';
-        ctx.fillText(l.text, pos.revenue.x, pos.revenue.y - pos.revenue.r - 14 - a * 26);
-        return true;
-      });
-      ctx.globalAlpha = 1;
+      rings = rings.filter(function (r) { return t - r.t < 1.2; });
+      sweeps = sweeps.filter(function (s) { return t - s.t < 1.1; });
     }
+    function ease(u) { return u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; }
 
     function frame(now) {
       raf = 0;
@@ -996,7 +1071,7 @@
     if (!hero) return;
     hero.classList.add('avx-fx-host', 'avx-pricing-3d');
     // the same quiet 3D floor as the landing page
-    hero.insertBefore(el('div', 'avx-hero-3d', '<div class="avx-hero-3d-plane"><div class="avx-hero-3d-grid"></div></div><div class="avx-hero-3d-fade"></div><div class="avx-hero-3d-horizon"></div>'), hero.firstChild);
+    hero.insertBefore(el('div', 'avx-pbg', '<div class="avx-pbg-spot"></div><div class="avx-pbg-dots"></div><div class="avx-pbg-eclipse"></div><div class="avx-pbg-fade"></div>'), hero.firstChild);
   }
 
   // ---------- Section backgrounds ----------
@@ -1264,6 +1339,24 @@
         sources.forEach(function (s, i) { wire(s, i, sources.length, false); });
         outputs.forEach(function (o, i) { wire(o, i, outputs.length, true); });
         svg.innerHTML = defs + paths;
+        // one dot per pair: in from a source, through the Avortyx box, out the other side
+        packets.innerHTML = '';
+        var n = Math.min(sources.length, outputs.length);
+        for (var i = 0; i < n; i++) {
+          var s = offsetIn(sources[i], diagram), o = offsetIn(outputs[i], diagram);
+          var yin = Math.round(h.y + h.h * (n > 1 ? 0.28 + 0.44 * i / (n - 1) : 0.5));
+          var sy = Math.round(s.y + s.h / 2), oy = Math.round(o.y + o.h / 2);
+          var d = curve(s.x + s.w, sy, h.x, yin) + ' L' + (h.x + h.w) + ' ' + yin + ' ' +
+            curve(h.x + h.w, yin, o.x, oy).replace(/^M[^C]+/, '');
+          var p = document.createElement('div');
+          p.className = 'avx-plat-packet avx-plat-thru';
+          p.style.offsetPath = 'path("' + d + '")';
+          var delay = (i * 1.1).toFixed(2) + 's';
+          p.style.animationDelay = delay;
+          sources[i].style.setProperty('--avx-d', delay);
+          outputs[i].style.setProperty('--avx-d', delay);
+          packets.appendChild(p);
+        }
       }
 
       layout();
@@ -1404,7 +1497,7 @@
     hero.classList.add('avx-rb-hero', 'avx-hero-calm');
 
     // a quiet 3D floor: a perspective grid reaching back to a soft horizon
-    hero.insertBefore(el('div', 'avx-hero-3d', '<div class="avx-hero-3d-plane"><div class="avx-hero-3d-grid"></div></div><div class="avx-hero-3d-fade"></div><div class="avx-hero-3d-horizon"></div>'), hero.firstChild);
+    hero.insertBefore(el('div', 'avx-pbg', '<div class="avx-pbg-spot"></div><div class="avx-pbg-dots"></div><div class="avx-pbg-eclipse"></div><div class="avx-pbg-fade"></div>'), hero.firstChild);
 
     // two distant holographic scenes (ringba style), each telling part of the call-tracking story
     var R = '/assets/avx-ringba/', B = '/assets/avx-baked/';
@@ -1451,6 +1544,59 @@
     hero.querySelectorAll('.avx-side').forEach(function (n) { n.setAttribute('aria-hidden', 'true'); });
   }
 
+
+  // ---------- Homepage: 3D waves floating behind the integration sections (no edges) ----------
+
+  function wavesDraw(ctx, W, H, t) {
+    var N = 34, step = W > 900 ? 12 : 10;
+    ctx.globalCompositeOperation = 'lighter';
+    for (var k = 0; k < N; k++) {
+      var d = k / (N - 1);                       // 0 far .. 1 near
+      var depth = 0.55 + 0.45 * d;               // nearer lines are wider
+      var yc = H * (0.5 + (d - 0.5) * 0.5);
+      var amp = H * (0.07 + 0.09 * d);
+      var x0 = W / 2 - W * 0.6 * depth, x1 = W / 2 + W * 0.6 * depth;
+      var g = ctx.createLinearGradient(x0, 0, x1, 0);
+      var a = (0.05 + 0.22 * Math.pow(d, 1.6)).toFixed(3);
+      var col = d < 0.5 ? '99,102,241' : '59,130,246';
+      g.addColorStop(0, 'rgba(' + col + ',0)');
+      g.addColorStop(0.3, 'rgba(' + col + ',' + a + ')');
+      g.addColorStop(0.7, 'rgba(' + col + ',' + a + ')');
+      g.addColorStop(1, 'rgba(' + col + ',0)');
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 0.6 + 0.9 * d;
+      ctx.beginPath();
+      for (var x = x0; x <= x1 + step; x += step) {
+        var u = (x - W / 2) / W;
+        var y = yc + amp * Math.sin(u * 7 + t * 0.32 + d * 2.6) * Math.cos(u * 3.2 - t * 0.21 + d * 1.4) +
+          amp * 0.35 * Math.sin(u * 13 - t * 0.5 + d * 4);
+        if (x === x0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  function initIntegrationWaves() {
+    if (pageKey() !== '/') return;
+    var main = document.querySelector('main');
+    var heads = Array.prototype.slice.call(document.querySelectorAll('main section h2'));
+    var a = heads.filter(function (h) { return /we integrate with/i.test(h.textContent); })[0];
+    var b = heads.filter(function (h) { return /bring your own voip/i.test(h.textContent); })[0];
+    a = a && a.closest('section');
+    b = b && b.closest('section');
+    if (!main || !a || !b) return;
+    main.classList.add('avx-main-layer');
+    function place() {
+      wrap.style.top = (a.offsetTop - 40) + 'px';
+      wrap.style.height = (b.offsetTop + b.offsetHeight - a.offsetTop + 80) + 'px';
+    }
+    var wrap;
+    window.addEventListener('resize', function () { if (wrap) place(); });
+    wrap = canvasScene('avx-iwaves', wavesDraw);
+    main.insertBefore(wrap, main.firstChild);
+    place();
+    window.addEventListener('load', place);
+  }
 
   // ---------- Hero: a call attribution card (source, campaign, keyword, buyer, revenue) ----------
 
@@ -3165,7 +3311,7 @@
     var steps = [initMotionToggle, initProgress, initRingbaHero, initLeadFlow, initPlatformFlow,
       initBottomWaves, initHeroCharts, initPingPostDemos, initProductTour,
       initBackLinks, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
-      initPricingHorizon, initFlowSequences, initTables, initCounters,
+      initPricingHorizon, initIntegrationWaves, initFlowSequences, initTables, initCounters,
       initOffscreenPause, initScrollHints];
     if (!reduced) steps.push(initReveal);
     // apply a saved pause to scenes built after the toggle

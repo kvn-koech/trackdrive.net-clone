@@ -6213,3 +6213,243 @@ main > section {
 .avx-hero-calm [class*="stat-value"] {
   text-shadow: none !important;
 }
+
+/* =====================================================================
+   Premium pass: hero & pricing backgrounds, subtle lead flow, subtle CTA,
+   floating integration waves, features dots that pass through the hub
+   ===================================================================== */
+
+/* ---------- Premium background: spotlight, faint dot field, glowing horizon arc ---------- */
+
+.avx-pbg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #07090f;
+}
+
+.avx-pbg-spot {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(48% 60% at 50% -8%, rgba(59, 130, 246, .26), rgba(37, 99, 235, .08) 45%, rgba(37, 99, 235, 0) 75%),
+    radial-gradient(28% 34% at 16% 18%, rgba(99, 102, 241, .08), rgba(99, 102, 241, 0) 70%),
+    radial-gradient(28% 34% at 84% 22%, rgba(56, 189, 248, .06), rgba(56, 189, 248, 0) 70%);
+  animation: avxPbgBreathe 12s ease-in-out infinite alternate;
+}
+
+@keyframes avxPbgBreathe {
+  from { opacity: .8; }
+  to { opacity: 1; }
+}
+
+.avx-pbg-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(148, 163, 184, .16) 1px, transparent 1.2px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(55% 60% at 50% 30%, #000, transparent 80%);
+  mask-image: radial-gradient(55% 60% at 50% 30%, #000, transparent 80%);
+}
+
+/* a dark planet rising from below, its rim lit by the spotlight */
+.avx-pbg-eclipse {
+  position: absolute;
+  left: 50%;
+  width: 2600px;
+  height: 2600px;
+  margin-left: -1300px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #05070c 97%, #0a1020 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(191, 219, 254, .55),
+    inset 0 18px 40px -20px rgba(59, 130, 246, .35),
+    0 -1px 18px rgba(96, 165, 250, .28),
+    0 -50px 140px -40px rgba(59, 130, 246, .4);
+}
+
+.avx-hero-calm .avx-pbg-eclipse { top: calc(100% - 172px); }
+.avx-pricing-3d .avx-pbg-eclipse { top: calc(100% - 64px); }
+
+/* blend into the page below */
+.avx-pbg-fade {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 90px;
+  background: linear-gradient(180deg, rgba(11, 12, 16, 0), #0b0c10);
+}
+
+/* the previous grid floors are replaced */
+.avx-hero-3d {
+  display: none !important;
+}
+
+.avx-hero-calm.hero-constellation-bg,
+[data-bs-theme="dark"] .avx-hero-calm.hero-constellation-bg,
+.avx-pricing-3d,
+[data-bs-theme="dark"] .avx-pricing-3d {
+  background: #07090f !important;
+}
+
+@media (max-width: 767.98px) {
+  .avx-hero-calm .avx-pbg-eclipse { top: calc(100% - 120px); }
+}
+
+/* ---------- "Everything you need": subtle ---------- */
+
+.avx-flow3d.avx-lf2.avx-lf3 .hero-simple-node-icon,
+.avx-flow3d.avx-lf2.avx-lf3 .hero-simple-hub-icon {
+  animation: none !important;
+  transform: none !important;
+}
+
+.avx-lfp-floor img,
+.avx-lfp-floor .avx-lfp-dots {
+  animation: none;
+  opacity: .28;
+}
+
+.avx-flow3d.avx-lf2.avx-lf3 .avx-hit {
+  scale: 1;
+}
+
+.avx-hit + .avx-lfp .avx-lfp-pulse {
+  animation-duration: .9s;
+  border-color: rgba(147, 197, 253, .45);
+}
+
+/* ---------- "Ready to get started?": a subtle band ---------- */
+
+[data-bs-theme="dark"] .marketing-cta-band,
+.marketing-cta-band {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(55% 90% at 50% 0%, rgba(59, 130, 246, .16), rgba(59, 130, 246, 0) 70%),
+    #090c13 !important;
+  border-top: 1px solid rgba(255, 255, 255, .06);
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.marketing-cta-band__bg,
+.marketing-cta-band .avx-fx,
+.marketing-cta-band .avx-cta-waves {
+  display: none !important;
+}
+
+.marketing-cta-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(148, 163, 184, .14) 1px, transparent 1.2px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(50% 80% at 50% 40%, #000, transparent 80%);
+  mask-image: radial-gradient(50% 80% at 50% 40%, #000, transparent 80%);
+}
+
+[data-bs-theme="dark"] .marketing-cta-band p,
+.marketing-cta-band .marketing-cta-band__subtitle {
+  color: #a7afbd !important;
+}
+
+/* ---------- Floating waves behind "We Integrate With" … "Bring Your Own VoIP" ---------- */
+
+main.avx-main-layer {
+  position: relative;
+  isolation: isolate;
+}
+
+.avx-iwaves {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ---------- Features: one dot per pair, in through Avortyx and out the other side ---------- */
+
+.avx-plat-simple .avx-plat-packet.avx-plat-thru {
+  animation: avxPlatThru 4.4s cubic-bezier(.45, 0, .55, 1) infinite;
+}
+
+@keyframes avxPlatThru {
+  0% { offset-distance: 0%; opacity: 0; }
+  6% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+/* the hub box sits above the wires, so the dot passes behind it */
+.avx-plat-simple .flow-center-box {
+  position: relative;
+  z-index: 2;
+}
+
+.avx-plat-simple .avx-plat-packets {
+  z-index: 1;
+}
+
+.avx-plat-wired .flow-item {
+  animation-duration: 4.4s;
+}
+
+@keyframes avxPlatChip {
+  0%, 12%, 100% { border-color: rgba(255, 255, 255, .09); }
+  3% { border-color: rgba(96, 165, 250, .7); }
+}
+
+@keyframes avxPlatChipOut {
+  0%, 84%, 100% { border-color: rgba(255, 255, 255, .09); }
+  95% { border-color: rgba(96, 165, 250, .7); }
+}
+
+/* the dot passes behind the Avortyx box: the box's column stacks above the packet layer */
+.avx-plat-simple .flow-column-center {
+  position: relative;
+  z-index: 3;
+}
+
+.avx-plat-simple .avx-plat-packets {
+  z-index: 2;
+}
+
+/* ---------- "Everything you need": glass spheres (drawn on the scene canvas) ---------- */
+
+.avx-flow3d.avx-lf2.avx-lf3.avx-lf-sph .hero-simple-node-icon,
+.avx-flow3d.avx-lf2.avx-lf3.avx-lf-sph .hero-simple-hub-icon {
+  background: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.avx-lf-sph .hero-simple-node-icon::before,
+.avx-lf-sph .hero-simple-node-icon::after,
+.avx-lf-sph .hero-simple-hub-icon::before,
+.avx-lf-sph .hero-simple-hub-icon::after,
+.avx-lf-sph .avx-lf-edge,
+.avx-lf-sph .avx-lfp {
+  display: none !important;
+}
+
+.avx-lf-sph .hero-simple-node-icon > i {
+  color: #fff !important;
+  text-shadow: 0 1px 8px rgba(8, 20, 60, .65);
+}
+
+.avx-lf-sph .hero-simple-hub-icon .avx-hub-mark {
+  filter: drop-shadow(0 1px 6px rgba(8, 20, 60, .7));
+}
+
+.avx-lf-sph .hero-simple-node-label,
+.avx-lf-sph .hero-simple-hub-name {
+  margin-top: 22px;
+}
