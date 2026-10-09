@@ -67,46 +67,136 @@
   --bs-success-rgb: 37, 99, 235;
 }
 
-/* ---------- Backgrounds: white sections, off-white surfaces ---------- */
+/* ---------- Light mode: porcelain-blue canvas, white elevated surfaces ----------
+   Sections sit on a soft blue-tinted canvas lit by fixed ambient glows; cards,
+   tables and inputs stay crisp white with a layered blue-tinted shadow. */
+
+[data-bs-theme="light"] {
+  --avx-canvas: #f2f5fb;
+  --avx-canvas-alt: rgba(219, 230, 248, .45);
+  --avx-card: #fff;
+  --avx-card-border: #dfe7f4;
+  --avx-inset: #f5f8fd;
+  --avx-card-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 10px 28px -8px rgba(30, 64, 175, .12);
+  --avx-card-shadow-hover: 0 2px 4px rgba(15, 23, 42, .05), 0 18px 40px -10px rgba(30, 64, 175, .2);
+}
+
+[data-bs-theme="light"] {
+  background-color: var(--avx-canvas);
+}
 
 [data-bs-theme="light"] body,
 [data-bs-theme="light"] main {
-  background-color: var(--avx-bg);
+  background-color: transparent;
+}
+
+/* ambient light: fixed so it costs nothing while scrolling */
+[data-bs-theme="light"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 560px at 6% -8%, rgba(96, 165, 250, .22), transparent 62%),
+    radial-gradient(820px 520px at 98% 2%, rgba(129, 140, 248, .16), transparent 60%),
+    radial-gradient(1100px 680px at 50% 112%, rgba(59, 130, 246, .12), transparent 62%),
+    linear-gradient(180deg, #f6f8fd 0%, #eef3fb 100%);
+}
+
+/* section canvases: transparent so the ambient light shows through */
+[data-bs-theme="light"] .hero-constellation-bg,
+[data-bs-theme="light"] .pricing-hero,
+[data-bs-theme="light"] .mktg-auth-section,
+[data-bs-theme="light"] .mktg-subpage-hero,
+[data-bs-theme="light"] .signup-section,
+[data-bs-theme="light"] .hero-home {
+  background: transparent;
 }
 
 [data-bs-theme="light"] .mktg-section:nth-of-type(even),
-[data-bs-theme="light"] .pricing-hero,
-[data-bs-theme="light"] .mktg-auth-section,
-[data-bs-theme="light"] .mktg-subpage-hero {
-  background: var(--avx-bg);
+[data-bs-theme="light"] .pricing-faq-section {
+  background: var(--avx-canvas-alt);
+}
+
+[data-bs-theme="light"] .bg-light {
+  background-color: var(--avx-canvas-alt) !important;
+}
+
+[data-bs-theme="light"] .marketing-hero::after {
+  background: transparent;
+}
+
+/* frosted navbar with a hairline edge */
+[data-bs-theme="light"] .marketing-navbar {
+  background-color: rgba(246, 248, 253, .78) !important;
+  border-bottom: 1px solid rgba(148, 170, 210, .25);
+  -webkit-backdrop-filter: saturate(170%) blur(14px);
+  backdrop-filter: saturate(170%) blur(14px);
+}
+
+[data-bs-theme="light"] .marketing-navbar .dropdown-menu {
+  border-color: var(--avx-card-border);
+  box-shadow: var(--avx-card-shadow-hover);
 }
 
 [data-bs-theme="light"] .marketing-footer {
-  background-color: var(--avx-surface);
-  border-top: 1px solid var(--avx-border);
+  background: linear-gradient(180deg, rgba(226, 234, 248, .55), rgba(214, 225, 245, .7));
+  border-top: 1px solid rgba(148, 170, 210, .3);
 }
 
+/* elevated white surfaces */
 [data-bs-theme="light"] .card,
 [data-bs-theme="light"] .feature-card,
 [data-bs-theme="light"] .features-grid-card,
 [data-bs-theme="light"] .integration-card,
+[data-bs-theme="light"] .integration-logo-card,
 [data-bs-theme="light"] .spotlight-flow-step,
+[data-bs-theme="light"] .bg-light .spotlight-flow-step,
 [data-bs-theme="light"] .mktg-auth-card,
 [data-bs-theme="light"] .mktg-brand-card,
-[data-bs-theme="light"] .pricing-highlight-card {
-  --bs-card-bg: var(--avx-surface);
-  background-color: var(--avx-surface);
-  border-color: var(--avx-border);
+[data-bs-theme="light"] .mktg-careers-card,
+[data-bs-theme="light"] .pricing-highlight-card,
+[data-bs-theme="light"] .flow-item,
+[data-bs-theme="light"] .flow-branch-item,
+[data-bs-theme="light"] .signup-form,
+[data-bs-theme="light"] .signup-box {
+  --bs-card-bg: var(--avx-card);
+  background-color: var(--avx-card);
+  border: 1px solid var(--avx-card-border);
+  box-shadow: var(--avx-card-shadow);
 }
 
-[data-bs-theme="light"] .mktg-auth-card {
-  border: 1px solid var(--avx-border);
-  box-shadow: 0 10px 30px rgba(15, 23, 42, .06);
+[data-bs-theme="light"] .feature-card:hover,
+[data-bs-theme="light"] .features-grid-card:hover,
+[data-bs-theme="light"] .integration-card:hover,
+[data-bs-theme="light"] .integration-logo-card:hover,
+[data-bs-theme="light"] .mktg-brand-card:hover,
+[data-bs-theme="light"] .flow-item:hover {
+  box-shadow: var(--avx-card-shadow-hover);
 }
 
-[data-bs-theme="light"] .integration-logo-card {
-  background: var(--avx-surface);
-  border: 1px solid var(--avx-border);
+[data-bs-theme="light"] .pricing-table-wrap,
+[data-bs-theme="light"] .pricing-accordion .accordion-item,
+[data-bs-theme="light"] .marketing-code-tabs .tab-content {
+  background-color: var(--avx-card);
+  border-color: var(--avx-card-border);
+  box-shadow: var(--avx-card-shadow);
+}
+
+/* light inset surfaces inside cards and tables */
+[data-bs-theme="light"] .pricing-table .pricing-table-enterprise-row,
+[data-bs-theme="light"] .pricing-footnotes,
+[data-bs-theme="light"] .marketing-subpage-content pre,
+[data-bs-theme="light"] .marketing-code-tabs .nav-tabs,
+[data-bs-theme="light"] .flow-seq-message,
+[data-bs-theme="light"] .mktg-brand-preview,
+[data-bs-theme="light"] .section-box {
+  background-color: var(--avx-inset);
+}
+
+[data-bs-theme="light"] .pricing-footnotes {
+  border: 1px solid var(--avx-card-border);
 }
 
 /* ---------- Typography: dark slate ---------- */
@@ -669,56 +759,69 @@ a,
   background-color: #1d4ed8;
 }
 
-/* ---------- Dark mode: deeper navy-black palette ----------
-   Same surface hierarchy and layout as the original dark theme
-   (page < cards/navbar/footer < alternate sections < inputs/hover),
-   shifted from neutral gray to deep navy. Colors only. */
+/* ---------- Dark theme: near-black with blue light (avortyx console palette) ----------
+   The site renders dark for every visitor. Same surface hierarchy as the
+   original dark theme (page < cards/navbar/footer < alternate sections <
+   inputs/hover), in neutral near-black with bright neutral text and the
+   brand blues as the only accent. Colors only. */
 
 :root[data-bs-theme="dark"] {
   --avx-link: #60a5fa;
   --avx-link-hover: #93c5fd;
-  --avx-primary-tint: rgba(59, 130, 246, .14);
-  --avx-accent-tint: rgba(59, 130, 246, .16);
+  --avx-primary-tint: rgba(59, 130, 246, .12);
+  --avx-accent-tint: rgba(59, 130, 246, .14);
+  --avx-indigo: #3b82f6;
+  --avx-glass: rgba(17, 19, 24, .78);
+  --avx-glass-border: rgba(255, 255, 255, .09);
 
   /* site surfaces (originals: #1a1d21, #212529, #2b3035, #323840, #3a4049) */
-  --td-body-bg: #0a0e17;
-  --td-surface-bg: #111827;
-  --td-surface-secondary-bg: #161e2e;
-  --td-surface-tertiary-bg: #1c2539;
-  --td-surface-hover-bg: #222d44;
-  --td-border-color: #334155;
-  --td-border-color-light: #283447;
-  --td-border-color-muted: #334155;
-  --td-border-color-strong: #475569;
-  --td-text-color: #e2e8f0;
-  --td-text-muted: #aab4c3;
-  --td-text-subtle: #a3adbd;
-  --td-text-faint: #96a1b2;
-  --td-input-bg: #161e2e;
-  --td-input-color: #e2e8f0;
-  --td-input-border: #475569;
-  --td-navbar-bg: #111827;
-  --td-footer-bg: #111827;
-  --td-code-bg: #161e2e;
-  --td-pre-bg: #161e2e;
-  --td-table-stripe-bg: #161e2e;
+  --td-body-bg: #0b0c10;
+  --td-surface-bg: #111318;
+  --td-surface-secondary-bg: #14171d;
+  --td-surface-tertiary-bg: #171a20;
+  --td-surface-hover-bg: #1d212a;
+  --td-border-color: #262a33;
+  --td-border-color-light: #1d2027;
+  --td-border-color-muted: #262a33;
+  --td-border-color-strong: #353b47;
+  --td-text-color: #f3f5f8;
+  --td-text-muted: #a7afbd;
+  --td-text-subtle: #9aa3b2;
+  --td-text-faint: #8a93a3;
+  --td-input-bg: #111318;
+  --td-input-color: #f3f5f8;
+  --td-input-border: #353b47;
+  --td-navbar-bg: #0b0c10;
+  --td-footer-bg: #0b0c10;
+  --td-code-bg: #111318;
+  --td-pre-bg: #111318;
+  --td-table-stripe-bg: #111318;
 
   /* Bootstrap surfaces */
-  --bs-body-bg: #0a0e17;
-  --bs-body-bg-rgb: 10, 14, 23;
-  --bs-body-color: #e2e8f0;
-  --bs-body-color-rgb: 226, 232, 240;
-  --bs-secondary-bg: #1c2539;
-  --bs-secondary-bg-rgb: 28, 37, 57;
-  --bs-tertiary-bg: #161e2e;
-  --bs-tertiary-bg-rgb: 22, 30, 46;
-  --bs-border-color: #334155;
-  --bs-light-bg-subtle: #1c2539;
-  --bs-dark-bg-subtle: #0a0e17;
+  --bs-body-bg: #0b0c10;
+  --bs-body-bg-rgb: 11, 12, 16;
+  --bs-body-color: #f3f5f8;
+  --bs-body-color-rgb: 243, 245, 248;
+  --bs-secondary-color: #bbc2cf;
+  --bs-secondary-bg: #171a20;
+  --bs-secondary-bg-rgb: 23, 26, 32;
+  --bs-tertiary-bg: #111318;
+  --bs-tertiary-bg-rgb: 17, 19, 24;
+  --bs-border-color: #262a33;
+  --bs-border-color-translucent: rgba(255, 255, 255, .1);
+  --bs-light-bg-subtle: #171a20;
+  --bs-dark-bg-subtle: #0b0c10;
   --bs-link-color: #60a5fa;
   --bs-link-color-rgb: 96, 165, 250;
   --bs-link-hover-color: #93c5fd;
   --bs-link-hover-color-rgb: 147, 197, 253;
+}
+
+/* body copy: brighter neutral grey reads better than the old lavender */
+[data-bs-theme="dark"] .text-muted,
+[data-bs-theme="dark"] .lead,
+[data-bs-theme="dark"] main p {
+  color: #bbc2cf !important;
 }
 
 [data-bs-theme="dark"] .badge,
@@ -728,19 +831,199 @@ a,
   border-color: rgba(96, 165, 250, .3);
 }
 
-/* logo wordmark: dark text in light mode, light text in dark mode */
+/* ---------- Logo: the avortyx.com vortex mark and gradient wordmark ---------- */
+
+:root {
+  --vortyx-teal: #1d4ed8;
+  --vortyx-cyan: #60a5fa;
+  --vortyx-deep: #1739a8;
+  --vortyx-bright: #60a5fa;
+  --vortyx-ultra: #dbeafe;
+  --vortyx-glow: rgba(29, 78, 216, .16);
+}
+
+:root[data-bs-theme="dark"] {
+  --vortyx-teal: #3b82f6;
+  --vortyx-cyan: #93c5fd;
+  --vortyx-deep: #1d4ed8;
+  --vortyx-bright: #bfdbfe;
+  --vortyx-ultra: #eff6ff;
+  --vortyx-glow: rgba(59, 130, 246, .2);
+}
+
+.avx-logo-mark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 48px;
+}
+
+/* the mark sits on a small dark app-icon tile: fine border, soft top light, no glow */
+.avx-logo-mark::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 11px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(160deg, #1a1f2a, #0d0f14);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .1),
+    inset 0 1px 0 rgba(255, 255, 255, .12),
+    0 6px 16px -6px rgba(0, 0, 0, .7);
+  transition: box-shadow .4s ease;
+}
+
+.avx-logo-mark svg {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+/* the soft core fill read as a glow; the rings alone are crisper */
+.avx-logo-mark svg > circle:first-of-type {
+  display: none;
+}
+
+.avx-logo-mark path {
+  transform-box: view-box;
+  transform-origin: 32px 32px;
+  transition: transform .8s cubic-bezier(.2, .8, .2, 1);
+}
+
+a:hover > .avx-logo-mark::before {
+  box-shadow:
+    inset 0 0 0 1px rgba(96, 165, 250, .55),
+    inset 0 1px 0 rgba(255, 255, 255, .14),
+    0 6px 16px -6px rgba(0, 0, 0, .7);
+}
+
+a:hover > .avx-logo-mark .avx-mk-r1 { transform: rotate(-30deg); }
+a:hover > .avx-logo-mark .avx-mk-r2 { transform: rotate(45deg); }
+a:hover > .avx-logo-mark .avx-mk-r3 { transform: rotate(-60deg); }
+
+/* wordmark: Inter Tight semibold, tight tracking, a quiet silver finish */
 .avx-wordmark {
-  color: #0f172a;
+  font-size: 25px !important;
+  font-weight: 600 !important;
+  letter-spacing: -.035em !important;
+  line-height: 1;
+  background: linear-gradient(180deg, #ffffff 30%, #c3cbd8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
-.avx-wordmark > span {
-  color: #2563eb;
+/* ---------- Typography: the avortyx.com type system ----------
+   Inter Tight for display, Inter for copy, JetBrains Mono for data and labels.
+   Smoothing and regular-weight copy keep text crisp on the dark canvas. */
+
+:root {
+  --avx-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --avx-font-display: "Inter Tight", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --avx-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --bs-body-font-family: var(--avx-font-sans);
+  --bs-font-sans-serif: var(--avx-font-sans);
+  --bs-font-monospace: var(--avx-font-mono);
 }
 
-[data-bs-theme="dark"] .avx-wordmark {
-  color: #f1f5f9;
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
+  font-kerning: normal;
 }
 
-[data-bs-theme="dark"] .avx-wordmark > span {
-  color: #60a5fa;
+body,
+p,
+li,
+td,
+th,
+label,
+button,
+input,
+select,
+textarea,
+.btn,
+.lead,
+.nav-link,
+.dropdown-item,
+.tooltip,
+.popover,
+#okCookie {
+  font-family: var(--avx-font-sans);
+}
+
+body {
+  /* Inter: open 4, 6 and 9 for clearer figures, rounder quotes and commas */
+  font-feature-settings: "cv02", "cv03", "cv04", "ss03";
+}
+
+.btn {
+  --bs-btn-font-family: var(--avx-font-sans);
+  font-weight: 600;
+  letter-spacing: -.005em;
+}
+
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6,
+.avx-wordmark {
+  font-family: var(--avx-font-display) !important;
+}
+
+h1, .h1 {
+  font-weight: 700;
+  letter-spacing: -.022em;
+  line-height: 1.08;
+}
+
+h2, .h2 {
+  font-weight: 700;
+  letter-spacing: -.025em;
+  line-height: 1.15;
+}
+
+h3, .h3, h4, .h4, h5, .h5 {
+  font-weight: 650;
+  letter-spacing: -.015em;
+}
+
+/* the original light (300) copy weight thins out on dark backgrounds */
+p,
+.lead,
+.text-muted {
+  font-weight: 400;
+}
+
+.lead {
+  letter-spacing: -.005em;
+  line-height: 1.6;
+}
+
+code,
+pre,
+kbd,
+samp,
+.pricing-table thead th,
+.hero-proof-stats .text-uppercase,
+.mktg-subpage-hero-eyebrow,
+.pricing-footnote-badge,
+.formula-type-badge {
+  font-family: var(--avx-font-mono) !important;
+}
+
+.hero-proof-stats .fs-3,
+.pricing-table td,
+.pricing-calculator-row-rate,
+.mktg-stats .stat-value {
+  font-family: var(--avx-font-display);
+  font-variant-numeric: tabular-nums;
 }

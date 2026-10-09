@@ -12,7 +12,7 @@ public/                    Everything else, copied to the build as-is
   assets/avx-motion/       motion.css + motion.js: 3D animations and scroll effects
   assets/avx-baked/        Pre-rendered artwork used by the animations
   assets/trackdrive_marketing/brand-assets/ringba assets/   Sphere images used by the animations
-  avortyx_logo_blue.png, favicon-*.png, apple-touch-icon-blue.png   Logo and icons
+  favicon.svg, favicon-*.png, apple-touch-icon-blue.png   Icons (the logo itself is inline SVG in each page)
 src/                       React version of the site (not used by the live site)
 vercel.json                URL rewrites
 ```
