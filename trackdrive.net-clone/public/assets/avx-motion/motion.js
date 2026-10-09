@@ -332,7 +332,7 @@
       tilt.appendChild(flow);
       leadScene(tilt, flow);
 
-      // 3D: each node is a glass sphere floating over its platform, drawn by leadScene;
+      // 3D: leadScene draws the spheres, the Avortyx globe and their platforms;
       // the icon glyphs ride on top of them
       flowWrap.classList.add('avx-lf3', 'avx-lf-sph');
 
@@ -350,7 +350,9 @@
     });
   }
 
-  // three glass spheres on platforms; calls travel between them as glossy beads on 3D arcs
+  // Ringba-style holographic scene: Leads and Revenue are glass spheres, Avortyx is a
+  // wireframe globe of light; each floats over a disc of glowing rings, and calls fly
+  // between them as comets
   function leadScene(tilt, flow) {
     var canvas = el('canvas', 'avx-lf-canvas');
     canvas.setAttribute('aria-hidden', 'true');
@@ -363,9 +365,18 @@
       revenue: flow.querySelector('.hero-simple-node-revenue .hero-simple-node-icon')
     };
     if (!nodes.leads || !nodes.hub || !nodes.revenue) return;
-    var PAD_X = 60, PAD_T = 80, PAD_B = 110;
+    var PAD_X = 60, PAD_T = 80, PAD_B = 110, TAU = Math.PI * 2;
     var W = 0, H = 0, dpr = 1, pos = {}, raf = 0, visible = false, clock = 0, last = 0, lastDraw = 0;
-    var beads = [], nextBead = 0.2, rings = [];
+    var calls = [], nextCall = 0.4, ripples = [], flash = -9;
+    // the scene is seen from slightly above
+    var TILT = 0.42, CT = Math.cos(TILT), ST = Math.sin(TILT);
+    var TINT = {
+      leads: ['#c7d2fe', '#6d6af5', '#312e81', '#0d0b33'],
+      revenue: ['#bae6fd', '#0ea5e9', '#0c4a6e', '#03172a'],
+      moonA: ['#e0e7ff', '#818cf8', '#3730a3', '#110f40'],
+      moonB: ['#cffafe', '#22d3ee', '#0e7490', '#041e29']
+    };
+    var SPR = {}, CURVES = globeCurves(), DOTS = fibSphere(140);
 
     function centre(elm) {
       var x = elm.offsetWidth / 2, y = elm.offsetHeight / 2, n = elm;
@@ -383,26 +394,8 @@
       pos.leads = centre(nodes.leads);
       pos.hub = centre(nodes.hub);
       pos.revenue = centre(nodes.revenue);
-      buildSprites();
+      SPR = { leads: glass(pos.leads.r, TINT.leads), revenue: glass(pos.revenue.r, TINT.revenue), moonA: glass(6, TINT.moonA), moonB: glass(4.5, TINT.moonB) };
     }
-
-    // quadratic arc lifted towards the viewer: a bead looks larger at the crest
-    function arc(a, b, t) {
-      var cx = (a.x + b.x) / 2, cy = Math.min(a.y, b.y) - 64, u = 1 - t;
-      return { x: u * u * a.x + 2 * u * t * cx + t * t * b.x, y: u * u * a.y + 2 * u * t * cy + t * t * b.y, s: 1 + Math.sin(t * Math.PI) * 0.35 };
-    }
-    function hit(name, t) {
-      var n = nodes[name];
-      n.classList.add('avx-hit');
-      setTimeout(function () { n.classList.remove('avx-hit'); }, 380);
-      rings.push({ name: name, t: t });
-      if (name !== 'hub') sweeps.push({ name: name, t: t });
-    }
-
-    // ---- the nodes are glass spheres: shading is baked once per size, the dot
-    // lattice turns every frame, orbits pass behind and in front of each sphere ----
-    var SPH = {}, LAT = fibSphere(150), TILT = 0.38, ROLL = 0.2;
-    var sweeps = [], hubFlash = -9;
 
     function fibSphere(n) {
       var pts = [], ga = Math.PI * (3 - Math.sqrt(5));
@@ -412,6 +405,32 @@
       }
       return pts;
     }
+    // the globe's wireframe: five latitudes and six meridians, as 3D polylines
+    function globeCurves() {
+      var c = [], i, pts;
+      [-0.7, -0.36, 0, 0.36, 0.7].forEach(function (y) {
+        var rr = Math.sqrt(1 - y * y);
+        for (pts = [], i = 0; i <= 40; i++) pts.push([Math.cos(i / 40 * TAU) * rr, y, Math.sin(i / 40 * TAU) * rr]);
+        c.push(pts);
+      });
+      for (var m = 0; m < 6; m++) {
+        var th = m / 6 * Math.PI;
+        for (pts = [], i = 0; i <= 40; i++) {
+          var a = i / 40 * TAU;
+          pts.push([Math.cos(a) * Math.cos(th), Math.sin(a), Math.cos(a) * Math.sin(th)]);
+        }
+        c.push(pts);
+      }
+      return c;
+    }
+    // turn about the vertical axis, then tip towards the viewer; z > 0 faces the viewer
+    function project(P, rot) {
+      var cr = Math.cos(rot), sr = Math.sin(rot);
+      var x = P[0] * cr + P[2] * sr, z = -P[0] * sr + P[2] * cr, y = P[1];
+      return [x, -(y * CT - z * ST), y * ST + z * CT];
+    }
+
+    // glass spheres are shaded once per size and blitted every frame
     function sprite(r) {
       var s = Math.ceil(r * 2 + 6), c = document.createElement('canvas');
       c.width = c.height = Math.round(s * dpr);
@@ -419,54 +438,173 @@
       g.setTransform(dpr, 0, 0, dpr, s * dpr / 2, s * dpr / 2);
       return { c: c, g: g, s: s };
     }
-    function shadeBody(r, hub) {
+    function glass(r, c) {
       var o = sprite(r), g = o.g;
-      g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.clip();
-      var b = g.createRadialGradient(-r * 0.38, -r * 0.42, r * 0.04, -r * 0.12, -r * 0.12, r * 1.25);
-      var st = hub ? ['#3567cc', '#16347c', '#0b1a44', '#050a1c'] : ['#78a9ff', '#2d68e2', '#173f9e', '#081646'];
-      b.addColorStop(0, st[0]); b.addColorStop(0.36, st[1]); b.addColorStop(0.72, st[2]); b.addColorStop(1, st[3]);
+      g.save();
+      g.beginPath(); g.arc(0, 0, r, 0, TAU); g.clip();
+      var b = g.createRadialGradient(-r * 0.36, -r * 0.42, r * 0.04, -r * 0.1, -r * 0.1, r * 1.25);
+      b.addColorStop(0, c[0]); b.addColorStop(0.34, c[1]); b.addColorStop(0.74, c[2]); b.addColorStop(1, c[3]);
       g.fillStyle = b; g.fillRect(-r, -r, r * 2, r * 2);
-      // light bouncing back up from the platform
-      var u = g.createRadialGradient(r * 0.12, r * 0.98, 0, r * 0.12, r * 0.98, r * 0.95);
-      u.addColorStop(0, 'rgba(96,165,250,.42)'); u.addColorStop(1, 'rgba(96,165,250,0)');
+      var u = g.createRadialGradient(r * 0.1, r * 0.98, 0, r * 0.1, r * 0.98, r * 0.95);
+      u.addColorStop(0, 'rgba(125,211,252,.4)'); u.addColorStop(1, 'rgba(125,211,252,0)');
       g.fillStyle = u; g.fillRect(-r, -r, r * 2, r * 2);
-      // fresnel rim
-      var f = g.createRadialGradient(0, 0, r * 0.62, 0, 0, r);
-      f.addColorStop(0, 'rgba(147,197,253,0)'); f.addColorStop(0.82, 'rgba(147,197,253,.07)'); f.addColorStop(1, 'rgba(191,219,254,.42)');
+      var f = g.createRadialGradient(0, 0, r * 0.6, 0, 0, r);
+      f.addColorStop(0, 'rgba(191,219,254,0)'); f.addColorStop(0.85, 'rgba(191,219,254,.08)'); f.addColorStop(1, 'rgba(219,234,254,.5)');
       g.fillStyle = f; g.fillRect(-r, -r, r * 2, r * 2);
-      return o;
-    }
-    function shadeSpec(r) {
-      var o = sprite(r), g = o.g;
-      g.save(); g.translate(-r * 0.36, -r * 0.46); g.rotate(-0.62); g.scale(1, 0.58);
-      var h = g.createRadialGradient(0, 0, 0, 0, 0, r * 0.46);
-      h.addColorStop(0, 'rgba(255,255,255,.62)'); h.addColorStop(0.45, 'rgba(255,255,255,.16)'); h.addColorStop(1, 'rgba(255,255,255,0)');
-      g.fillStyle = h; g.beginPath(); g.arc(0, 0, r * 0.46, 0, Math.PI * 2); g.fill();
       g.restore();
-      var hs = g.createRadialGradient(-r * 0.42, -r * 0.5, 0, -r * 0.42, -r * 0.5, r * 0.1);
-      hs.addColorStop(0, 'rgba(255,255,255,.9)'); hs.addColorStop(1, 'rgba(255,255,255,0)');
-      g.fillStyle = hs; g.fillRect(-r, -r, r * 2, r * 2);
-      // a thin back-light catching the lower right edge
-      g.lineWidth = 1.1;
-      g.strokeStyle = 'rgba(191,219,254,.38)';
-      g.beginPath(); g.arc(0, 0, r - 0.7, 0.12, 1.25); g.stroke();
+      g.save(); g.translate(-r * 0.36, -r * 0.46); g.rotate(-0.62); g.scale(1, 0.56);
+      var h = g.createRadialGradient(0, 0, 0, 0, 0, r * 0.44);
+      h.addColorStop(0, 'rgba(255,255,255,.7)'); h.addColorStop(0.45, 'rgba(255,255,255,.16)'); h.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = h; g.beginPath(); g.arc(0, 0, r * 0.44, 0, TAU); g.fill();
+      g.restore();
       return o;
-    }
-    function buildSprites() {
-      ['leads', 'hub', 'revenue'].forEach(function (n) {
-        var r = pos[n].r;
-        SPH[n] = { body: shadeBody(r, n === 'hub'), spec: shadeSpec(r) };
-      });
     }
     function blit(o, x, y) { ctx.drawImage(o.c, x - o.s / 2, y - o.s / 2, o.s, o.s); }
 
-    // the dotted route a call takes between two spheres
-    function drawTrack(a, b, t) {
+    function bob(name, t) {
+      if (reduced) return 0;
+      return Math.sin(t * 0.8 + { leads: 0, hub: 2.1, revenue: 4.2 }[name]) * (name === 'hub' ? 3 : 4);
+    }
+
+    // a disc of glowing rings with a turning ring of ticks, like Ringba's platforms
+    function platform(name, t) {
+      var p = pos[name], hub = name === 'hub';
+      var cx = p.x, cy = p.y + p.r + (hub ? 18 : 18), rx = p.r * (hub ? 1.6 : 1.5), ry = rx * 0.26;
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(1, 0.26);
+      var g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx * 1.2);
+      g.addColorStop(0, 'rgba(59,130,246,.32)'); g.addColorStop(0.55, 'rgba(37,99,235,.1)'); g.addColorStop(1, 'rgba(37,99,235,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, rx * 1.2, 0, TAU); ctx.fill();
+      ctx.restore();
+      [1, 0.8, 0.6, 0.4].forEach(function (k, i) {
+        ctx.strokeStyle = 'rgba(96,165,250,' + [0.5, 0.26, 0.2, 0.14][i] + ')';
+        ctx.lineWidth = i ? 1 : 1.3;
+        ctx.beginPath(); ctx.ellipse(cx, cy, rx * k, ry * k, 0, 0, TAU); ctx.stroke();
+      });
+      // the near edge of the outer ring catches the light
+      ctx.strokeStyle = 'rgba(191,219,254,.55)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, Math.PI * 0.12, Math.PI * 0.88); ctx.stroke();
+      var n = hub ? 96 : 64, a0 = t * (hub ? 0.12 : -0.15);
+      ctx.beginPath();
+      for (var i = 0; i < n; i++) {
+        var a = a0 + i / n * TAU, ca = Math.cos(a), sa = Math.sin(a), r2 = i % 4 === 0 ? 1.24 : 1.15;
+        ctx.moveTo(cx + ca * rx * 1.08, cy + sa * ry * 1.08);
+        ctx.lineTo(cx + ca * rx * r2, cy + sa * ry * r2);
+      }
+      ctx.strokeStyle = 'rgba(125,211,252,.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ripples.forEach(function (rp) {
+        if (rp.name !== name) return;
+        var a = (t - rp.t) / 1.2;
+        if (a < 0 || a > 1) return;
+        ctx.strokeStyle = 'rgba(147,197,253,' + (0.6 * (1 - a) * (1 - a)).toFixed(3) + ')';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.ellipse(cx, cy, rx * (0.45 + a * 0.95), ry * (0.45 + a * 0.95), 0, 0, TAU); ctx.stroke();
+      });
+      if (hub) {
+        // a soft beam rising from the disc into the globe
+        // (a tall soft ellipse, so it has no edges)
+        var bw = rx * 0.42, top = p.y - p.r * 0.3;
+        ctx.save(); ctx.translate(cx, cy); ctx.scale(1, (cy - top) / bw);
+        var bg = ctx.createRadialGradient(0, 0, 0, 0, 0, bw);
+        bg.addColorStop(0, 'rgba(96,165,250,.2)'); bg.addColorStop(1, 'rgba(96,165,250,0)');
+        ctx.fillStyle = bg; ctx.beginPath(); ctx.arc(0, 0, bw, Math.PI, TAU); ctx.fill();
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    // a thin tilted ring around a glass sphere: back half first, front half after the sphere
+    function halo(x, y, r, front) {
+      ctx.strokeStyle = front ? 'rgba(191,219,254,.45)' : 'rgba(147,197,253,.16)';
+      ctx.lineWidth = 1.1;
+      ctx.beginPath(); ctx.ellipse(x, y, r * 1.42, r * 0.34, -0.18, front ? 0 : Math.PI, front ? Math.PI : TAU); ctx.stroke();
+    }
+    function node(name, t, off) {
+      var p = pos[name], y = p.y + off;
+      halo(p.x, y, p.r, false);
+      blit(SPR[name], p.x, y);
+      halo(p.x, y, p.r, true);
+    }
+
+    // the Avortyx globe: a lit core, a turning wireframe and a dust of points
+    function globe(t, off) {
+      var p = pos.hub, x = p.x, y = p.y + off, r = p.r * 1.02, rot = reduced ? 0.4 : t * 0.35;
+      var fl = Math.max(0, 1 - (t - flash) / 0.9);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      var hg = ctx.createRadialGradient(x, y, r * 0.8, x, y, r * 1.7);
+      hg.addColorStop(0, 'rgba(59,130,246,' + (0.2 + fl * 0.2).toFixed(3) + ')'); hg.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(x, y, r * 1.7, 0, TAU); ctx.fill();
+      ctx.restore();
+      var cg = ctx.createRadialGradient(x - r * 0.25, y - r * 0.3, r * 0.1, x, y, r);
+      cg.addColorStop(0, 'rgba(37,99,235,.55)'); cg.addColorStop(0.7, 'rgba(23,37,84,.6)'); cg.addColorStop(1, 'rgba(96,165,250,.4)');
+      ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      var back = new Path2D(), front = new Path2D();
+      CURVES.forEach(function (pts) {
+        var prev = project(pts[0], rot);
+        for (var i = 1; i < pts.length; i++) {
+          var q = project(pts[i], rot), path = prev[2] + q[2] > 0 ? front : back;
+          path.moveTo(x + prev[0] * r, y + prev[1] * r);
+          path.lineTo(x + q[0] * r, y + q[1] * r);
+          prev = q;
+        }
+      });
+      ctx.lineWidth = 0.8;
+      ctx.strokeStyle = 'rgba(96,165,250,.2)';
+      ctx.stroke(back);
+      ctx.lineWidth = 1.1;
+      ctx.strokeStyle = 'rgba(147,213,255,' + (0.5 + fl * 0.35).toFixed(3) + ')';
+      ctx.stroke(front);
+      var dots = new Path2D();
+      DOTS.forEach(function (P) {
+        var q = project(P, rot * 1.3);
+        if (q[2] < 0.2) return;
+        dots.moveTo(x + q[0] * r + 1.1, y + q[1] * r);
+        dots.arc(x + q[0] * r, y + q[1] * r, 1.1, 0, TAU);
+      });
+      ctx.fillStyle = 'rgba(191,232,255,.55)';
+      ctx.fill(dots);
+      // rim light, then a shell that expands when a call lands
+      ctx.strokeStyle = 'rgba(147,213,255,.5)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.stroke();
+      if (fl > 0) {
+        var a = 1 - fl;
+        ctx.strokeStyle = 'rgba(147,213,255,' + (0.5 * fl).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(x, y, r * (1 + a * 0.45), 0, TAU); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    // two small glass moons orbit the globe, passing behind and in front of it
+    function moons(t, off, front) {
+      var p = pos.hub, rx = p.r * 1.7, ry = p.r * 0.42, rot = -0.22, cr = Math.cos(rot), sr = Math.sin(rot);
+      [['moonA', 0.55, 0], ['moonB', -0.4, 2.4]].forEach(function (m) {
+        var a = (reduced ? 1 : t) * m[1] + m[2], inFront = Math.sin(a) > 0;
+        if (inFront !== front) return;
+        var ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
+        ctx.globalAlpha = front ? 1 : 0.55;
+        blit(SPR[m[0]], p.x + ex * cr - ey * sr, p.y + off + ex * sr + ey * cr);
+        ctx.globalAlpha = 1;
+      });
+    }
+
+    // quadratic arc lifted above the scene
+    function arc(a, b, t) {
+      var cx = (a.x + b.x) / 2, cy = Math.min(a.y, b.y) - 60, u = 1 - t;
+      return { x: u * u * a.x + 2 * u * t * cx + t * t * b.x, y: u * u * a.y + 2 * u * t * cy + t * t * b.y, s: 1 + Math.sin(t * Math.PI) * 0.3 };
+    }
+    function track(a, b, t) {
       ctx.save();
       ctx.setLineDash([2, 7]);
       ctx.lineDashOffset = -t * 22;
-      ctx.lineWidth = 1.4;
-      ctx.strokeStyle = 'rgba(147,197,253,.22)';
+      ctx.lineWidth = 1.3;
+      ctx.strokeStyle = 'rgba(147,197,253,.2)';
       ctx.beginPath();
       for (var i = 0; i <= 40; i++) {
         var q = arc(a, b, i / 40);
@@ -475,195 +613,73 @@
       ctx.stroke();
       ctx.restore();
     }
-
-    // a small glossy sphere (orbiting moons and the calls themselves)
-    function mini(x, y, r, glow) {
-      if (glow) {
-        var gl = ctx.createRadialGradient(x, y, 0, x, y, r * 3.4);
-        gl.addColorStop(0, 'rgba(96,165,250,' + (0.3 * glow).toFixed(3) + ')'); gl.addColorStop(1, 'rgba(96,165,250,0)');
-        ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(x, y, r * 3.4, 0, Math.PI * 2); ctx.fill();
-      }
-      var g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, 0, x, y, r);
-      g.addColorStop(0, '#ffffff'); g.addColorStop(0.28, '#cfe1ff'); g.addColorStop(0.65, '#5b8def'); g.addColorStop(1, '#1b3a8c');
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-    }
-
-    function bob(name, t) {
-      if (reduced) return 0;
-      var ph = { leads: 0, hub: 2.1, revenue: 4.2 }[name];
-      return Math.sin(t * 0.75 + ph) * (name === 'hub' ? 2.5 : 3.5);
-    }
-
-    function drawPlatform(name, p, t, lift) {
-      var y = p.y + p.r + 16, rx = p.r * (name === 'hub' ? 1.4 : 1.45), ry = rx * 0.22;
-      ctx.save(); ctx.translate(p.x, y); ctx.scale(1, 0.22);
-      // contact shadow tightens as the sphere sinks; a pool of its own light around it
-      var sh = ctx.createRadialGradient(0, 0, 0, 0, 0, rx * 0.75);
-      sh.addColorStop(0, 'rgba(0,0,0,' + (0.5 - lift * 0.03).toFixed(3) + ')'); sh.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = sh; ctx.beginPath(); ctx.arc(0, 0, rx * 0.75, 0, Math.PI * 2); ctx.fill();
-      var pl = ctx.createRadialGradient(0, 0, rx * 0.4, 0, 0, rx * 1.25);
-      pl.addColorStop(0, 'rgba(59,130,246,.16)'); pl.addColorStop(1, 'rgba(59,130,246,0)');
-      ctx.fillStyle = pl; ctx.beginPath(); ctx.arc(0, 0, rx * 1.25, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = 'rgba(96,165,250,.26)';
-      ctx.beginPath(); ctx.ellipse(p.x, y, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
-      ctx.strokeStyle = 'rgba(96,165,250,.12)';
-      ctx.beginPath(); ctx.ellipse(p.x, y, rx * 0.7, ry * 0.7, 0, 0, Math.PI * 2); ctx.stroke();
-      // a dotted outer ring turning slowly
+    // a call: a bright head with a fading tail of light
+    function comet(a, b, e) {
+      var fade = Math.min(1, e / 0.06, (1 - e) / 0.06);
       ctx.save();
-      ctx.setLineDash([1.5, 7]);
-      ctx.lineDashOffset = -t * 9;
-      ctx.lineWidth = 1.4;
-      ctx.strokeStyle = 'rgba(147,197,253,.3)';
-      ctx.beginPath(); ctx.ellipse(p.x, y, rx * 1.22, ry * 1.22, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalCompositeOperation = 'lighter';
+      for (var k = 14; k >= 1; k--) {
+        var u = e - k / 14 * 0.2;
+        if (u < 0) continue;
+        var q = arc(a, b, u), w = 1 - k / 14;
+        ctx.fillStyle = 'rgba(125,211,252,' + (w * 0.45 * fade).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(q.x, q.y, 0.6 + w * 2.6 * q.s, 0, TAU); ctx.fill();
+      }
+      var h = arc(a, b, e), R = 12 * h.s;
+      var g = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, R);
+      g.addColorStop(0, 'rgba(224,242,254,' + (0.95 * fade).toFixed(3) + ')');
+      g.addColorStop(0.3, 'rgba(56,189,248,' + (0.4 * fade).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(56,189,248,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(h.x, h.y, R, 0, TAU); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,' + fade.toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(h.x, h.y, 2.2 * h.s, 0, TAU); ctx.fill();
       ctx.restore();
-      rings.forEach(function (rg) {
-        if (rg.name !== name) return;
-        var a = (t - rg.t) / 1.1;
-        if (a < 0 || a > 1) return;
-        ctx.strokeStyle = 'rgba(147,197,253,' + (0.5 * (1 - a) * (1 - a)).toFixed(3) + ')';
-        ctx.lineWidth = 1.3;
-        ctx.beginPath(); ctx.ellipse(p.x, y, rx * (0.6 + a * 0.85), ry * (0.6 + a * 0.85), 0, 0, Math.PI * 2); ctx.stroke();
-      });
     }
-
-    // the turning dot lattice, seen through the glass: back dots faint, front dots bright
-    function drawLattice(x, y, r, t, spin, k) {
-      var a = t * spin, ca = Math.cos(a), sa = Math.sin(a), ct = Math.cos(TILT), stt = Math.sin(TILT), cr = Math.cos(ROLL), sr = Math.sin(ROLL);
-      var B = [[], [], [], []];
-      for (var i = 0; i < LAT.length; i++) {
-        var P = LAT[i], x1 = P[0] * ca + P[2] * sa, z1 = -P[0] * sa + P[2] * ca, y1 = P[1];
-        var y2 = y1 * ct + z1 * stt, z2 = z1 * ct - y1 * stt;
-        var px = x1 * cr - y2 * sr, py = x1 * sr + y2 * cr;
-        B[z2 < 0 ? 0 : z2 < 0.45 ? 1 : z2 < 0.8 ? 2 : 3].push(x + px * r * 0.96, y + py * r * 0.96);
-      }
-      var AL = [0.07, 0.2, 0.36, 0.55], SZ = [0.75, 0.95, 1.15, 1.35];
-      for (var b = 0; b < 4; b++) {
-        var L = B[b];
-        if (!L.length) continue;
-        ctx.fillStyle = 'rgba(191,219,254,' + (AL[b] * k).toFixed(3) + ')';
-        ctx.beginPath();
-        for (var j = 0; j < L.length; j += 2) { ctx.moveTo(L[j] + SZ[b], L[j + 1]); ctx.arc(L[j], L[j + 1], SZ[b], 0, Math.PI * 2); }
-        ctx.fill();
-      }
+    function hit(name, t) {
+      var n = nodes[name];
+      n.classList.add('avx-hit');
+      setTimeout(function () { n.classList.remove('avx-hit'); }, 380);
+      ripples.push({ name: name, t: t });
+      if (name === 'hub') flash = t;
     }
-
-    // a ring of light sweeping down the surface when a call lands
-    function drawSweeps(name, x, y, r, t) {
-      sweeps.forEach(function (sw) {
-        if (sw.name !== name) return;
-        var a = (t - sw.t) / 1.0;
-        if (a < 0 || a > 1) return;
-        var e = a * a * (3 - 2 * a), yy = -0.92 + 1.84 * e, rx = Math.sqrt(1 - yy * yy) * r, ry = rx * Math.sin(TILT);
-        var cy = y + yy * Math.cos(TILT) * r, al = Math.sin(a * Math.PI) * 0.75;
-        ctx.lineWidth = 1.6;
-        ctx.strokeStyle = 'rgba(191,219,254,' + al.toFixed(3) + ')';
-        ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, ROLL, 0, Math.PI); ctx.stroke();
-        ctx.strokeStyle = 'rgba(191,219,254,' + (al * 0.3).toFixed(3) + ')';
-        ctx.beginPath(); ctx.ellipse(x, cy, rx, ry, ROLL, Math.PI, Math.PI * 2); ctx.stroke();
-      });
-    }
-
-    // orbit list per node: [radius x, radius y, tilt, speed, phase, kind]
-    var ORBITS = {
-      leads: [[1.6, 0.42, -0.32, 0.8, 0, 'moon'], [1.85, 0.3, 0.42, -0.55, 2.4, 'moon']],
-      hub: [[1.72, 0.4, -0.2, 0.42, 0, 'ring']],
-      revenue: [[1.65, 0.36, 0.3, -0.62, 1.2, 'moon']]
-    };
-    function drawOrbits(name, x, y, r, t, front) {
-      ORBITS[name].forEach(function (o) {
-        var rx = r * o[0], ry = r * o[1], rot = o[2], cr = Math.cos(rot), sr = Math.sin(rot);
-        if (o[5] === 'ring') {
-          var fl = Math.max(0, 1 - (t - hubFlash) / 0.9);
-          ctx.lineWidth = 5;
-          ctx.strokeStyle = 'rgba(96,165,250,' + ((front ? 0.07 : 0.035) + fl * 0.08).toFixed(3) + ')';
-          ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot, front ? 0 : Math.PI, front ? Math.PI : Math.PI * 2); ctx.stroke();
-          ctx.lineWidth = 1.1;
-          ctx.strokeStyle = 'rgba(147,197,253,' + ((front ? 0.5 : 0.18) + fl * 0.4).toFixed(3) + ')';
-          ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot, front ? 0 : Math.PI, front ? Math.PI : Math.PI * 2); ctx.stroke();
-          for (var i = 0; i < 3; i++) {
-            var th = t * o[3] + i * 2.094, inF = Math.sin(th) > 0;
-            if (inF !== front) continue;
-            var ex = Math.cos(th) * rx, ey = Math.sin(th) * ry, d = 1 + Math.sin(th) * 0.25;
-            mini(x + ex * cr - ey * sr, y + ex * sr + ey * cr, 2.6 * d, front ? 0.8 : 0.3);
-          }
-          return;
-        }
-        // a faint orbit path, its front half a touch brighter
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = front ? 'rgba(147,197,253,.16)' : 'rgba(147,197,253,.07)';
-        ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot, front ? 0 : Math.PI, front ? Math.PI : Math.PI * 2); ctx.stroke();
-        var a = t * o[3] + o[4], inFront = Math.sin(a) > 0;
-        if (inFront !== front) return;
-        var ex2 = Math.cos(a) * rx, ey2 = Math.sin(a) * ry, s = 1 + Math.sin(a) * 0.3;
-        if (!front) ctx.globalAlpha = 0.55;
-        mini(x + ex2 * cr - ey2 * sr, y + ex2 * sr + ey2 * cr, 3.4 * s, front ? 1 : 0.4);
-        ctx.globalAlpha = 1;
-      });
-    }
-
-    function drawSphere(name, t, off) {
-      var p = pos[name], x = p.x, y = p.y + off, r = p.r, S2 = SPH[name];
-      drawOrbits(name, x, y, r, t, false);
-      blit(S2.body, x, y);
-      ctx.save();
-      ctx.beginPath(); ctx.arc(x, y, r - 0.5, 0, Math.PI * 2); ctx.clip();
-      drawLattice(x, y, r, t, name === 'hub' ? -0.22 : 0.3, name === 'hub' ? 0.5 : 1);
-      drawSweeps(name, x, y, r, t);
-      ctx.restore();
-      blit(S2.spec, x, y);
-      drawOrbits(name, x, y, r, t, true);
-    }
-
-    // the call: a glossy bead on a 3D arc, fading in as it leaves one sphere and out into the next
-    function drawCall(a, b, e, warm) {
-      for (var k = 6; k >= 1; k--) {
-        var tr = arc(a, b, Math.max(0, e - k * 0.022));
-        ctx.globalAlpha = 0.05 * (7 - k) * edgeFade(e);
-        mini(tr.x, tr.y, 2.2 * tr.s, 0);
-      }
-      var q = arc(a, b, e);
-      ctx.globalAlpha = edgeFade(e);
-      mini(q.x, q.y, (warm ? 4 : 3.6) * q.s, 1);
-      ctx.globalAlpha = 1;
-    }
-    function edgeFade(e) { return Math.min(1, e / 0.08, (1 - e) / 0.08); }
+    function ease(u) { return u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; }
 
     function draw(t) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
       var off = { leads: bob('leads', t), hub: bob('hub', t), revenue: bob('revenue', t) };
       Object.keys(off).forEach(function (n) { nodes[n].style.translate = '0 ' + off[n].toFixed(2) + 'px'; });
-      var L = { x: pos.leads.x + pos.leads.r * 0.92, y: pos.leads.y + off.leads };
-      var Hin = { x: pos.hub.x - pos.hub.r * 0.92, y: pos.hub.y + off.hub };
-      var Hout = { x: pos.hub.x + pos.hub.r * 0.92, y: pos.hub.y + off.hub };
-      var R = { x: pos.revenue.x - pos.revenue.r * 0.92, y: pos.revenue.y + off.revenue };
-      drawTrack(L, Hin, t);
-      drawTrack(Hout, R, t);
-      ['leads', 'hub', 'revenue'].forEach(function (n) { drawPlatform(n, pos[n], t, off[n]); });
-      ['leads', 'hub', 'revenue'].forEach(function (n) { drawSphere(n, t, off[n]); });
+      var L = { x: pos.leads.x + pos.leads.r * 0.95, y: pos.leads.y + off.leads };
+      var Hin = { x: pos.hub.x - pos.hub.r * 1.02, y: pos.hub.y + off.hub };
+      var Hout = { x: pos.hub.x + pos.hub.r * 1.02, y: pos.hub.y + off.hub };
+      var R = { x: pos.revenue.x - pos.revenue.r * 0.95, y: pos.revenue.y + off.revenue };
+      track(L, Hin, t);
+      track(Hout, R, t);
+      ['leads', 'hub', 'revenue'].forEach(function (n) { platform(n, t); });
+      node('leads', t, off.leads);
+      moons(t, off.hub, false);
+      globe(t, off.hub);
+      moons(t, off.hub, true);
+      node('revenue', t, off.revenue);
 
-      if (!reduced && !motionPaused() && t > nextBead) {
-        beads.push({ t0: t });
+      if (!reduced && !motionPaused() && t > nextCall) {
+        calls.push({ t0: t });
         hit('leads', t);
-        nextBead = t + 2.2 + Math.random() * 1.1;
+        nextCall = t + 2.2 + Math.random() * 1.1;
       }
-      var LEG = 1.7;
-      beads = beads.filter(function (b) {
-        var age = t - b.t0;
-        if (age < LEG) { drawCall(L, Hin, ease(age / LEG), false); return true; }
-        if (!b.inHub) { b.inHub = true; hit('hub', t); hubFlash = t; }
-        var age2 = age - LEG - 0.35;
-        if (age2 < 0) return true; // a beat inside the hub while it routes the call
-        if (age2 < LEG) { drawCall(Hout, R, ease(age2 / LEG), true); return true; }
+      var LEG = 1.6;
+      calls = calls.filter(function (c) {
+        var age = t - c.t0;
+        if (age < LEG) { comet(L, Hin, ease(age / LEG)); return true; }
+        if (!c.inHub) { c.inHub = true; hit('hub', t); }
+        var age2 = age - LEG - 0.4;
+        if (age2 < 0) return true; // a beat inside the globe while it routes the call
+        if (age2 < LEG) { comet(Hout, R, ease(age2 / LEG)); return true; }
         hit('revenue', t);
         return false;
       });
-      rings = rings.filter(function (r) { return t - r.t < 1.2; });
-      sweeps = sweeps.filter(function (s) { return t - s.t < 1.1; });
+      ripples = ripples.filter(function (r) { return t - r.t < 1.2; });
     }
-    function ease(u) { return u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; }
 
     function frame(now) {
       raf = 0;
