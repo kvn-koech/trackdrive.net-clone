@@ -867,12 +867,6 @@
   var BOTTOM_SCENES = {
     '/p/contact.html': function () { return globeScene('avx-cv-bottom avx-cv-globe'); },
     '/sign_up.html': function () { return lanesScene('avx-cv-bottom avx-cv-lanes'); },
-    '/pricing.html': function () {
-      return silkScene('avx-cv-bottom', [
-        { color: '59,130,246', lines: 44, alpha: .3, base: .6, amp: .15, spread: .36, freq: 1, phase: 0, speed: .3 },
-        { color: '165,180,252', lines: 16, alpha: .2, base: .64, amp: .1, spread: .18, freq: .7, phase: 2.2, speed: .22 }
-      ]);
-    },
     '/features/integrations.html': function () {
       return silkScene('avx-cv-bottom', [
         { color: '56,189,248', lines: 36, alpha: .28, base: .56, amp: .13, spread: .3, freq: .9, phase: 1, speed: .26 },
@@ -883,7 +877,7 @@
 
   function initBottomWaves() {
     if (/^\/features(\.html)?\/?$/.test(location.pathname)) return; // features page ends clean
-    if (pageKey() === '/') return; // the landing page ends on Bring Your Own VoIP, clean
+    if (pageKey() === '/' || pageKey() === '/pricing.html') return; // these pages end clean
     if (/^\/features\/(voice_agents|ai_sms_bots|transcriptions)\b/.test(location.pathname)) return; // AI pages too
     var sections = topSections().filter(function (sec) {
       return !sec.classList.contains('marketing-cta-band');
@@ -1002,8 +996,9 @@
   function initPricingHorizon() {
     var hero = document.querySelector('main section.pricing-hero');
     if (!hero) return;
-    hero.classList.add('avx-fx-host');
-    hero.insertBefore(horizonScene('avx-cv-horizon'), hero.firstChild);
+    hero.classList.add('avx-fx-host', 'avx-pricing-3d');
+    // the same quiet 3D floor as the landing page
+    hero.insertBefore(el('div', 'avx-hero-3d', '<div class="avx-hero-3d-plane"><div class="avx-hero-3d-grid"></div></div><div class="avx-hero-3d-horizon"></div>'), hero.firstChild);
   }
 
   // ---------- Section backgrounds ----------
@@ -1213,11 +1208,7 @@
       // hub: the vortex mark replaces the bolt, with a large tilted vortex behind the box
       var bolt = hub.querySelector('.flow-center-title .fa-bolt');
       if (bolt) bolt.parentNode.replaceChild(vortexSvg('avx-vx-t' + di, 'avx-plat-mark'), bolt);
-      var halo = document.createElement('div');
-      halo.className = 'avx-plat-halo';
-      halo.setAttribute('aria-hidden', 'true');
-      halo.appendChild(vortexSvg('avx-vx-h' + di, 'avx-plat-vortex'));
-      hub.parentNode.insertBefore(halo, hub);
+      stage.classList.add('avx-plat-simple');
 
       // wires and packets
       var svg = document.createElementNS(SVGNS, 'svg');
@@ -1270,7 +1261,6 @@
           p.className = 'avx-plat-packet';
           p.style.offsetPath = 'path("' + d + '")';
           p.style.setProperty('--avx-d', item.style.getPropertyValue('--avx-d'));
-          p.appendChild(img(out ? 'icon-sphere--blue.png' : 'blue-sphere-120.png'));
           packets.appendChild(p);
         }
         sources.forEach(function (s, i) { wire(s, i, sources.length, false); });
@@ -2544,7 +2534,7 @@
   };
 
   function initHeroCharts() {
-    var hero = document.querySelector('main section.mktg-subpage-hero, main section.pricing-hero');
+    var hero = document.querySelector('main section.mktg-subpage-hero');
     if (!hero) return;
     // the cards are positioned inside the header itself
     hero.classList.add('avx-fx-host');

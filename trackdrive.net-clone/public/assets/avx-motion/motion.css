@@ -5818,3 +5818,122 @@ main > section {
 .avx-lf3 .hero-simple-hub-name {
   margin-top: 10px;
 }
+
+/* ---------- Features diagram: flat, crisp and simple ---------- */
+
+.avx-plat-simple .avx-plat-tilt,
+.avx-plat-simple:not(.avx-seen) .avx-plat-tilt,
+.avx-plat-simple .flow-platform-diagram,
+.avx-plat-simple .flow-item,
+.avx-plat-simple .flow-item:hover,
+.avx-plat-simple .flow-center-box {
+  transform: none !important;
+  opacity: 1 !important;
+  transition: border-color .3s ease !important;
+}
+
+.avx-plat-simple .flow-platform-diagram {
+  animation: none !important;
+}
+
+.avx-plat-simple .flow-center-box {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: #111522 !important;
+  border: 1px solid rgba(96, 165, 250, .4) !important;
+  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, .9) !important;
+}
+
+.avx-plat-simple .flow-item {
+  background: #11141b !important;
+  border: 1px solid rgba(255, 255, 255, .09) !important;
+  box-shadow: none !important;
+}
+
+/* thin, steady wires; one small dot per wire */
+.avx-plat-simple .avx-plat-wire {
+  stroke-width: 1.25;
+}
+
+.avx-plat-simple .avx-plat-flow {
+  display: none;
+}
+
+.avx-plat-simple .avx-plat-packet {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: #dbeafe;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, .28);
+  offset-anchor: center;
+}
+
+/* an item's border brightens as its dot passes, nothing more */
+@keyframes avxPlatChip {
+  0%, 16%, 100% { border-color: rgba(255, 255, 255, .09); }
+  4% { border-color: rgba(96, 165, 250, .7); }
+}
+
+@keyframes avxPlatChipOut {
+  0%, 30%, 100% { border-color: rgba(255, 255, 255, .09); }
+  42% { border-color: rgba(96, 165, 250, .7); }
+}
+
+.avx-plat-simple .avx-plat-mark > span {
+  animation: none !important;
+}
+
+.avx-plat-simple .flow-arrows-column {
+  opacity: 0 !important;
+}
+
+/* ---------- Pricing header: simple background with the 3D grid floor ---------- */
+
+.avx-pricing-3d,
+[data-bs-theme="dark"] .avx-pricing-3d {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0b0d12 !important;
+  padding-bottom: 72px !important;
+}
+
+.avx-pricing-3d > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.avx-pricing-3d .avx-hero-3d {
+  perspective-origin: 50% 10%;
+}
+
+.avx-pricing-3d .avx-hero-3d-plane {
+  height: 150%;
+}
+
+.avx-pricing-3d .avx-hero-3d-horizon {
+  top: 40%;
+}
+
+/* the pricing floor fades out at the bottom instead of ending on a line */
+.avx-pricing-3d .avx-hero-3d {
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+}
+
+.avx-pricing-3d,
+[data-bs-theme="dark"] .avx-pricing-3d {
+  background: transparent !important;
+}
+
+.avx-pricing-3d .avx-hero-3d {
+  -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
+}
+
+.avx-pricing-3d .avx-hero-3d-grid {
+  background:
+    linear-gradient(rgba(96, 165, 250, .5) 1.5px, transparent 1.5px) 0 0 / 72px 72px,
+    linear-gradient(90deg, rgba(96, 165, 250, .5) 1.5px, transparent 1.5px) 0 0 / 72px 72px;
+}
