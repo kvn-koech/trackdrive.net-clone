@@ -5083,3 +5083,738 @@ main > section {
     animation: none;
   }
 }
+
+/* ---------- Hero side scenes in 3D ---------- */
+
+.avx-s3d {
+  position: relative;
+  width: 240px;
+  height: 170px;
+  margin: 0 auto;
+  perspective: 620px;
+  perspective-origin: 50% 30%;
+  transform-style: preserve-3d;
+}
+
+/* left: a glossy phone coin turning above a floor with ring ripples */
+.avx-call3d-floor {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  margin-left: -75px;
+  transform: rotateX(74deg);
+  transform-style: preserve-3d;
+}
+
+.avx-call3d-floor b {
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 0, 0, .7), rgba(0, 0, 0, 0) 70%);
+  animation: avxCoinShadow 3.6s ease-in-out infinite alternate;
+}
+
+.avx-call3d-floor i {
+  position: absolute;
+  inset: 30%;
+  border: 2px solid rgba(96, 165, 250, .7);
+  border-radius: 50%;
+  opacity: 0;
+  animation: avxFloorRipple 2.4s cubic-bezier(.2, .7, .3, 1) infinite;
+}
+
+.avx-call3d-floor i:nth-of-type(2) { animation-delay: .8s; }
+.avx-call3d-floor i:nth-of-type(3) { animation-delay: 1.6s; }
+
+@keyframes avxFloorRipple {
+  0% { opacity: .9; transform: scale(.8); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+
+@keyframes avxCoinShadow {
+  from { transform: scale(1); opacity: .9; }
+  to { transform: scale(.82); opacity: .6; }
+}
+
+.avx-call3d-float {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: 78px;
+  height: 78px;
+  margin-left: -39px;
+  transform-style: preserve-3d;
+  animation: avxCoinBob 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes avxCoinBob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+.avx-call3d-coin {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: avxCoinTurn 4.8s ease-in-out infinite alternate;
+}
+
+@keyframes avxCoinTurn {
+  from { transform: rotateY(-32deg) rotateX(8deg); }
+  to { transform: rotateY(32deg) rotateX(-4deg); }
+}
+
+/* the coin's edge: stacked discs give it real thickness */
+.avx-call3d-coin > i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #1e40af, #172554);
+}
+
+.avx-call3d-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #1e3a8a;
+  transform: translateZ(-8px) rotateY(180deg);
+}
+
+.avx-call3d-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(120% 120% at 30% 22%, #6aa5ff 0%, #2f6fe8 40%, #1d4ed8 75%, #1e3a8a 100%);
+  box-shadow: inset 0 2px 1px rgba(255, 255, 255, .35), inset 0 -6px 12px rgba(10, 20, 60, .45);
+  color: #fff;
+}
+
+.avx-call3d-face svg {
+  width: 32px;
+  height: 32px;
+  animation: avxPhoneShake 2.4s ease-in-out infinite;
+}
+
+/* right: a tilted board, the call travelling through three columns */
+.avx-r3-board {
+  position: absolute;
+  top: 58px;
+  left: 5px;
+  width: 230px;
+  height: 90px;
+  transform: rotateX(58deg) rotateZ(-26deg);
+  transform-style: preserve-3d;
+}
+
+.avx-r3-path,
+.avx-r3-path-lit {
+  position: absolute;
+  top: 44px;
+  left: 20px;
+  width: 190px;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(96, 165, 250, .25);
+}
+
+.avx-r3-path-lit {
+  background: linear-gradient(90deg, #60a5fa, #bfdbfe);
+  transform-origin: left center;
+  animation: avxPathFill 3.2s ease-in-out infinite;
+}
+
+@keyframes avxPathFill {
+  0%, 6% { transform: scaleX(0); opacity: 1; }
+  40%, 52% { transform: scaleX(.5); opacity: 1; }
+  86% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+
+.avx-r3-node {
+  position: absolute;
+  top: 45px;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+.avx-r3-n1 { left: 20px; }
+.avx-r3-n2 { left: 115px; }
+.avx-r3-n3 { left: 210px; }
+
+.avx-r3-node > i,
+.avx-r3-top,
+.avx-r3-glow {
+  position: absolute;
+  top: -13px;
+  left: -13px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+
+.avx-r3-node > i {
+  background: #12224a;
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, .25);
+}
+
+.avx-r3-hub > i {
+  background: #1a3a8f;
+}
+
+.avx-r3-top {
+  background: radial-gradient(circle at 35% 30%, #9cc4ff, #3b82f6 55%, #1d4ed8);
+  transform: translateZ(16px);
+  opacity: .55;
+}
+
+.avx-r3-hub .avx-r3-top {
+  opacity: .9;
+}
+
+.avx-r3-glow {
+  top: -26px;
+  left: -26px;
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(circle, rgba(96, 165, 250, .55), transparent 68%);
+  opacity: 0;
+}
+
+.avx-r3-n1 .avx-r3-top, .avx-r3-n1 .avx-r3-glow { animation: avxR3Lit1 3.2s ease-in-out infinite; }
+.avx-r3-n2 .avx-r3-top, .avx-r3-n2 .avx-r3-glow { animation: avxR3Lit2 3.2s ease-in-out infinite; }
+.avx-r3-n3 .avx-r3-top, .avx-r3-n3 .avx-r3-glow { animation: avxR3Lit3 3.2s ease-in-out infinite; }
+
+@keyframes avxR3Lit1 {
+  0%, 10% { opacity: 1; }
+  24%, 100% { opacity: .5; }
+}
+
+@keyframes avxR3Lit2 {
+  0%, 32% { opacity: .55; }
+  42%, 54% { opacity: 1; }
+  68%, 100% { opacity: .55; }
+}
+
+@keyframes avxR3Lit3 {
+  0%, 78% { opacity: .5; }
+  88%, 96% { opacity: 1; }
+  100% { opacity: .5; }
+}
+
+/* the glows start hidden: their own keyframes run from 0 */
+.avx-r3-n1 .avx-r3-glow { animation-name: avxR3Glow1; }
+.avx-r3-n2 .avx-r3-glow { animation-name: avxR3Glow2; }
+.avx-r3-n3 .avx-r3-glow { animation-name: avxR3Glow3; }
+
+@keyframes avxR3Glow1 { 0%, 8% { opacity: 1; } 22%, 100% { opacity: 0; } }
+@keyframes avxR3Glow2 { 0%, 34% { opacity: 0; } 42%, 52% { opacity: 1; } 64%, 100% { opacity: 0; } }
+@keyframes avxR3Glow3 { 0%, 80% { opacity: 0; } 88%, 96% { opacity: 1; } 100% { opacity: 0; } }
+
+/* labels stand upright, facing the viewer */
+.avx-r3-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 90px;
+  margin-left: -45px;
+  font: 600 10px/1 var(--avx-font-mono, monospace);
+  letter-spacing: .1em;
+  text-align: center;
+  text-transform: uppercase;
+  color: #93c5fd;
+  white-space: nowrap;
+  transform: translateZ(40px) rotateZ(26deg) rotateX(-58deg);
+}
+
+.avx-r3-hub .avx-r3-label {
+  color: #e5e9f0;
+}
+
+/* the call: a bright bead riding just above the path */
+.avx-r3-packet {
+  position: absolute;
+  top: 45px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  animation: avxR3Packet 3.2s ease-in-out infinite;
+}
+
+.avx-r3-packet i {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #bfdbfe 45%, #60a5fa);
+  box-shadow: 0 0 10px rgba(147, 197, 253, .9);
+  transform: translateZ(8px) rotateZ(26deg) rotateX(-58deg);
+}
+
+@keyframes avxR3Packet {
+  0% { opacity: 0; transform: translateX(0); }
+  6% { opacity: 1; transform: translateX(0); }
+  40%, 52% { opacity: 1; transform: translateX(95px); }
+  86% { opacity: 1; transform: translateX(190px); }
+  96%, 100% { opacity: 0; transform: translateX(190px); }
+}
+
+/* the earlier flat versions are replaced */
+.avx-ringing,
+.avx-route {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-s3d *,
+  .avx-s3d *::before {
+    animation: none !important;
+  }
+}
+
+/* ---------- Hero side scenes: distant holographic platforms (ringba style) ---------- */
+
+.avx-rbs {
+  width: 300px;
+}
+
+.avx-rbs-stage {
+  position: relative;
+  width: 300px;
+  height: 230px;
+  margin: 0 auto;
+  perspective: 1000px;
+  perspective-origin: 50% -10%;
+  transform-style: preserve-3d;
+  opacity: .92;
+}
+
+/* the platform: rings and a dotted halo lying on a tilted floor, set back in depth */
+.avx-rbs-floor {
+  position: absolute;
+  top: 66px;
+  left: 30px;
+  width: 240px;
+  height: 240px;
+  transform: translateZ(-60px) rotateX(74deg);
+  transform-style: preserve-3d;
+}
+
+.avx-rbs-rings,
+.avx-rbs-dots {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: 50%;
+}
+
+.avx-rbs-rings {
+  inset: 14%;
+  width: 72%;
+  height: 72%;
+  animation: avxSpinZ 50s linear infinite;
+}
+
+.avx-rbs-dots {
+  opacity: .7;
+  animation: avxSpinZ 80s linear infinite reverse;
+}
+
+.avx-rbs-ripple {
+  position: absolute;
+  inset: 38%;
+  border: 2px solid rgba(147, 197, 253, .8);
+  border-radius: 50%;
+  opacity: 0;
+  animation: avxRbsRipple 3.2s cubic-bezier(.2, .7, .3, 1) infinite;
+}
+
+.avx-rbs-ripple + .avx-rbs-ripple {
+  animation-delay: 1.6s;
+}
+
+@keyframes avxRbsRipple {
+  0% { opacity: .9; transform: scale(.6); }
+  100% { opacity: 0; transform: scale(2.6); }
+}
+
+/* source orbs orbiting the platform, kept upright */
+.avx-rbs-orbit {
+  position: absolute;
+  top: 76px;
+  left: 50px;
+  width: 200px;
+  height: 200px;
+  transform: translateZ(-60px) rotateX(74deg);
+  transform-style: preserve-3d;
+}
+
+.avx-rbs-orbit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(96, 165, 250, .3);
+  border-radius: 50%;
+}
+
+.avx-rbs-slot {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: avxRbsSlot 18s linear infinite;
+}
+
+@keyframes avxRbsSlot {
+  to { transform: rotateZ(360deg); }
+}
+
+.avx-rbs-sat {
+  position: absolute;
+  top: -19px;
+  left: 50%;
+  width: 38px;
+  height: 38px;
+  margin-left: -19px;
+  max-width: none;
+  transform-origin: 50% 100%;
+  animation: avxRbsSat 18s linear infinite;
+}
+
+@keyframes avxRbsSat {
+  from { transform: rotateZ(0deg) rotateX(-74deg); }
+  to { transform: rotateZ(-360deg) rotateX(-74deg); }
+}
+
+/* the beam lifting each call to its tracking number */
+.avx-rbs-beam {
+  position: absolute;
+  top: 82px;
+  left: 50%;
+  width: 46px;
+  height: 92px;
+  margin-left: -23px;
+  background: linear-gradient(0deg, rgba(96, 165, 250, .5), rgba(96, 165, 250, .06) 85%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+  animation: avxRbsBeam 3.2s ease-in-out infinite;
+}
+
+@keyframes avxRbsBeam {
+  0%, 100% { opacity: .55; }
+  20% { opacity: 1; }
+}
+
+/* the hologram tag: the tracking number the call came in on */
+.avx-rbs-tag {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: 168px;
+  margin-left: -84px;
+  padding: 8px 10px 9px;
+  border: 1px solid rgba(96, 165, 250, .35);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(23, 37, 84, .72), rgba(15, 23, 42, .72));
+  text-align: center;
+  animation: avxRbsTag 5s ease-in-out infinite alternate;
+}
+
+@keyframes avxRbsTag {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
+}
+
+.avx-rbs-tag span {
+  display: block;
+  font: 600 8px/1 var(--avx-font-mono, monospace);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #7f9cc9;
+}
+
+.avx-rbs-tag b {
+  display: block;
+  margin: 4px 0 3px;
+  font: 700 15px/1.1 var(--avx-font-mono, monospace);
+  letter-spacing: .01em;
+  color: #eff6ff;
+}
+
+.avx-rbs-tag em {
+  display: block;
+  font: 500 10px/1.2 var(--avx-font-sans, sans-serif);
+  font-style: normal;
+  color: #93c5fd;
+}
+
+/* right: lanes on the floor from the centre out to buyers */
+.avx-rbs-lane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 104px;
+  height: 2px;
+  margin-top: -1px;
+  transform-origin: 0 50%;
+  transform-style: preserve-3d;
+  background: linear-gradient(90deg, rgba(96, 165, 250, .55), rgba(96, 165, 250, .15));
+}
+
+.avx-rbs-pk {
+  position: absolute;
+  top: -4px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff, #93c5fd 50%, rgba(59, 130, 246, 0) 72%);
+  animation: avxRbsPk 2.4s ease-in infinite;
+}
+
+@keyframes avxRbsPk {
+  0% { opacity: 0; transform: translateX(0); }
+  10% { opacity: 1; }
+  80% { opacity: 1; transform: translateX(104px); }
+  90%, 100% { opacity: 0; transform: translateX(104px); }
+}
+
+/* a buyer: an upright pillar of light at the end of its lane */
+.avx-rbs-buyer {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+.avx-rbs-buyer em {
+  position: absolute;
+  bottom: 0;
+  left: -6px;
+  width: 12px;
+  height: 40px;
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(0deg, #1d4ed8, #93c5fd);
+  box-shadow: 0 0 0 1px rgba(147, 197, 253, .3);
+  opacity: .55;
+  animation: avxRbsBuyer 2.4s ease-in-out infinite;
+}
+
+@keyframes avxRbsBuyer {
+  0%, 74% { opacity: .55; }
+  84%, 92% { opacity: 1; }
+  100% { opacity: .55; }
+}
+
+/* the hologram: a ring turning in 3D around the Avortyx mark */
+.avx-rbs-holo {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  width: 104px;
+  height: 104px;
+  margin-left: -52px;
+  transform-style: preserve-3d;
+  animation: avxRbsTag 5s ease-in-out infinite alternate;
+}
+
+.avx-rbs-neon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  animation: avxRbsTurn 9s linear infinite;
+}
+
+@keyframes avxRbsTurn {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+
+.avx-rbs-mark {
+  position: absolute;
+  inset: 30%;
+}
+
+.avx-rbs-mark .avx-vxl {
+  width: 100%;
+  height: 100%;
+}
+
+/* the earlier close-up scenes are replaced */
+.avx-s3d {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-rbs *,
+  .avx-rbs *::before {
+    animation: none !important;
+  }
+}
+
+/* ---------- "Everything you need": 3D coins on holographic platforms ---------- */
+
+.avx-lf3 .hero-simple-flow,
+.avx-lf3 .hero-simple-node,
+.avx-lf3 .hero-simple-hub {
+  transform-style: preserve-3d;
+}
+
+.avx-lf3 .hero-simple-node,
+.avx-lf3 .hero-simple-hub {
+  position: relative;
+}
+
+/* the coins: a glossy face over stacked edge discs, turning gently */
+.avx-flow3d.avx-lf2.avx-lf3 .hero-simple-node-icon,
+.avx-flow3d.avx-lf2.avx-lf3 .hero-simple-hub-icon {
+  position: relative;
+  overflow: visible;
+  transform-style: preserve-3d;
+  background: radial-gradient(120% 120% at 30% 22%, #6aa5ff 0%, #2f6fe8 40%, #1d4ed8 75%, #1e3a8a 100%) !important;
+  box-shadow: inset 0 2px 1px rgba(255, 255, 255, .32), inset 0 -8px 14px rgba(10, 20, 60, .45) !important;
+  animation: avxLfCoin 5s ease-in-out infinite alternate !important;
+}
+
+.avx-flow3d.avx-lf2.avx-lf3 .hero-simple-hub-icon {
+  background: radial-gradient(120% 120% at 30% 22%, #2b4f9e 0%, #14275e 50%, #0a1638 100%) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(96, 165, 250, .45), inset 0 2px 1px rgba(255, 255, 255, .18) !important;
+}
+
+@keyframes avxLfCoin {
+  from { transform: translateY(0) rotateY(-24deg) rotateX(6deg); }
+  to { transform: translateY(-8px) rotateY(24deg) rotateX(-4deg); }
+}
+
+.avx-lf-edge {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #1e40af, #172554);
+  pointer-events: none;
+}
+
+.avx-lf3 .hero-simple-hub-icon .avx-lf-edge {
+  background: linear-gradient(180deg, #13245a, #0a1430);
+}
+
+.avx-lf3 .hero-simple-node-icon > i,
+.avx-lf3 .hero-simple-hub-icon > .avx-hub-mark {
+  transform: translateZ(1px);
+}
+
+.avx-flow3d.avx-lf2.avx-lf3 .avx-hit {
+  scale: 1.08;
+  transition: scale .3s ease;
+}
+
+/* the platforms, lying on the floor just below each coin */
+.avx-lfp {
+  position: absolute;
+  top: 44px;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  margin-left: -75px;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.avx-lfp-hub {
+  top: 62px;
+  width: 190px;
+  height: 190px;
+  margin-left: -95px;
+}
+
+.avx-lfp-floor {
+  position: absolute;
+  inset: 0;
+  transform: rotateX(76deg);
+  transform-style: preserve-3d;
+}
+
+.avx-lfp-floor img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: 50%;
+  opacity: .9;
+  animation: avxSpinZ 40s linear infinite;
+}
+
+.avx-lfp-floor .avx-lfp-dots {
+  inset: -18%;
+  width: 136%;
+  height: 136%;
+  opacity: .6;
+  animation: avxSpinZ 70s linear infinite reverse;
+}
+
+.avx-lfp-pulse {
+  position: absolute;
+  inset: 30%;
+  border: 2px solid rgba(147, 197, 253, .9);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+/* a call landing flashes its platform */
+.avx-hit + .avx-lfp .avx-lfp-pulse {
+  animation: avxLfpPulse .38s ease-out;
+}
+
+@keyframes avxLfpPulse {
+  from { opacity: .9; transform: scale(.7); }
+  to { opacity: 0; transform: scale(1.9); }
+}
+
+/* labels stay in front of the platforms */
+.avx-lf3 .hero-simple-node-label,
+.avx-lf3 .hero-simple-hub-name,
+.avx-lf3 .hero-simple-node-sources {
+  position: relative;
+  transform: translateZ(40px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-flow3d.avx-lf2.avx-lf3 .hero-simple-node-icon,
+  .avx-flow3d.avx-lf2.avx-lf3 .hero-simple-hub-icon,
+  .avx-lfp-floor img {
+    animation: none !important;
+  }
+}
+
+/* platforms sit right under each coin, clear of the labels */
+.avx-lfp {
+  top: 14px;
+  width: 128px;
+  height: 128px;
+  margin-left: -64px;
+}
+
+.avx-lfp-hub {
+  top: 20px;
+  width: 168px;
+  height: 168px;
+  margin-left: -84px;
+}
+
+.avx-lf3 .hero-simple-node-label,
+.avx-lf3 .hero-simple-hub-name {
+  margin-top: 10px;
+}

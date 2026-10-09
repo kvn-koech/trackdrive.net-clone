@@ -334,6 +334,30 @@
       tilt.appendChild(flow);
       leadScene(tilt, flow);
 
+      // 3D: each node becomes a thick coin turning gently above its own holographic platform
+      flowWrap.classList.add('avx-lf3');
+      [leads, hubIcon, revenue].forEach(function (icon, n) {
+        if (!icon) return;
+        var edge = '';
+        for (var k = 1; k <= 8; k++) edge += '<b class="avx-lf-edge" style="transform:translateZ(' + (-k) + 'px)"></b>';
+        icon.insertAdjacentHTML('afterbegin', edge);
+        icon.style.animationDelay = (-n * 1.3) + 's';
+        var plat = el('div', 'avx-lfp' + (icon === hubIcon ? ' avx-lfp-hub' : ''),
+          '<div class="avx-lfp-floor"><img src="/assets/avx-ringba/pt-hero-rings-blue.webp" alt="" decoding="async">' +
+          (icon === hubIcon ? '<img class="avx-lfp-dots" src="/assets/avx-ringba/platform-ring-blue.webp" alt="" decoding="async">' : '') +
+          '<i class="avx-lfp-pulse"></i></div>');
+        plat.setAttribute('aria-hidden', 'true');
+        icon.parentNode.insertBefore(plat, icon.nextSibling);
+        // centre the platform just under the coin, from the coin's real layout position
+        function place() {
+          var h = plat.offsetHeight;
+          plat.style.top = Math.round(icon.offsetTop + icon.offsetHeight + 6 - h / 2) + 'px';
+        }
+        place();
+        window.addEventListener('resize', place);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+      });
+
       if (reduced) { flowWrap.classList.add('avx-seen', 'avx-settled'); return; }
 
       driver(flowWrap, 0.06, function (hx, hy) {
@@ -1394,19 +1418,48 @@
     // a quiet 3D floor: a perspective grid reaching back to a soft horizon
     hero.insertBefore(el('div', 'avx-hero-3d', '<div class="avx-hero-3d-plane"><div class="avx-hero-3d-grid"></div></div><div class="avx-hero-3d-horizon"></div>'), hero.firstChild);
 
-    // two quiet side animations: a call ringing in, and that call being routed to a buyer
-    hero.appendChild(el('div', 'avx-side avx-side-l',
-      '<div class="avx-ringing"><i></i><i></i><i></i><span class="avx-ringing-badge">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>' +
-      '</svg></span></div>' +
-      '<p class="avx-side-cap"><b>Inbound call</b><span>Tracked to its ad, keyword and source</span></p>'));
-    hero.appendChild(el('div', 'avx-side avx-side-r',
-      '<div class="avx-route"><div class="avx-route-line"><i class="avx-route-dot"></i></div>' +
-      '<span class="avx-route-n avx-route-n1"><i></i>Caller</span>' +
-      '<span class="avx-route-n avx-route-n2"><i></i>Avortyx</span>' +
-      '<span class="avx-route-n avx-route-n3"><i></i>Buyer</span></div>' +
-      '<p class="avx-side-cap"><b>Routed in milliseconds</b><span>To the right buyer, by your rules</span></p>'));
+    // two distant holographic scenes (ringba style), each telling part of the call-tracking story
+    var R = '/assets/avx-ringba/', B = '/assets/avx-baked/';
+    function im(src, cls, style) {
+      return '<img src="' + src + '" class="' + cls + '" alt="" decoding="async"' + (style ? ' style="' + style + '"' : '') + '>';
+    }
+
+    // left: call sources orbiting a platform; a beam carries each call up to its tracking number
+    var orbs = [[B + 'icon-sphere--green-b.webp', '0s'], [R + 'purple-sphere-312.webp', '-6s'], [R + 'icon-sphere--blue.webp', '-12s']];
+    var left = el('div', 'avx-side avx-side-l avx-rbs',
+      '<div class="avx-rbs-stage">' +
+      '<div class="avx-rbs-floor">' + im(R + 'pt-hero-rings-blue.webp', 'avx-rbs-rings') + im(R + 'platform-ring-blue.webp', 'avx-rbs-dots') +
+      '<i class="avx-rbs-ripple"></i><i class="avx-rbs-ripple"></i></div>' +
+      '<div class="avx-rbs-orbit">' + orbs.map(function (o) {
+        return '<div class="avx-rbs-slot" style="animation-delay:' + o[1] + '">' + im(o[0], 'avx-rbs-sat', 'animation-delay:' + o[1]) + '</div>';
+      }).join('') + '</div>' +
+      '<div class="avx-rbs-beam"></div>' +
+      '<div class="avx-rbs-tag"><span>Tracking number</span><b>(888) 571-0429</b><em class="avx-rbs-src">Google Ads · Medicare</em></div>' +
+      '</div>' +
+      '<p class="avx-side-cap"><b>Every call source, tracked</b><span>Ad, campaign and keyword on every call</span></p>');
+    hero.appendChild(left);
+    var SRC = [['(888) 571-0429', 'Google Ads · Medicare'], ['(855) 204-7731', 'Meta · Solar'], ['(866) 742-0915', 'Organic · Legal'], ['(877) 390-1158', 'Bing Ads · Auto']];
+    var si = 0;
+    ticker(left, 3200, function () {
+      si = (si + 1) % SRC.length;
+      left.querySelector('.avx-rbs-tag b').textContent = SRC[si][0];
+      left.querySelector('.avx-rbs-src').textContent = SRC[si][1];
+    });
+
+    // right: a hologram ring with the Avortyx mark; calls run out along floor lanes to buyers
+    var lanes = [[155, '0s'], [90, '-0.8s'], [25, '-1.6s']].map(function (l) {
+      return '<span class="avx-rbs-lane" style="transform:rotateZ(' + l[0] + 'deg)">' +
+        '<i class="avx-rbs-pk" style="animation-delay:' + l[1] + '"></i>' +
+        '<b class="avx-rbs-buyer" style="transform:rotateZ(' + (-l[0]) + 'deg) rotateX(-72deg)"><em style="animation-delay:' + l[1] + '"></em></b></span>';
+    }).join('');
+    var right = el('div', 'avx-side avx-side-r avx-rbs',
+      '<div class="avx-rbs-stage">' +
+      '<div class="avx-rbs-floor">' + im(R + 'platform-ring-blue.webp', 'avx-rbs-dots') + lanes + '</div>' +
+      '<div class="avx-rbs-holo">' + im(R + 'neon-ring-blue.webp', 'avx-rbs-neon') + '<span class="avx-rbs-mark"></span></div>' +
+      '</div>' +
+      '<p class="avx-side-cap"><b>Routed to the right buyer</b><span>In milliseconds, by your rules</span></p>');
+    right.querySelector('.avx-rbs-mark').appendChild(vortexSvg('avx-vx-rbs', ''));
+    hero.appendChild(right);
     hero.querySelectorAll('.avx-side').forEach(function (n) { n.setAttribute('aria-hidden', 'true'); });
   }
 
