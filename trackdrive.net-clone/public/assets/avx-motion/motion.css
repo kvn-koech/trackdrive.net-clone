@@ -1198,6 +1198,17 @@ img.avx-tint {
   text-shadow: 0 0 12px #f8f9fa, 0 0 4px #f8f9fa;
 }
 
+/* dark mode: the light halo blurs light text, so use bright text with a dark shadow instead */
+[data-bs-theme="dark"] .avx-ihub-host h1.fw-bold {
+  color: #f8fafc;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .7), 0 0 3px rgba(0, 0, 0, .5);
+}
+
+[data-bs-theme="dark"] .avx-ihub-host .lead {
+  color: #cbd5e1 !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .6);
+}
+
 .avx-ihub {
   position: absolute;
   top: 50%;
@@ -1421,6 +1432,19 @@ img.avx-tint {
 
 .avx-ibg-glow-1 { top: 6%; left: -140px; }
 .avx-ibg-glow-2 { right: -140px; bottom: 18%; animation-delay: -6s; }
+
+/* dark mode: soften the backdrop so it doesn't wash out the heading */
+[data-bs-theme="dark"] .avx-ibg-ribbon img {
+  opacity: .14;
+}
+
+[data-bs-theme="dark"] .avx-ibg-grid {
+  opacity: .6;
+}
+
+[data-bs-theme="dark"] .avx-ibg-glow {
+  opacity: .1;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .avx-ibg *,
