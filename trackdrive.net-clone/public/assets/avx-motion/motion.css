@@ -4407,16 +4407,14 @@ html.avx-booted main {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  animation: avxVxcRock var(--rock, 8s) ease-in-out infinite alternate;
-  animation-delay: var(--rock-delay, 0s);
+  will-change: transform;
 }
 
 .avx-vxc-spin {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  animation: avxSpinZ var(--spin, 20s) linear infinite;
-  animation-direction: var(--dir, normal);
+  will-change: transform;
 }
 
 .avx-vxc-spin svg {
@@ -4433,14 +4431,30 @@ html.avx-booted main {
   filter: drop-shadow(0 0 5px rgba(59, 130, 246, .55));
 }
 
-/* each ring: its own depth, rocking range and spin */
-.avx-vxc-r1 { --z: -26px; --x0: -24deg; --x1: 22deg; --y0: 26deg; --y1: -18deg; --rock: 9s; --spin: 26s; }
-.avx-vxc-r2 { --z: 0px; --x0: 30deg; --x1: -22deg; --y0: -28deg; --y1: 24deg; --rock: 7s; --rock-delay: -2s; --spin: 17s; --dir: reverse; }
-.avx-vxc-r3 { --z: 24px; --x0: -36deg; --x1: 30deg; --y0: -30deg; --y1: 18deg; --rock: 5.5s; --rock-delay: -3.5s; --spin: 11s; }
+/* each ring precesses like a spinning top: the direction of its tilt sweeps round in a
+   continuous circle (no reversals), while the ring spins in its own plane. Literal values
+   only, so every animation runs on the compositor at full frame rate. */
+.avx-vxc-r1 { animation: avxVxcP1 16s linear infinite; }
+.avx-vxc-r2 { animation: avxVxcP2 12s linear infinite reverse; }
+.avx-vxc-r3 { animation: avxVxcP3 9s linear infinite; }
 
-@keyframes avxVxcRock {
-  from { transform: translateZ(var(--z)) rotateX(var(--x0)) rotateY(var(--y0)); }
-  to { transform: translateZ(var(--z)) rotateX(var(--x1)) rotateY(var(--y1)); }
+.avx-vxc-r1 .avx-vxc-spin { animation: avxSpinZ 24s linear infinite; }
+.avx-vxc-r2 .avx-vxc-spin { animation: avxSpinZ 16s linear infinite reverse; }
+.avx-vxc-r3 .avx-vxc-spin { animation: avxSpinZ 10s linear infinite; }
+
+@keyframes avxVxcP1 {
+  from { transform: translateZ(-26px) rotateZ(0deg) rotateX(22deg) rotateZ(0deg); }
+  to { transform: translateZ(-26px) rotateZ(360deg) rotateX(22deg) rotateZ(-360deg); }
+}
+
+@keyframes avxVxcP2 {
+  from { transform: translateZ(0) rotateZ(120deg) rotateX(28deg) rotateZ(-120deg); }
+  to { transform: translateZ(0) rotateZ(480deg) rotateX(28deg) rotateZ(-480deg); }
+}
+
+@keyframes avxVxcP3 {
+  from { transform: translateZ(24px) rotateZ(240deg) rotateX(34deg) rotateZ(-240deg); }
+  to { transform: translateZ(24px) rotateZ(600deg) rotateX(34deg) rotateZ(-600deg); }
 }
 
 /* the core: a small bright sphere floating in front */
