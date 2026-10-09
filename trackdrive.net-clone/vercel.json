@@ -1,11 +1,70 @@
 {
   "rewrites": [
-    { "source": "/:page(brand_assets|careers|features|pricing|privacy_policy|terms_of_service)/", "destination": "/:page.html" },
-    { "source": "/:page(brand_assets|careers|features|pricing|privacy_policy|terms_of_service)", "destination": "/:page.html" },
-    { "source": "/features/integrations/", "destination": "/features/integrations.html" },
-    { "source": "/features/integrations", "destination": "/features/integrations.html" },
-    { "source": "/p/contact/", "destination": "/p/contact.html" },
-    { "source": "/p/contact", "destination": "/p/contact.html" },
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/:page(brand_assets|careers|features|pricing|privacy_policy|terms_of_service)/",
+      "destination": "/:page.html"
+    },
+    {
+      "source": "/:page(brand_assets|careers|features|pricing|privacy_policy|terms_of_service)",
+      "destination": "/:page.html"
+    },
+    {
+      "source": "/features/integrations/",
+      "destination": "/features/integrations.html"
+    },
+    {
+      "source": "/features/integrations",
+      "destination": "/features/integrations.html"
+    },
+    {
+      "source": "/p/contact/",
+      "destination": "/p/contact.html"
+    },
+    {
+      "source": "/p/contact",
+      "destination": "/p/contact.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/assets/avx-baked/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/assets/avx-ringba/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/assets/trackdrive_marketing/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/(favicon\\.ico|favicon\\.svg|favicon-32\\.png|favicon-192\\.png|apple-touch-icon-blue\\.png)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
+    }
   ]
 }

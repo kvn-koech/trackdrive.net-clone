@@ -3045,7 +3045,7 @@ img.avx-tint {
   transform-box: view-box;
   transform-origin: 0 -32px;
   transform: scaleY(.6);
-  transition: transform 1.2s var(--avx-ease);
+  transition: transform .6s var(--avx-ease);
 }
 
 .avx-rd-bars rect {
@@ -3799,4 +3799,14 @@ html.avx-booted main {
   html.avx-booted main {
     transition: none;
   }
+}
+
+/* performance: panels floating over moving scenes would re-blur every frame;
+   a near-solid glass reads the same and costs nothing while scrolling */
+.avx-live,
+.avx-chart-card,
+.avx-c-chip {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: linear-gradient(180deg, rgba(20, 23, 30, .94), rgba(14, 16, 22, .94)) !important;
 }

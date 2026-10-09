@@ -17,9 +17,10 @@
   function img(name, className) {
     var el = document.createElement('img');
     var twin = BLUE_TWIN.test(name) && !/avx-keep/.test(className || '');
-    el.src = twin ? BAKED + name.replace('.png', '-b.png') : ASSETS + name;
+    el.src = twin ? BAKED + name.replace('.png', '-b.webp') : ASSETS + name;
     el.alt = '';
     el.decoding = 'async';
+    el.loading = 'lazy';
     if (className) el.className = className;
     // colored spheres are tinted to the hero blue, unless marked avx-keep
     return el;
@@ -30,11 +31,13 @@
     return bakedFile(base + (DARK ? '-d' : '-l') + '.png', className);
   }
 
+  // dark art ships as WebP; the light-theme PNGs are kept only as a fallback
   function bakedFile(file, className) {
     var el = document.createElement('img');
-    el.src = BAKED + file;
+    el.src = BAKED + (/-l\.png$/.test(file) ? file : file.replace(/\.png$/, '.webp'));
     el.alt = '';
     el.decoding = 'async';
+    el.loading = 'lazy';
     if (className) el.className = className;
     return el;
   }
@@ -551,7 +554,7 @@
       if (o.z) layer.style.setProperty('--z', o.z);
       var im = document.createElement('div');
       im.className = 'avx-bw-img avx-bw-' + l[1] + ' ' + l[2];
-      if (l[0]) im.style.setProperty('--src', 'url("' + BAKED + l[0] + (DARK ? '-d' : '-l') + '.png")');
+      if (l[0]) im.style.setProperty('--src', 'url("' + BAKED + l[0] + (DARK ? '-d.webp' : '-l.png') + '")');
       if (o.alpha) im.style.setProperty('--alpha', o.alpha);
       if (o.speed) im.style.setProperty('--speed', o.speed);
       if (o.pos) im.style.setProperty('--pos', o.pos);
@@ -1034,6 +1037,7 @@
     el.src = RB + file;
     el.alt = '';
     el.decoding = 'async';
+    el.loading = 'lazy';
     if (className) el.className = className;
     return el;
   }
@@ -1195,6 +1199,12 @@
 
   var MOTION_KEY = 'avx-motion';
 
+  // true while the page is being scrolled (and briefly after): canvas scenes skip frames then,
+  // leaving the main thread to the scroll itself
+  var scrollingUntil = 0;
+  window.addEventListener('scroll', function () { scrollingUntil = performance.now() + 150; }, { passive: true });
+  function isScrolling() { return performance.now() < scrollingUntil; }
+
   function motionPaused() {
     return document.documentElement.classList.contains('avx-paused');
   }
@@ -1281,7 +1291,7 @@
     function frame(now) {
       raf = 0;
       // the swell is slow, so 30 fps reads the same and halves the work
-      if (!reduced && now - lastDraw < 32) { schedule(); return; }
+      if (!reduced && (now - lastDraw < 32 || isScrolling())) { schedule(); return; }
       lastDraw = now;
       // scene time only advances while running, so a pause resumes without a jump
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
@@ -1387,7 +1397,7 @@
 
     function frame(now) {
       raf = 0;
-      if (!reduced && now - lastDraw < 32) { schedule(); return; }
+      if (!reduced && (now - lastDraw < 32 || isScrolling())) { schedule(); return; }
       lastDraw = now;
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
@@ -2307,11 +2317,6 @@
     });
   }
 
-  function initHeroRings() {
-    var rings = document.querySelector('.hero-rings img');
-    if (rings) rings.src = BAKED + 'rings-' + (DARK ? 'd' : 'l') + '.png';
-  }
-
   // lift the boot gate once the page is built and the web fonts are in (or after a short wait)
   function reveal() {
     var root = document.documentElement;
@@ -2323,7 +2328,18 @@
       });
     }
     if (document.fonts && document.fonts.ready) {
-      Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 800); })]).then(show, show);
+      // the font stylesheet loads without blocking: wait for it to land, then for its fonts
+      var fonts = new Promise(function (res) {
+        var t0 = Date.now();
+        (function wait() {
+          var css = Array.prototype.some.call(document.styleSheets, function (s) {
+            return s.href && s.href.indexOf('fonts.googleapis') > -1;
+          });
+          if (css || Date.now() - t0 > 600) document.fonts.ready.then(res, res);
+          else setTimeout(wait, 30);
+        })();
+      });
+      Promise.race([fonts, new Promise(function (r) { setTimeout(r, 800); })]).then(show, show);
     } else {
       show();
     }
@@ -2340,7 +2356,6 @@
   function build() {
     initMotionToggle();
     initProgress();
-    initHeroRings();
     initRingbaHero();
     initLeadFlow();
     initPlatformFlow();
