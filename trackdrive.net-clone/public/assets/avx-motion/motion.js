@@ -877,7 +877,7 @@
 
   function initBottomWaves() {
     if (/^\/features(\.html)?\/?$/.test(location.pathname)) return; // features page ends clean
-    if (pageKey() === '/' || pageKey() === '/pricing.html') return; // these pages end clean
+    if (pageKey() === '/' || pageKey() === '/pricing.html' || pageKey() === '/users/sign_in.html') return; // these pages end clean
     if (/^\/features\/(voice_agents|ai_sms_bots|transcriptions)\b/.test(location.pathname)) return; // AI pages too
     var sections = topSections().filter(function (sec) {
       return !sec.classList.contains('marketing-cta-band');
@@ -916,16 +916,13 @@
     var section = card.closest('section');
     if (section) section.classList.add('avx-fx-host');
 
-    var ring = sbg('avx-authring');
-    var tilt = document.createElement('div');
-    tilt.className = 'avx-authring-tilt';
-    var sway = document.createElement('div');
-    sway.className = 'avx-authring-sway';
-    sway.appendChild(baked('rings'));
-    tilt.appendChild(sway);
-    ring.appendChild(tilt);
-    stage.insertBefore(ring, card);
-    if (section) reactive(section, ring, true);
+    // a quiet background: a faint dot grid and two soft glows drifting slowly behind the card
+    if (section) {
+      section.classList.add('avx-auth-calm');
+      var bg = el('div', 'avx-auth-bg', '<i class="avx-auth-glow avx-auth-glow-1"></i><i class="avx-auth-glow avx-auth-glow-2"></i><span class="avx-auth-dots"></span>');
+      bg.setAttribute('aria-hidden', 'true');
+      section.insertBefore(bg, section.firstChild);
+    }
   }
 
   // ---------- Integrations page: 3D hub of orbiting integration logos ----------

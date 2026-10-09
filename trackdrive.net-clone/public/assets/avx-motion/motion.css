@@ -5937,3 +5937,112 @@ main > section {
     linear-gradient(rgba(96, 165, 250, .5) 1.5px, transparent 1.5px) 0 0 / 72px 72px,
     linear-gradient(90deg, rgba(96, 165, 250, .5) 1.5px, transparent 1.5px) 0 0 / 72px 72px;
 }
+
+/* ---------- Sign in: a simple animated background ---------- */
+
+.avx-auth-calm,
+[data-bs-theme="dark"] .avx-auth-calm {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0b0d12 !important;
+}
+
+.avx-auth-calm > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.avx-auth-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* two soft glows drifting slowly (transform only: smooth on the GPU) */
+.avx-auth-glow {
+  position: absolute;
+  width: 640px;
+  height: 640px;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.avx-auth-glow-1 {
+  top: -220px;
+  left: calc(50% - 560px);
+  background: radial-gradient(circle, rgba(37, 99, 235, .22), transparent 65%);
+  animation: avxAuthDrift1 22s ease-in-out infinite alternate;
+}
+
+.avx-auth-glow-2 {
+  bottom: -260px;
+  left: calc(50% - 60px);
+  background: radial-gradient(circle, rgba(59, 130, 246, .16), transparent 65%);
+  animation: avxAuthDrift2 26s ease-in-out infinite alternate;
+}
+
+@keyframes avxAuthDrift1 {
+  from { transform: translate(0, 0); }
+  to { transform: translate(220px, 120px); }
+}
+
+@keyframes avxAuthDrift2 {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-260px, -100px); }
+}
+
+/* a faint dot grid, strongest around the card and fading to the edges */
+.avx-auth-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(148, 163, 184, .22) 1px, transparent 1.2px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(60% 70% at 50% 45%, #000, transparent 75%);
+  mask-image: radial-gradient(60% 70% at 50% 45%, #000, transparent 75%);
+}
+
+/* the card sits on a clean solid surface */
+.avx-auth-calm .mktg-auth-card {
+  background: #11141b !important;
+  border: 1px solid rgba(255, 255, 255, .08) !important;
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .9) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-auth-glow {
+    animation: none;
+  }
+}
+
+/* glows fade fully inside their box (no visible edge); the background fades out above the footer */
+.avx-auth-glow {
+  border-radius: 0;
+}
+
+.avx-auth-glow-1 {
+  background: radial-gradient(closest-side, rgba(37, 99, 235, .22), rgba(37, 99, 235, .08) 55%, transparent);
+}
+
+.avx-auth-glow-2 {
+  background: radial-gradient(closest-side, rgba(59, 130, 246, .16), rgba(59, 130, 246, .06) 55%, transparent);
+}
+
+.avx-auth-bg {
+  -webkit-mask-image: linear-gradient(180deg, #000 75%, transparent);
+  mask-image: linear-gradient(180deg, #000 75%, transparent);
+}
+
+/* eased falloff: no visible ring where the glow meets the background */
+.avx-auth-glow-1 {
+  background: radial-gradient(closest-side, rgba(37, 99, 235, .2), rgba(37, 99, 235, .14) 22%, rgba(37, 99, 235, .07) 48%, rgba(37, 99, 235, .025) 72%, rgba(37, 99, 235, 0));
+}
+
+.avx-auth-glow-2 {
+  background: radial-gradient(closest-side, rgba(59, 130, 246, .15), rgba(59, 130, 246, .1) 22%, rgba(59, 130, 246, .05) 48%, rgba(59, 130, 246, .018) 72%, rgba(59, 130, 246, 0));
+}
+
+.avx-auth-calm .mktg-auth-card {
+  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, .7) !important;
+}
