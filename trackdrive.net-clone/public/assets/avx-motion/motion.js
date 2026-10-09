@@ -339,7 +339,7 @@
       [leads, hubIcon, revenue].forEach(function (icon, n) {
         if (!icon) return;
         var edge = '';
-        for (var k = 1; k <= 8; k++) edge += '<b class="avx-lf-edge" style="transform:translateZ(' + (-k) + 'px)"></b>';
+        for (var k = 1; k <= 4; k++) edge += '<b class="avx-lf-edge" style="transform:translateZ(' + (-k * 1.5) + 'px)"></b>';
         icon.insertAdjacentHTML('afterbegin', edge);
         icon.style.animationDelay = (-n * 1.3) + 's';
         var plat = el('div', 'avx-lfp' + (icon === hubIcon ? ' avx-lfp-hub' : ''),
@@ -395,7 +395,7 @@
       return { x: x + PAD_X, y: y + PAD_T, r: elm.offsetWidth / 2 };
     }
     function measure() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       W = tilt.offsetWidth + PAD_X * 2;
       H = tilt.offsetHeight + PAD_T + PAD_B;
       canvas.width = Math.round(W * dpr);
@@ -474,7 +474,7 @@
       ctx.setLineDash([2, 7]);
       ctx.lineDashOffset = -t * 22;
       ctx.lineWidth = 1.4;
-      ctx.strokeStyle = 'rgba(147,197,253,.32)';
+      ctx.strokeStyle = 'rgba(147,197,253,.22)';
       ctx.beginPath();
       for (var i = 0; i <= 40; i++) {
         var q = arc(a, b, i / 40);
@@ -510,7 +510,7 @@
     }
 
     function bead(p, warm) {
-      var r = 3.4 * p.s;
+      var r = 2.6 * p.s;
       var g = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.3, 0, p.x, p.y, r * 2.4);
       g.addColorStop(0, '#ffffff');
       g.addColorStop(0.35, warm ? '#dbeafe' : '#93c5fd');
@@ -529,7 +529,7 @@
       if (!reduced && !motionPaused() && t > nextBead) {
         beads.push({ t0: t });
         hit('leads', t);
-        nextBead = t + 0.7 + Math.random() * 0.5;
+        nextBead = t + 1.5 + Math.random() * 0.8;
       }
       var LEG = 1.6;
       beads = beads.filter(function (b) {
@@ -538,7 +538,7 @@
           var u = age / LEG, e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
           for (var k = 5; k >= 1; k--) {
             var tr = arc(pos.leads, pos.hub, Math.max(0, e - k * 0.025));
-            ctx.globalAlpha = 0.12 * (6 - k);
+            ctx.globalAlpha = 0.07 * (6 - k);
             bead({ x: tr.x, y: tr.y, s: tr.s * 0.6 }, false);
           }
           ctx.globalAlpha = 1;
@@ -552,7 +552,7 @@
           var v = age2 / LEG, e2 = v < 0.5 ? 2 * v * v : 1 - Math.pow(-2 * v + 2, 2) / 2;
           for (var j = 5; j >= 1; j--) {
             var tr2 = arc(pos.hub, pos.revenue, Math.max(0, e2 - j * 0.025));
-            ctx.globalAlpha = 0.12 * (6 - j);
+            ctx.globalAlpha = 0.07 * (6 - j);
             bead({ x: tr2.x, y: tr2.y, s: tr2.s * 0.6 }, true);
           }
           ctx.globalAlpha = 1;
@@ -560,7 +560,6 @@
           return true;
         }
         hit('revenue', t);
-        labels.push({ t: t, text: '+$' + (24 + Math.floor(Math.random() * 70)) });
         return false;
       });
 
@@ -593,6 +592,8 @@
 
     function frame(now) {
       raf = 0;
+      // the calls move slowly: 30 fps reads the same and halves the work while scrolling
+      if (!reduced && now - lastDraw < 32) { schedule(); return; }
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
       lastDraw = now;
@@ -995,7 +996,7 @@
     if (!hero) return;
     hero.classList.add('avx-fx-host', 'avx-pricing-3d');
     // the same quiet 3D floor as the landing page
-    hero.insertBefore(el('div', 'avx-hero-3d', '<div class="avx-hero-3d-plane"><div class="avx-hero-3d-grid"></div></div><div class="avx-hero-3d-horizon"></div>'), hero.firstChild);
+    hero.insertBefore(el('div', 'avx-hero-3d', '<div class="avx-hero-3d-plane"><div class="avx-hero-3d-grid"></div></div><div class="avx-hero-3d-fade"></div><div class="avx-hero-3d-horizon"></div>'), hero.firstChild);
   }
 
   // ---------- Section backgrounds ----------
@@ -1403,7 +1404,7 @@
     hero.classList.add('avx-rb-hero', 'avx-hero-calm');
 
     // a quiet 3D floor: a perspective grid reaching back to a soft horizon
-    hero.insertBefore(el('div', 'avx-hero-3d', '<div class="avx-hero-3d-plane"><div class="avx-hero-3d-grid"></div></div><div class="avx-hero-3d-horizon"></div>'), hero.firstChild);
+    hero.insertBefore(el('div', 'avx-hero-3d', '<div class="avx-hero-3d-plane"><div class="avx-hero-3d-grid"></div></div><div class="avx-hero-3d-fade"></div><div class="avx-hero-3d-horizon"></div>'), hero.firstChild);
 
     // two distant holographic scenes (ringba style), each telling part of the call-tracking story
     var R = '/assets/avx-ringba/', B = '/assets/avx-baked/';
@@ -1427,7 +1428,7 @@
     hero.appendChild(left);
     var SRC = [['(888) 571-0429', 'Google Ads · Medicare'], ['(855) 204-7731', 'Meta · Solar'], ['(866) 742-0915', 'Organic · Legal'], ['(877) 390-1158', 'Bing Ads · Auto']];
     var si = 0;
-    ticker(left, 3200, function () {
+    ticker(left, 5000, function () {
       si = (si + 1) % SRC.length;
       left.querySelector('.avx-rbs-tag b').textContent = SRC[si][0];
       left.querySelector('.avx-rbs-src').textContent = SRC[si][1];
@@ -2951,7 +2952,7 @@
           if (motionPaused()) return;
           var i = TOUR.map(function (x) { return x[0]; }).indexOf(current);
           show(TOUR[(i + 1) % TOUR.length][0]);
-        }, 7000);
+        }, 10000);
       }, function () { clearInterval(auto); auto = null; }, 0.3);
     }
   }

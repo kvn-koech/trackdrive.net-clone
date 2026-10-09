@@ -6046,3 +6046,170 @@ main > section {
 .avx-auth-calm .mktg-auth-card {
   box-shadow: 0 18px 40px -24px rgba(0, 0, 0, .7) !important;
 }
+
+/* =====================================================================
+   Scroll performance: the 3D floors fade with overlay gradients (cheap)
+   instead of masks on a moving layer (repainted every frame)
+   ===================================================================== */
+
+.avx-hero-3d-plane,
+.avx-pricing-3d .avx-hero-3d {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+.avx-hero-3d-plane {
+  right: -25%;
+  left: -25%;
+  /* the grid is its own GPU layer; the plane just holds the tilt */
+  contain: strict;
+}
+
+.avx-hero-3d-grid {
+  backface-visibility: hidden;
+}
+
+/* fades painted once, on top of the moving grid, in the page colour */
+.avx-hero-3d-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, #0b0d12 0%, #0b0d12 34%, rgba(11, 13, 18, .55) 50%, rgba(11, 13, 18, 0) 72%),
+    linear-gradient(90deg, #0b0d12 0%, rgba(11, 13, 18, 0) 22%, rgba(11, 13, 18, 0) 78%, #0b0d12 100%);
+}
+
+.avx-pricing-3d .avx-hero-3d-fade {
+  background:
+    linear-gradient(180deg, #0b0d12 0%, #0b0d12 30%, rgba(11, 13, 18, .5) 46%, rgba(11, 13, 18, 0) 64%, rgba(11, 13, 18, 0) 80%, #0b0d12 100%),
+    linear-gradient(90deg, #0b0d12 0%, rgba(11, 13, 18, 0) 22%, rgba(11, 13, 18, 0) 78%, #0b0d12 100%);
+}
+
+/* pricing header sits on the same solid colour so the fades match */
+.avx-pricing-3d,
+[data-bs-theme="dark"] .avx-pricing-3d {
+  background: #0b0d12 !important;
+}
+
+/* "Everything you need": each platform is a self-contained 3D layer, so the
+   diagram is not re-sorted in 3D every frame */
+.avx-lfp {
+  transform-style: flat;
+  perspective: 700px;
+  perspective-origin: 50% 0%;
+}
+
+.avx-lfp-floor img {
+  backface-visibility: hidden;
+}
+
+/* the floor moves as one tilted layer (no clipped, animated child inside a 3D plane) */
+.avx-hero-3d-plane {
+  overflow: visible !important;
+  contain: none !important;
+  background:
+    linear-gradient(rgba(96, 165, 250, .32) 1.5px, transparent 1.5px) 0 0 / 72px 72px,
+    linear-gradient(90deg, rgba(96, 165, 250, .32) 1.5px, transparent 1.5px) 0 0 / 72px 72px;
+  will-change: transform;
+  animation: avxHeroFloor2 7s linear infinite;
+}
+
+.avx-pricing-3d .avx-hero-3d-plane {
+  background:
+    linear-gradient(rgba(96, 165, 250, .5) 1.5px, transparent 1.5px) 0 0 / 72px 72px,
+    linear-gradient(90deg, rgba(96, 165, 250, .5) 1.5px, transparent 1.5px) 0 0 / 72px 72px;
+}
+
+.avx-hero-3d-grid {
+  display: none !important;
+}
+
+@keyframes avxHeroFloor2 {
+  from { transform: rotateX(76deg) translateY(-72px); }
+  to { transform: rotateX(76deg) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-hero-3d-plane {
+    animation: none;
+    transform: rotateX(76deg);
+  }
+}
+
+/* =====================================================================
+   Subtle landing page: slower, quieter, smaller movements
+   ===================================================================== */
+
+/* hero floor: fainter lines, slower drift */
+.avx-hero-calm .avx-hero-3d-plane {
+  background:
+    linear-gradient(rgba(96, 165, 250, .2) 1px, transparent 1px) 0 0 / 72px 72px,
+    linear-gradient(90deg, rgba(96, 165, 250, .2) 1px, transparent 1px) 0 0 / 72px 72px;
+  animation-duration: 14s;
+}
+
+.avx-hero-calm .avx-hero-3d-horizon {
+  opacity: .6;
+}
+
+/* hero side scenes: quieter and slower */
+.avx-rbs-stage {
+  opacity: .72;
+}
+
+.avx-rbs-rings { animation-duration: 90s; }
+.avx-rbs-dots { animation-duration: 140s; }
+.avx-rbs-slot, .avx-rbs-sat { animation-duration: 32s; }
+.avx-rbs-neon { animation-duration: 16s; }
+.avx-rbs-ripple { animation-duration: 5s; border-color: rgba(147, 197, 253, .45); }
+.avx-rbs-ripple + .avx-rbs-ripple { animation-delay: 2.5s; }
+.avx-rbs-beam { animation-duration: 5s; opacity: .6; }
+.avx-rbs-pk { animation-duration: 3.6s; }
+.avx-rbs-buyer em { animation-duration: 3.6s; }
+.avx-rbs-tag,
+.avx-rbs-holo { animation-duration: 8s; }
+
+/* trust strip: slower, softer */
+.avx-marquee-track { animation-duration: 110s; }
+.avx-marquee-track img { opacity: .38; }
+
+/* "Everything you need": gentle coins, quiet platforms */
+@keyframes avxLfCoin {
+  from { transform: translateY(0) rotateY(-10deg); }
+  to { transform: translateY(-4px) rotateY(10deg); }
+}
+
+.avx-flow3d.avx-lf2.avx-lf3 .hero-simple-node-icon,
+.avx-flow3d.avx-lf2.avx-lf3 .hero-simple-hub-icon {
+  animation-duration: 8s !important;
+}
+
+.avx-lfp-floor img {
+  opacity: .5;
+  animation-duration: 90s;
+}
+
+.avx-lfp-floor .avx-lfp-dots {
+  opacity: .35;
+  animation-duration: 140s;
+}
+
+.avx-hit + .avx-lfp .avx-lfp-pulse {
+  animation-duration: .6s;
+}
+
+.avx-flow3d.avx-lf2.avx-lf3 .avx-hit {
+  scale: 1.03;
+}
+
+/* product tour: no progress bar racing under the active tab */
+.avx-tour-tab.avx-on i {
+  animation-duration: 10s;
+  opacity: .6;
+}
+
+/* hero stats: no glow, plain figures */
+.avx-hero-calm .hero-simple-stat-value,
+.avx-hero-calm [class*="stat-value"] {
+  text-shadow: none !important;
+}
