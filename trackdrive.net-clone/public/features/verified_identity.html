@@ -15,7 +15,19 @@
   <script>
     // the site renders in its dark theme for every visitor
     document.documentElement.setAttribute('data-bs-theme', 'dark');
+    // hold the page until the motion layer has built it, so the plain markup never flashes first
+    document.documentElement.classList.add('avx-boot');
+    (function () {
+      // safety net: never keep the page hidden if the motion layer fails to run
+      function lift() { document.documentElement.classList.remove('avx-boot'); }
+      window.addEventListener('load', function () { setTimeout(lift, 1500); });
+      setTimeout(lift, 12000);
+    })();
   </script>
+  <style>html.avx-boot main { opacity: 0 !important; animation: none !important; }</style>
+  <link rel="preload" href="/assets/avx-motion/motion.js" as="script">
+  <link rel="preload" href="/assets/avx-motion/motion.css" as="style">
+  <link rel="preload" href="/assets/avx-theme/theme.css" as="style">
 
   <title>
       Verified Identity &amp; Caller ID - Register Your Business with the Carriers | Avortyx
@@ -32,12 +44,12 @@
 
     <link rel="canonical" href="https://avortyx.com/features/verified_identity">
 
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
-  <link rel="shortcut icon" href="/favicon-32.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-blue.png" />
-  <meta name="msapplication-TileImage" content="/favicon-192.png" />
+  <link rel="icon" href="/favicon.ico?v=3" sizes="48x48" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=3" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png?v=3" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-blue.png?v=3" />
+  <meta name="msapplication-TileImage" content="/favicon-192.png?v=3" />
   <meta name="msapplication-TileColor" content="#1d4ed8">
 <meta name="theme-color" content="#06071a">
   <script defer="" src="https://kit.fontawesome.com/97f7211792.js"></script>

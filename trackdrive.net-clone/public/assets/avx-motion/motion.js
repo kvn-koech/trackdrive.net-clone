@@ -2312,7 +2312,32 @@
     if (rings) rings.src = BAKED + 'rings-' + (DARK ? 'd' : 'l') + '.png';
   }
 
+  // lift the boot gate once the page is built and the web fonts are in (or after a short wait)
+  function reveal() {
+    var root = document.documentElement;
+    if (!root.classList.contains('avx-boot')) return;
+    function show() {
+      requestAnimationFrame(function () {
+        root.classList.add('avx-booted');
+        root.classList.remove('avx-boot');
+      });
+    }
+    if (document.fonts && document.fonts.ready) {
+      Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 800); })]).then(show, show);
+    } else {
+      show();
+    }
+  }
+
   function init() {
+    try {
+      build();
+    } finally {
+      reveal();
+    }
+  }
+
+  function build() {
     initMotionToggle();
     initProgress();
     initHeroRings();

@@ -15,16 +15,7 @@
   --avx-blue: #4176a3;
 }
 
-/* ---------- Page entrance + scroll progress ---------- */
-
-main {
-  animation: avxPageIn .6s ease backwards;
-}
-
-@keyframes avxPageIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+/* ---------- Scroll progress (the page entrance is the boot gate at the end of this file) ---------- */
 
 .avx-progress {
   position: fixed;
@@ -3797,4 +3788,15 @@ img.avx-tint {
 
 [data-bs-theme="dark"] .accordion-button:not(.collapsed)::after {
   background-image: var(--bs-accordion-btn-active-icon) !important;
+}
+
+/* boot gate: main fades in once, after the motion layer has built the page */
+html.avx-booted main {
+  transition: opacity .45s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.avx-booted main {
+    transition: none;
+  }
 }
