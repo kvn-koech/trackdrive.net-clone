@@ -2488,7 +2488,8 @@
 
   // ---------- Landing hero: the Signal Core, built from ringba art ----------
 
-  function buildSignalCore() {
+  // still: chips keep fixed values (the logo version, so nothing flickers around it)
+  function buildSignalCore(still) {
     var core = el('div', 'avx-core3d');
     core.setAttribute('aria-hidden', 'true');
     var stage = el('div', 'avx-c-stage');
@@ -2534,7 +2535,7 @@
     core.appendChild(chipA);
     core.appendChild(chipB);
 
-    if (!reduced) {
+    if (!reduced && !still) {
       var bars = radar.querySelectorAll('.avx-rd-bar'), lvl = [], score = 92, routed = 1283, timer = null;
       for (var b = 0; b < 24; b++) lvl.push(.35 + Math.random() * .6);
       function pulse() {
@@ -2757,7 +2758,7 @@
   }
 
   function buildVortexCore() {
-    var core = buildSignalCore();
+    var core = buildSignalCore(true);
     var heart = core.querySelector('.avx-c-core');
     ['.avx-radar', '.avx-c-gyro'].forEach(function (sel) {
       var n = heart.querySelector(sel);
