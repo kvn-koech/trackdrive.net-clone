@@ -11,9 +11,18 @@
     gtag('config', 'G-HD8WHHFDQV');
   </script>
 
-  <meta name="color-scheme" content="light only">
   <script>
-    document.documentElement.setAttribute('data-bs-theme', 'light');
+    (function() {
+      var match = document.cookie.match(/(?:^|;\s*)avortyx-theme=([^;]*)/);
+      var pref = match ? match[1] : 'system';
+      var theme;
+      if (pref === 'dark' || pref === 'light') {
+        theme = pref;
+      } else {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
   </script>
 
   <title>
