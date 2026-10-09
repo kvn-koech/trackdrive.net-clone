@@ -2,9 +2,6 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowIcon, BrandMark } from '../components/icons.jsx'
 import { CtaBanner, Scene3D } from '../components/Scene3D.jsx'
-import LiveRoutingVisualizer from '../components/LiveRoutingVisualizer.jsx'
-import WorkflowBuilder from '../components/WorkflowBuilder.jsx'
-import CallGlobe from '../components/CallGlobe.jsx'
 
 const workflows = [
   {
@@ -287,7 +284,7 @@ export default function Home() {
               the right eligible buyer while the opportunity is still live.
             </p>
             <Link className="text-link" to="/platform">Explore the platform <ArrowIcon /></Link>
-            <LiveRoutingVisualizer />
+            <Scene3D variant="stack" />
           </div>
           <div className="intelligence-workspace">
             <div className="principles-grid">
@@ -369,21 +366,12 @@ export default function Home() {
                 </div>
                 <div className={`workflow-art workflow-art-${index + 1}`}>
                   <div className="art-orbit art-orbit-one" /><div className="art-orbit art-orbit-two" />
-                  {index === 2 ? <WorkflowBuilder /> : <WorkflowVisual steps={workflow.steps} variant={workflow.id} />}
+                  <WorkflowVisual steps={workflow.steps} variant={workflow.id} />
                   <span className="art-label">{String(index + 1).padStart(2, '0')} / 04</span>
                 </div>
               </article>
             ))}
           </div>
-        </section>
-
-        <section className="global-reach-section section-pad" style={{ textAlign: 'center' }}>
-          <div className="section-heading" style={{ marginBottom: '0' }}>
-            <span className="section-kicker">GLOBAL REACH</span>
-            <h2>Route calls across the world.</h2>
-            <p style={{ maxWidth: '600px', margin: '0 auto 2rem' }}>Our low-latency network processes billions of requests globally, ensuring caller intent is matched in milliseconds.</p>
-          </div>
-          <CallGlobe />
         </section>
 
         <section className="capabilities-section section-pad" id="resources">
