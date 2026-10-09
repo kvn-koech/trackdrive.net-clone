@@ -861,30 +861,10 @@ a,
   height: 48px;
 }
 
-/* the mark sits on a small dark app-icon tile: fine border, soft top light, no glow */
-.avx-logo-mark::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 40px;
-  height: 40px;
-  margin: -20px 0 0 -20px;
-  border-radius: 11px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, 0) 55%),
-    linear-gradient(160deg, #1a1f2a, #0d0f14);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, .1),
-    inset 0 1px 0 rgba(255, 255, 255, .12),
-    0 6px 16px -6px rgba(0, 0, 0, .7);
-  transition: box-shadow .4s ease;
-}
-
 .avx-logo-mark svg {
   position: relative;
-  width: 28px;
-  height: 28px;
+  width: 38px;
+  height: 38px;
 }
 
 /* the soft core fill read as a glow; the rings alone are crisper */
@@ -898,12 +878,7 @@ a,
   transition: transform .8s cubic-bezier(.2, .8, .2, 1);
 }
 
-a:hover > .avx-logo-mark::before {
-  box-shadow:
-    inset 0 0 0 1px rgba(96, 165, 250, .55),
-    inset 0 1px 0 rgba(255, 255, 255, .14),
-    0 6px 16px -6px rgba(0, 0, 0, .7);
-}
+
 
 a:hover > .avx-logo-mark .avx-mk-r1 { transform: rotate(-30deg); }
 a:hover > .avx-logo-mark .avx-mk-r2 { transform: rotate(45deg); }
