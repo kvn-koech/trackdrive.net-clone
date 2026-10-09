@@ -13,6 +13,9 @@
   --avx-primary-tint: #eff6ff;
   --avx-primary-soft: rgba(37, 99, 235, .14);
   --avx-headline: #1d4ed8;
+  /* blue used for text (links, accents); lightened in dark mode for contrast */
+  --avx-link: #2563eb;
+  --avx-link-hover: #1d4ed8;
 
   --avx-accent: #2563eb;
   --avx-accent-hover: #1d4ed8;
@@ -153,7 +156,7 @@
 }
 
 .marketing-hero-simple h1 .text-success {
-  color: var(--avx-primary) !important;
+  color: var(--avx-link) !important;
 }
 
 /* ---------- Primary: buttons, links, active states ---------- */
@@ -192,19 +195,19 @@
 
 .mktg-link-green,
 .mktg-link-green:focus {
-  color: var(--avx-primary);
+  color: var(--avx-link);
   text-decoration-color: rgba(37, 99, 235, .4);
 }
 
 .mktg-link-green:hover {
-  color: var(--avx-primary-hover);
+  color: var(--avx-link-hover);
   text-decoration-color: var(--avx-primary-hover);
 }
 
 .marketing-navbar.navbar .navbar-nav .nav-link:hover,
 .marketing-navbar.navbar .navbar-nav .nav-link:focus,
 .marketing-navbar.navbar .navbar-nav .nav-link.active {
-  color: var(--avx-primary);
+  color: var(--avx-link);
   background-color: var(--avx-primary-tint);
 }
 
@@ -218,11 +221,11 @@
 
 .mktg-subpage-hero .mktg-subpage-hero-eyebrow,
 [data-bs-theme="dark"] .mktg-subpage-hero .mktg-subpage-hero-eyebrow {
-  color: var(--avx-primary);
+  color: var(--avx-link);
 }
 
 .mktg-subpage-back {
-  color: var(--avx-primary);
+  color: var(--avx-link);
 }
 
 .marketing-subpage-header {
@@ -237,12 +240,12 @@
 }
 
 .mktg-compact-feature-item:hover {
-  color: var(--avx-primary);
+  color: var(--avx-link);
   background-color: var(--avx-primary-tint);
 }
 
 .marketing-code-tabs .nav-tabs .nav-link.active {
-  color: var(--avx-primary);
+  color: var(--avx-link);
 }
 
 .pricing-highlight-card {
@@ -261,16 +264,16 @@
 }
 
 .flow-arrows-column {
-  color: var(--avx-primary);
+  color: var(--avx-link);
 }
 
 .hero-proof-stats .fs-3,
 .mktg-stats .stat-value {
-  color: var(--avx-primary) !important;
+  color: var(--avx-link) !important;
 }
 
 .spotlight-flow-step i {
-  color: var(--avx-primary);
+  color: var(--avx-link);
   background: var(--avx-primary-tint);
 }
 
@@ -305,7 +308,7 @@
 }
 
 .pricing-accordion .accordion-button:not(.collapsed) {
-  color: var(--avx-primary);
+  color: var(--avx-link);
   background-color: var(--avx-primary-tint);
 }
 
@@ -338,7 +341,7 @@
 /* ---------- Accent: blue ---------- */
 
 .btn-outline-td-green {
-  color: var(--avx-accent);
+  color: var(--avx-link);
   border-color: var(--avx-accent);
 }
 
@@ -367,8 +370,9 @@
   border-radius: 999px;
 }
 
+/* keep Bootstrap's bg-opacity-* support (e.g. tinted icon tiles on the features page) */
 .bg-success {
-  background-color: var(--avx-accent) !important;
+  background-color: rgba(var(--bs-success-rgb), var(--bs-bg-opacity, 1)) !important;
 }
 
 .border-success {
@@ -379,17 +383,17 @@
 
 .mktg-subpage-hero .mktg-subpage-back,
 [data-bs-theme="dark"] .mktg-subpage-hero .mktg-subpage-back {
-  color: var(--avx-primary);
+  color: var(--avx-link);
 }
 
 main a:not([class]),
 .marketing-subpage-content a:not(.btn) {
-  color: var(--avx-primary);
+  color: var(--avx-link);
 }
 
 main a:not([class]):hover,
 .marketing-subpage-content a:not(.btn):hover {
-  color: var(--avx-primary-hover);
+  color: var(--avx-link-hover);
 }
 
 .mktg-auth-card .form-check-input:checked,
@@ -408,12 +412,12 @@ main a:not([class]):hover,
 /* card header icons (e.g. "More ways to win the call") are brand accents: blue */
 .card .card-body > .text-success:first-child,
 .card .card-body > .text-success:first-child i {
-  color: var(--avx-primary) !important;
+  color: var(--avx-link) !important;
 }
 
 /* card actions (e.g. "Explore …" under "More ways to win the call") use the primary blue */
 .card .btn-outline-td-green {
-  color: var(--avx-primary);
+  color: var(--avx-link);
   border-color: var(--avx-primary);
 }
 
@@ -429,15 +433,15 @@ main a:not([class]):hover,
 .feature-modal-fullpage,
 .feature-modal .feature-modal-fullpage,
 [data-bs-theme="dark"] .feature-modal-fullpage {
-  color: var(--avx-primary);
+  color: var(--avx-link);
 }
 
 .text-success {
-  color: var(--avx-primary) !important;
+  color: var(--avx-link) !important;
 }
 
 .spinner-border.text-success {
-  color: var(--avx-primary) !important;
+  color: var(--avx-link) !important;
 }
 
 /* brand kit swatches follow the new palette */
@@ -456,14 +460,14 @@ main a:not([class]):hover,
 /* ---------- Hover / focus states (light and dark) ---------- */
 
 a:hover {
-  color: var(--avx-primary-hover);
+  color: var(--avx-link-hover);
 }
 
 .marketing-navbar.navbar .navbar-nav .nav-link:hover,
 .marketing-navbar.navbar .navbar-nav .nav-link:focus,
 [data-bs-theme="dark"] .marketing-navbar.navbar .navbar-nav .nav-link:hover,
 [data-bs-theme="dark"] .marketing-navbar.navbar .navbar-nav .nav-link:focus {
-  color: var(--avx-primary);
+  color: var(--avx-link);
   background-color: var(--avx-primary-tint);
 }
 
@@ -472,7 +476,7 @@ a:hover {
 .marketing-navbar .dropdown-menu .dropdown-item.active,
 [data-bs-theme="dark"] .marketing-navbar .dropdown-menu .dropdown-item:hover,
 [data-bs-theme="dark"] .marketing-navbar .dropdown-menu .dropdown-item:focus {
-  color: var(--avx-primary);
+  color: var(--avx-link);
   background-color: var(--avx-primary-tint);
 }
 
@@ -483,7 +487,7 @@ a:hover {
 
 .mktg-compact-feature-item:hover,
 [data-bs-theme="dark"] .mktg-compact-feature-item:hover {
-  color: var(--avx-primary);
+  color: var(--avx-link);
   background-color: var(--avx-primary-tint);
 }
 
@@ -504,12 +508,12 @@ a:hover {
 .breadcrumbs a:hover,
 .nav > li a:hover,
 .nav > li a.active {
-  color: var(--avx-primary);
+  color: var(--avx-link);
 }
 
 [data-bs-theme="dark"] .mktg-link-green:hover,
 [data-bs-theme="dark"] .mktg-link-green:focus {
-  color: var(--avx-primary-hover);
+  color: var(--avx-link-hover);
 }
 
 .marketing-hero-simple .btn-td-green:hover,
@@ -549,7 +553,7 @@ a,
 .onepage a,
 .pagination a,
 .pagination span {
-  color: var(--avx-primary);
+  color: var(--avx-link);
 }
 
 /* ---------- Dark mode: replace the site's dark-theme greens with blue ---------- */
@@ -621,15 +625,20 @@ a,
   border-color: rgba(96, 165, 250, .5);
 }
 
+/* same gradient treatment as the original dark buttons, in blue */
 [data-bs-theme="dark"] .btn-success {
-  background: var(--avx-primary);
-  border-color: var(--avx-primary);
+  background: linear-gradient(#3b82f6, #2563eb);
+  border-color: #2563eb;
 }
 
-[data-bs-theme="dark"] .btn-success:hover,
+[data-bs-theme="dark"] .btn-success:hover {
+  background: linear-gradient(#3b82f6, #1d4ed8);
+  border-color: #1d4ed8;
+}
+
 [data-bs-theme="dark"] .btn-success:focus {
-  background: var(--avx-primary-hover);
-  border-color: var(--avx-primary-hover);
+  background: #1d4ed8;
+  border-color: #1e40af;
 }
 
 [data-bs-theme="dark"] .btn-outline-success {
@@ -658,4 +667,80 @@ a,
 [data-bs-theme="dark"] .navigation-menu .submenu .nav-item:hover,
 [data-bs-theme="dark"] .navigation-menu .submenu .nav-item .nav-link.active {
   background-color: #1d4ed8;
+}
+
+/* ---------- Dark mode: deeper navy-black palette ----------
+   Same surface hierarchy and layout as the original dark theme
+   (page < cards/navbar/footer < alternate sections < inputs/hover),
+   shifted from neutral gray to deep navy. Colors only. */
+
+:root[data-bs-theme="dark"] {
+  --avx-link: #60a5fa;
+  --avx-link-hover: #93c5fd;
+  --avx-primary-tint: rgba(59, 130, 246, .14);
+  --avx-accent-tint: rgba(59, 130, 246, .16);
+
+  /* site surfaces (originals: #1a1d21, #212529, #2b3035, #323840, #3a4049) */
+  --td-body-bg: #0a0e17;
+  --td-surface-bg: #111827;
+  --td-surface-secondary-bg: #161e2e;
+  --td-surface-tertiary-bg: #1c2539;
+  --td-surface-hover-bg: #222d44;
+  --td-border-color: #334155;
+  --td-border-color-light: #283447;
+  --td-border-color-muted: #334155;
+  --td-border-color-strong: #475569;
+  --td-text-color: #e2e8f0;
+  --td-text-muted: #aab4c3;
+  --td-text-subtle: #a3adbd;
+  --td-text-faint: #96a1b2;
+  --td-input-bg: #161e2e;
+  --td-input-color: #e2e8f0;
+  --td-input-border: #475569;
+  --td-navbar-bg: #111827;
+  --td-footer-bg: #111827;
+  --td-code-bg: #161e2e;
+  --td-pre-bg: #161e2e;
+  --td-table-stripe-bg: #161e2e;
+
+  /* Bootstrap surfaces */
+  --bs-body-bg: #0a0e17;
+  --bs-body-bg-rgb: 10, 14, 23;
+  --bs-body-color: #e2e8f0;
+  --bs-body-color-rgb: 226, 232, 240;
+  --bs-secondary-bg: #1c2539;
+  --bs-secondary-bg-rgb: 28, 37, 57;
+  --bs-tertiary-bg: #161e2e;
+  --bs-tertiary-bg-rgb: 22, 30, 46;
+  --bs-border-color: #334155;
+  --bs-light-bg-subtle: #1c2539;
+  --bs-dark-bg-subtle: #0a0e17;
+  --bs-link-color: #60a5fa;
+  --bs-link-color-rgb: 96, 165, 250;
+  --bs-link-hover-color: #93c5fd;
+  --bs-link-hover-color-rgb: 147, 197, 253;
+}
+
+[data-bs-theme="dark"] .badge,
+[data-bs-theme="dark"] .pricing-footnote-badge,
+[data-bs-theme="dark"] .formula-type-badge {
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, .3);
+}
+
+/* logo wordmark: dark text in light mode, light text in dark mode */
+.avx-wordmark {
+  color: #0f172a;
+}
+
+.avx-wordmark > span {
+  color: #2563eb;
+}
+
+[data-bs-theme="dark"] .avx-wordmark {
+  color: #f1f5f9;
+}
+
+[data-bs-theme="dark"] .avx-wordmark > span {
+  color: #60a5fa;
 }

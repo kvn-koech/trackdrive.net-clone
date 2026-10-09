@@ -789,6 +789,22 @@
     });
   }
 
+  // ---------- Wide tables: fade the edge that has more to scroll ----------
+
+  function initScrollHints() {
+    document.querySelectorAll('.pricing-table-wrap, .table-responsive').forEach(function (wrap) {
+      wrap.classList.add('avx-scroll-hint');
+      function update() {
+        var max = wrap.scrollWidth - wrap.clientWidth;
+        wrap.classList.toggle('avx-more-left', max > 1 && wrap.scrollLeft > 1);
+        wrap.classList.toggle('avx-more-right', max > 1 && wrap.scrollLeft < max - 1);
+      }
+      wrap.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      update();
+    });
+  }
+
   function initHeroRings() {
     var rings = document.querySelector('.hero-rings img');
     if (rings) rings.src = BAKED + 'rings-' + (DARK ? 'd' : 'l') + '.png';
@@ -809,6 +825,7 @@
     initCtaFx();
     initCounters();
     initOffscreenPause();
+    initScrollHints();
     if (!reduced) {
       initReveal();
       initTilt();

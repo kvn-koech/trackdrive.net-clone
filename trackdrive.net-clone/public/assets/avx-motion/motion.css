@@ -1561,3 +1561,45 @@ img.avx-tint {
 .avx-integrations .integration-card p {
   font-size: .8rem;
 }
+
+/* ---------- Smaller screens: decorations stay behind the text ----------
+   Sphere and scene positions are tuned for desktop; on narrower screens the
+   copy wraps underneath them, so they fade back instead of covering words. */
+
+@media (max-width: 991.98px) {
+  .avx-fx .avx-float {
+    opacity: .45;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .avx-fx .avx-float {
+    opacity: .35;
+  }
+
+  .avx-hfx {
+    opacity: .45;
+    scale: .8;
+  }
+
+  .avx-sbg-rings {
+    opacity: .55;
+  }
+}
+
+/* ---------- Wide tables: fade the edge that still has columns to scroll to ---------- */
+
+.avx-scroll-hint.avx-more-right {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+}
+
+.avx-scroll-hint.avx-more-left {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 40px);
+  mask-image: linear-gradient(to right, transparent, #000 40px);
+}
+
+.avx-scroll-hint.avx-more-left.avx-more-right {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+}
