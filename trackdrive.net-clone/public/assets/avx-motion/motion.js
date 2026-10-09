@@ -316,31 +316,14 @@
       var leads = flowWrap.querySelector('.hero-simple-node-leads .hero-simple-node-icon');
       var revenue = flowWrap.querySelector('.hero-simple-node-revenue .hero-simple-node-icon');
       var hubIcon = flowWrap.querySelector('.hero-simple-hub-icon');
-      if (leads) leads.insertBefore(img('blue-sphere-120.png', 'avx-orb'), leads.firstChild);
-      if (revenue) revenue.insertBefore(img('green-sphere-120.png', 'avx-orb'), revenue.firstChild);
+      flowWrap.classList.add('avx-lf2');
+      // the scene canvas reaches past the content edges: keep it from widening the page
+      var host = flowWrap.closest('section');
+      if (host) host.classList.add('avx-clip');
       if (hubIcon) {
-        hubIcon.insertBefore(img('icon-sphere--blue.png', 'avx-orb'), hubIcon.firstChild);
         // the animated Avortyx mark replaces the bolt above the name
         var bolt = hubIcon.querySelector('.fa-bolt');
         if (bolt) bolt.parentNode.replaceChild(vortexSvg('avx-vx-hub', 'avx-hub-mark'), bolt);
-        var orbits = document.createElement('div');
-        orbits.className = 'avx-orbits';
-        orbits.setAttribute('aria-hidden', 'true');
-        ['pink-sphere-120.png', 'orange_sphere-120.png'].forEach(function (name) {
-          var orbit = document.createElement('div');
-          orbit.className = 'avx-orbit';
-          orbit.appendChild(img(name, 'avx-sat'));
-          orbits.appendChild(orbit);
-        });
-        hubIcon.parentElement.insertBefore(orbits, hubIcon);
-      }
-
-      var section = flowWrap.closest('section');
-      if (section) {
-        addFloats(section, [
-          { baked: 'blue-sphere-soft.png', top: '4%', left: '-6%', size: 360, depth: 1.2, bob: '14s', spin: '90s' },
-          { baked: 'green-sphere-soft-b.png', bottom: '-12%', right: '-5%', size: 320, depth: 1.8, bob: '12s', spin: '80s', delay: '-6s' }
-        ], 'avx-convert-bg');
       }
 
       // tilt wrapper: the entrance and pointer tilt live here (updated only while the
@@ -349,6 +332,7 @@
       tilt.className = 'avx-flow-tilt';
       flow.parentNode.insertBefore(tilt, flow);
       tilt.appendChild(flow);
+      leadScene(tilt, flow);
 
       if (reduced) { flowWrap.classList.add('avx-seen', 'avx-settled'); return; }
 
@@ -362,6 +346,287 @@
         setTimeout(function () { flowWrap.classList.add('avx-settled'); }, 1500);
       }, null, 0.2);
     });
+  }
+
+  // calls travel as beads on 3D arcs: Leads -> Avortyx hub -> Revenue, over a perspective floor
+  function leadScene(tilt, flow) {
+    var canvas = el('canvas', 'avx-lf-canvas');
+    canvas.setAttribute('aria-hidden', 'true');
+    tilt.insertBefore(canvas, tilt.firstChild);
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    var nodes = {
+      leads: flow.querySelector('.hero-simple-node-leads .hero-simple-node-icon'),
+      hub: flow.querySelector('.hero-simple-hub-icon'),
+      revenue: flow.querySelector('.hero-simple-node-revenue .hero-simple-node-icon')
+    };
+    if (!nodes.leads || !nodes.hub || !nodes.revenue) return;
+    var PAD_X = 60, PAD_T = 80, PAD_B = 110;
+    var W = 0, H = 0, dpr = 1, pos = {}, raf = 0, visible = false, clock = 0, last = 0, lastDraw = 0;
+    var beads = [], nextBead = 0.2, labels = [], rings = [];
+
+    function centre(elm) {
+      var x = elm.offsetWidth / 2, y = elm.offsetHeight / 2, n = elm;
+      while (n && n !== tilt) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+      return { x: x + PAD_X, y: y + PAD_T, r: elm.offsetWidth / 2 };
+    }
+    function measure() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = tilt.offsetWidth + PAD_X * 2;
+      H = tilt.offsetHeight + PAD_T + PAD_B;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      pos.leads = centre(nodes.leads);
+      pos.hub = centre(nodes.hub);
+      pos.revenue = centre(nodes.revenue);
+    }
+
+    // quadratic arc lifted towards the viewer: a bead looks larger at the crest
+    function arc(a, b, t) {
+      var cx = (a.x + b.x) / 2, cy = Math.min(a.y, b.y) - 78, u = 1 - t;
+      return { x: u * u * a.x + 2 * u * t * cx + t * t * b.x, y: u * u * a.y + 2 * u * t * cy + t * t * b.y, s: 1 + Math.sin(t * Math.PI) * 0.45 };
+    }
+    function hit(name, t) {
+      var n = nodes[name];
+      n.classList.add('avx-hit');
+      setTimeout(function () { n.classList.remove('avx-hit'); }, 380);
+      rings.push({ at: pos[name], t: t });
+    }
+
+    function drawFloor() {
+      var y0 = Math.max(pos.leads.y, pos.revenue.y) + pos.leads.r + 86, cx = W / 2;
+      // a soft pool of light on the floor (an ellipse, so it has no edges)
+      ctx.save();
+      ctx.translate(cx, y0 + 40);
+      ctx.scale(1, 0.28);
+      var g = ctx.createRadialGradient(0, 0, 0, 0, 0, W * 0.46);
+      g.addColorStop(0, 'rgba(59,130,246,.16)');
+      g.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(0, 0, W * 0.46, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      ctx.lineWidth = 1;
+      // lines running into the distance, fading in from the horizon
+      for (var i = -12; i <= 12; i++) {
+        var xb = cx + i * (W / 14), xt = cx + i * (W / 60);
+        var a = 0.13 * (1 - Math.abs(i) / 13);
+        var lg = ctx.createLinearGradient(0, y0 - 26, 0, H);
+        lg.addColorStop(0, 'rgba(96,165,250,0)');
+        lg.addColorStop(0.35, 'rgba(96,165,250,' + a.toFixed(3) + ')');
+        ctx.strokeStyle = lg;
+        ctx.beginPath(); ctx.moveTo(xt, y0 - 26); ctx.lineTo(xb, H); ctx.stroke();
+      }
+      for (var r = 1; r < 7; r++) {
+        var k = r / 6, y = y0 - 26 + (H - y0 + 26) * k * k;
+        var grad = ctx.createLinearGradient(0, 0, W, 0);
+        var al = (0.03 + 0.1 * k).toFixed(3);
+        grad.addColorStop(0, 'rgba(96,165,250,0)');
+        grad.addColorStop(0.5, 'rgba(96,165,250,' + al + ')');
+        grad.addColorStop(1, 'rgba(96,165,250,0)');
+        ctx.strokeStyle = grad;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+    }
+
+    function drawPedestal(p, big) {
+      var y = p.y + p.r + 5, rx = p.r * (big ? 1.05 : 0.95), ry = rx * 0.2;
+      var sh = ctx.createRadialGradient(p.x, y, 2, p.x, y, rx);
+      sh.addColorStop(0, 'rgba(0,0,0,.55)');
+      sh.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.save(); ctx.translate(p.x, y); ctx.scale(1, ry / rx); ctx.translate(-p.x, -y);
+      ctx.fillStyle = sh; ctx.beginPath(); ctx.arc(p.x, y, rx, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(96,165,250,.35)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.ellipse(p.x, y, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(96,165,250,.14)';
+      ctx.beginPath(); ctx.ellipse(p.x, y, rx * 1.35, ry * 1.35, 0, 0, Math.PI * 2); ctx.stroke();
+    }
+
+    function drawTrack(a, b, t) {
+      ctx.save();
+      ctx.setLineDash([2, 7]);
+      ctx.lineDashOffset = -t * 22;
+      ctx.lineWidth = 1.4;
+      ctx.strokeStyle = 'rgba(147,197,253,.32)';
+      ctx.beginPath();
+      for (var i = 0; i <= 40; i++) {
+        var q = arc(a, b, i / 40);
+        if (i) ctx.lineTo(q.x, q.y); else ctx.moveTo(q.x, q.y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // two tilted orbits around the hub; satellites dim as they pass behind it
+    function drawHubOrbits(t, front) {
+      var h = pos.hub;
+      [[1.95, 0.42, -0.3, 0.9], [1.7, 0.36, 0.4, -1.3]].forEach(function (o, k) {
+        var rx = h.r * o[0], ry = h.r * o[1];
+        if (!front) {
+          ctx.strokeStyle = 'rgba(96,165,250,.22)';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.ellipse(h.x, h.y, rx, ry, o[2], 0, Math.PI * 2); ctx.stroke();
+        }
+        var a = t * o[3] + k * 2.1, ca = Math.cos(o[2]), sa = Math.sin(o[2]);
+        var ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
+        var inFront = Math.sin(a) > 0;
+        if (inFront !== front) return;
+        var x = h.x + ex * ca - ey * sa, y = h.y + ex * sa + ey * ca;
+        var rr = inFront ? 4.2 : 2.6;
+        var g = ctx.createRadialGradient(x - 1, y - 1, 0, x, y, rr * 2.2);
+        g.addColorStop(0, inFront ? '#ffffff' : '#bfdbfe');
+        g.addColorStop(0.45, inFront ? '#93c5fd' : 'rgba(96,165,250,.6)');
+        g.addColorStop(1, 'rgba(59,130,246,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x, y, rr * 2.2, 0, Math.PI * 2); ctx.fill();
+      });
+    }
+
+    function bead(p, warm) {
+      var r = 3.4 * p.s;
+      var g = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.3, 0, p.x, p.y, r * 2.4);
+      g.addColorStop(0, '#ffffff');
+      g.addColorStop(0.35, warm ? '#dbeafe' : '#93c5fd');
+      g.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(p.x, p.y, r * 2.4, 0, Math.PI * 2); ctx.fill();
+    }
+
+    function draw(t) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      drawFloor();
+      drawPedestal(pos.leads, false);
+      drawPedestal(pos.hub, true);
+      drawPedestal(pos.revenue, false);
+      drawTrack(pos.leads, pos.hub, t);
+      drawTrack(pos.hub, pos.revenue, t);
+      drawHubOrbits(t, false);
+
+      // a new call every ~0.9s while running
+      if (!reduced && !motionPaused() && t > nextBead) {
+        beads.push({ t0: t });
+        hit('leads', t);
+        nextBead = t + 0.7 + Math.random() * 0.5;
+      }
+      var LEG = 1.6;
+      beads = beads.filter(function (b) {
+        var age = t - b.t0;
+        if (age < LEG) {
+          var u = age / LEG, e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+          for (var k = 5; k >= 1; k--) {
+            var tr = arc(pos.leads, pos.hub, Math.max(0, e - k * 0.025));
+            ctx.globalAlpha = 0.12 * (6 - k);
+            bead({ x: tr.x, y: tr.y, s: tr.s * 0.6 }, false);
+          }
+          ctx.globalAlpha = 1;
+          bead(arc(pos.leads, pos.hub, e), false);
+          return true;
+        }
+        if (!b.inHub) { b.inHub = true; hit('hub', t); }
+        var age2 = age - LEG - 0.25;
+        if (age2 < 0) return true; // a beat inside the hub
+        if (age2 < LEG) {
+          var v = age2 / LEG, e2 = v < 0.5 ? 2 * v * v : 1 - Math.pow(-2 * v + 2, 2) / 2;
+          for (var j = 5; j >= 1; j--) {
+            var tr2 = arc(pos.hub, pos.revenue, Math.max(0, e2 - j * 0.025));
+            ctx.globalAlpha = 0.12 * (6 - j);
+            bead({ x: tr2.x, y: tr2.y, s: tr2.s * 0.6 }, true);
+          }
+          ctx.globalAlpha = 1;
+          bead(arc(pos.hub, pos.revenue, e2), true);
+          return true;
+        }
+        hit('revenue', t);
+        labels.push({ t: t, text: '+$' + (24 + Math.floor(Math.random() * 70)) });
+        return false;
+      });
+
+      // pulse rings where calls land
+      rings = rings.filter(function (r) {
+        var a = (t - r.t) / 0.9;
+        if (a > 1) return false;
+        var y = r.at.y + r.at.r + 5, rx = r.at.r * (0.95 + a * 0.9);
+        ctx.strokeStyle = 'rgba(147,197,253,' + (0.6 * (1 - a)).toFixed(3) + ')';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.ellipse(r.at.x, y, rx, rx * 0.22, 0, 0, Math.PI * 2); ctx.stroke();
+        return true;
+      });
+
+      drawHubOrbits(t, true);
+
+      // payout labels rising off the revenue disc
+      ctx.font = '600 12px "JetBrains Mono", ui-monospace, monospace';
+      ctx.textAlign = 'center';
+      labels = labels.filter(function (l) {
+        var a = (t - l.t) / 1.4;
+        if (a > 1) return false;
+        ctx.globalAlpha = a < 0.15 ? a / 0.15 : 1 - (a - 0.15) / 0.85;
+        ctx.fillStyle = '#bfdbfe';
+        ctx.fillText(l.text, pos.revenue.x, pos.revenue.y - pos.revenue.r - 14 - a * 26);
+        return true;
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function frame(now) {
+      raf = 0;
+      if (isScrolling()) { schedule(); return; }
+      clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
+      last = now;
+      lastDraw = now;
+      draw(clock + 1);
+      schedule();
+    }
+    function schedule() {
+      if (raf || !visible || reduced) return;
+      // paused: hold still, but only after the first frame is on screen
+      if (motionPaused() && lastDraw) { last = 0; setTimeout(schedule, 400); return; }
+      raf = requestAnimationFrame(frame);
+    }
+    var resizeT = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(function () { measure(); draw(clock + 1); }, 150);
+    });
+    onVisible(tilt, function () {
+      visible = true; last = 0; measure();
+      if (reduced) draw(1); else schedule();
+    }, function () { visible = false; }, 0);
+    // web fonts can shift the layout after the first measure
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (visible) measure(); });
+  }
+
+  // scroll-driven story: as the section scrolls up, a lead lights up, flows into the hub,
+  // and comes out as revenue
+  function storyline(wrap, flow) {
+    var nodes = [
+      [flow.querySelector('.hero-simple-node-leads'), 0.12],
+      [flow.querySelector('.hero-simple-hub'), 0.45],
+      [flow.querySelector('.hero-simple-node-revenue'), 0.8]
+    ];
+    var tracks = flow.querySelectorAll('.hero-simple-arrow-track');
+    wrap.classList.add('avx-story');
+    var ticking = false, last = -1;
+    function update() {
+      ticking = false;
+      var r = wrap.getBoundingClientRect(), vh = window.innerHeight;
+      // 0 when the flow enters the bottom of the screen, 1 once it reaches the upper third
+      var p = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.62 + r.height * 0.4)));
+      if (reduced) p = 1;
+      if (Math.abs(p - last) < 0.004) return;
+      last = p;
+      nodes.forEach(function (n) { if (n[0]) n[0].classList.toggle('avx-lit', p >= n[1]); });
+      if (tracks[0]) tracks[0].style.setProperty('--fill', Math.max(0, Math.min(1, (p - 0.14) / 0.3)).toFixed(3));
+      if (tracks[1]) tracks[1].style.setProperty('--fill', Math.max(0, Math.min(1, (p - 0.48) / 0.3)).toFixed(3));
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
   }
 
   // ---------- Spotlight headings: unique 3D scene behind each heading ----------
@@ -748,15 +1013,6 @@
       if (section) section.classList.add('avx-fx-host');
     });
 
-    // "How It Works" boxes get a grid floor moving forward
-    document.querySelectorAll('main .bg-light.rounded-3').forEach(function (box) {
-      if (!box.querySelector('.flow-diagram, .flow-diagram-vertical')) return;
-      box.classList.add('avx-sbg-host');
-      var floor = sbg('avx-sbg-floor');
-      buildWaveLayers(WAVE_STYLES.mesh, floor);
-      box.insertBefore(floor, box.firstChild);
-    });
-
     // integration logo sections get a slowly turning glow orb
     topSections().forEach(function (section) {
       if (section.querySelectorAll('.integration-logo-card').length < 3) return;
@@ -780,6 +1036,16 @@
       dots.appendChild(plane);
       section.insertBefore(dots, section.firstChild);
     });
+
+    // "How It Works" boxes get a grid floor moving forward
+    document.querySelectorAll('main .bg-light.rounded-3').forEach(function (box) {
+      if (!box.querySelector('.flow-diagram, .flow-diagram-vertical')) return;
+      box.classList.add('avx-sbg-host');
+      var floor = sbg('avx-sbg-floor');
+      buildWaveLayers(WAVE_STYLES.mesh, floor);
+      box.insertBefore(floor, box.firstChild);
+    });
+
   }
 
   // ---------- Step-by-step highlight for flow diagrams ----------
@@ -1049,34 +1315,6 @@
     return n;
   }
 
-  // ---------- Grid rails: hairlines at the content edges, crosshairs at section seams ----------
-
-  function initRails() {
-    var rails = el('div', 'avx-rails');
-    rails.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(rails);
-    function measure() {
-      var c = document.querySelector('main .container, footer .container');
-      if (!c) return;
-      var r = c.getBoundingClientRect();
-      document.documentElement.style.setProperty('--avx-rail-l', Math.round(r.left) + 'px');
-      document.documentElement.style.setProperty('--avx-rail-r', Math.round(window.innerWidth - r.right) + 'px');
-    }
-    measure();
-    window.addEventListener('resize', measure);
-    window.addEventListener('load', measure);
-
-    var seams = topSections().concat(Array.prototype.slice.call(document.querySelectorAll('.marketing-cta-band, footer.marketing-footer')));
-    seams = seams.filter(function (sec, i) { return seams.indexOf(sec) === i; });
-    seams.forEach(function (sec, i) {
-      if (i === 0 && sec.closest('main')) return; // no seam under the navbar
-      sec.classList.add('avx-seam-host');
-      var seam = el('div', 'avx-seam', '<i class="avx-cross avx-cross-l"></i><i class="avx-cross avx-cross-r"></i>');
-      seam.setAttribute('aria-hidden', 'true');
-      sec.insertBefore(seam, sec.firstChild);
-    });
-  }
-
   // ---------- Pointer spotlight on cards (fine pointers only) ----------
 
   var SPOT = '.card, .feature-card, .features-grid-card, .integration-card, .integration-logo-card, ' +
@@ -1160,7 +1398,7 @@
 
     hero.insertBefore(buildSignalSea(hero), hero.firstChild);
 
-    var holo = buildSignalCore();
+    var holo = buildVortexCore(hero);
     hero.appendChild(holo);
 
     var panel = el('div', 'avx-live',
@@ -1357,7 +1595,8 @@
 
     function schedule() {
       if (raf || !visible || reduced) return;
-      if (motionPaused()) { last = 0; setTimeout(schedule, 400); return; }
+      // paused: hold still, but only after the first frame is on screen
+      if (motionPaused() && lastDraw) { last = 0; setTimeout(schedule, 400); return; }
       raf = requestAnimationFrame(frame);
     }
 
@@ -1411,7 +1650,8 @@
 
     function schedule() {
       if (raf || !visible || reduced) return;
-      if (motionPaused()) { last = 0; setTimeout(schedule, 400); return; }
+      // paused: hold still, but only after the first frame is on screen
+      if (motionPaused() && lastDraw) { last = 0; setTimeout(schedule, 400); return; }
       raf = requestAnimationFrame(frame);
     }
 
@@ -1742,6 +1982,289 @@
         ctx.stroke();
       });
     });
+  }
+
+  // ---------- Signature: the Avortyx vortex as a real-time 3D sculpture (WebGL, no library) ----------
+  // Three glossy capped-torus arcs (the logo's rings) are ray-marched in a fragment shader;
+  // a 2D overlay projects incoming "calls" spiralling into the core with the same camera.
+
+  var VX_FRAG = [
+    'precision highp float;',
+    'uniform vec2 uRes; uniform float uTime; uniform mat3 uRotT; uniform vec3 uSpin; uniform float uCam;',
+    'uniform float uSep; uniform float uAlpha; uniform float uZoom;',
+    'vec2 rot(vec2 v, float a) { float c = cos(a), s = sin(a); return vec2(c * v.x - s * v.y, s * v.x + c * v.y); }',
+    // iq: capped torus, aperture centred on +y, gap on -y
+    'float capTorus(vec3 p, vec2 sc, float ra, float rb) {',
+    '  p.x = abs(p.x); float k = (sc.y * p.x > sc.x * p.y) ? dot(p.xy, sc) : length(p.xy);',
+    '  return sqrt(max(dot(p, p) + ra * ra - 2.0 * ra * k, 0.0)) - rb; }',
+    // the logo gap sits up-right (35deg); rotate it to -y in each ring frame
+    'vec3 ringP(vec3 p, int i) {',
+    '  float fi = float(i);',
+    '  p.z -= (fi - 1.0) * uSep;',
+    '  p.yz = rot(p.yz, sin(uTime * 0.35 + fi * 1.7) * 0.10 * fi);',
+    '  float sp = i == 0 ? uSpin.x : (i == 1 ? uSpin.y : uSpin.z);',
+    '  p.xy = rot(p.xy, 4.10152 - sp);',
+    '  return p; }',
+    'const vec2 SC = vec2(0.5736, -0.8192);',
+    'vec2 map(vec3 p) {',
+    '  float d0 = capTorus(ringP(p, 0), SC, 1.0, 0.100);',
+    '  float d1 = capTorus(ringP(p, 1), SC, 0.625, 0.088);',
+    '  float d2 = capTorus(ringP(p, 2), SC, 0.30, 0.076);',
+    '  float d3 = length(p - vec3(0.0, 0.0, uSep)) - 0.075;',
+    '  vec2 r = vec2(d0, 0.0);',
+    '  if (d1 < r.x) r = vec2(d1, 1.0);',
+    '  if (d2 < r.x) r = vec2(d2, 2.0);',
+    '  if (d3 < r.x) r = vec2(d3, 3.0);',
+    '  return r; }',
+    // central differences: smooth, stable normals right up to the silhouette
+    'vec3 normalAt(vec3 p, float e) {',
+    '  vec2 h = vec2(e, 0.0);',
+    '  vec3 g = vec3(map(p + h.xyy).x - map(p - h.xyy).x, map(p + h.yxy).x - map(p - h.yxy).x, map(p + h.yyx).x - map(p - h.yyx).x);',
+    '  return g / max(length(g), 1e-6); }',
+    // studio environment, all soft gradients (no hard strips that alias on the rim)
+    'vec3 env(vec3 r) {',
+    '  vec3 c = mix(vec3(0.004, 0.006, 0.016), vec3(0.030, 0.060, 0.170), smoothstep(-0.6, 0.9, r.y));',
+    '  c += vec3(0.85, 0.92, 1.0) * smoothstep(0.15, 0.62, r.y) * (1.0 - smoothstep(0.70, 1.02, r.y)) * 1.6;',
+    '  c += vec3(0.22, 0.42, 1.0) * smoothstep(0.1, 0.95, -r.x) * smoothstep(-0.5, 0.3, r.y) * 0.55;',
+    '  c += vec3(0.55, 0.65, 0.95) * smoothstep(0.55, 1.0, r.x) * (1.0 - smoothstep(-0.2, 0.6, r.y)) * 0.25;',
+    '  return c; }',
+    'vec3 toLin(vec3 c) { return c * c; }',
+    'void main() {',
+    '  vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / uRes.y;',
+    '  float pix = 2.0 * uZoom / uRes.y;',
+    '  vec3 ro = uRotT * vec3(0.0, 0.0, uCam);',
+    '  vec3 rd = uRotT * normalize(vec3(uv * uZoom, -1.0));',
+    '  float b = dot(ro, rd), c = dot(ro, ro) - 1.7 * 1.7, h = b * b - c;',
+    '  if (h < 0.0) { gl_FragColor = vec4(0.0); return; }',
+    '  float t = max(0.0, -b - sqrt(h)), tEnd = -b + sqrt(h);',
+    // march, remembering the closest pass (in pixels) for analytic edge coverage
+    '  float best = 1e9, tBest = t; bool found = false;',
+    '  for (int i = 0; i < 120; i++) {',
+    '    float d = map(ro + rd * t).x, pr = pix * t;',
+    '    if (d / pr < best) { best = d / pr; tBest = t; }',
+    '    if (d < pr * 0.15) { found = true; break; }',
+    '    t += d * 0.85;',
+    '    if (t > tEnd) break;',
+    '  }',
+    '  float cov = found ? 1.0 : 1.0 - smoothstep(0.0, 1.0, best);',
+    '  if (cov <= 0.0) { gl_FragColor = vec4(0.0); return; }',
+    '  vec3 p = ro + rd * tBest;',
+    '  float id = map(p).y;',
+    '  vec3 n = normalAt(p, max(0.0006, pix * tBest * 0.5));',
+    // the logo gradient: bright top-left to deep bottom-right
+    '  float g = clamp(dot(p.xy, normalize(vec2(1.0, -1.0))) * 0.55 + 0.5, 0.0, 1.0);',
+    '  vec3 base = g < 0.5 ? mix(vec3(0.75, 0.86, 1.0), vec3(0.23, 0.51, 0.96), g * 2.0)',
+    '                      : mix(vec3(0.23, 0.51, 0.96), vec3(0.11, 0.30, 0.85), (g - 0.5) * 2.0);',
+    '  if (id > 2.5) base = vec3(0.93, 0.96, 1.0);',
+    '  base = toLin(base);',
+    '  vec3 V = -rd;',
+    '  float nv = clamp(dot(n, V), 0.0, 1.0);',
+    // glazed ceramic: tinted diffuse under a clear coat (Schlick fresnel, broad highlights)
+    '  float F = 0.04 + 0.96 * pow(1.0 - nv, 5.0);',
+    '  vec3 L1 = normalize(vec3(-0.45, 0.70, 0.55)), L2 = normalize(vec3(0.7, -0.2, 0.4));',
+    '  float d1 = max(dot(n, L1), 0.0), d2 = max(dot(n, L2), 0.0);',
+    '  vec3 H1 = normalize(L1 + V);',
+    '  float s1 = pow(max(dot(n, H1), 0.0), 60.0) * (60.0 + 8.0) / 25.0;',
+    '  float wrap = max(dot(n, L1) * 0.5 + 0.5, 0.0);',
+    '  vec3 col = base * (0.10 + 0.95 * d1 + 0.18 * d2 + 0.12 * wrap);',
+    '  vec3 R = reflect(rd, n);',
+    '  col = mix(col, env(R) * mix(vec3(1.0), base * 1.6 + 0.25, 0.35), clamp(F * 0.9 + 0.12, 0.0, 1.0));',
+    '  col += vec3(1.0, 0.98, 0.95) * s1 * 0.22 * (1.0 - F * 0.5);',
+    // filmic tone map, then back to display gamma
+    '  col = col / (col + 0.55) * 1.35;',
+    '  col = sqrt(clamp(col, 0.0, 1.0));',
+    '  float a = cov * uAlpha;',
+    '  gl_FragColor = vec4(col * a, a);',
+    '}'
+  ].join('\n');
+
+  var VX_VERT = 'attribute vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }';
+
+  var VX_PRESETS = {
+    // landing hero: three-quarter view, rings slightly apart, calls flowing in
+    hero: { pitch: -0.22, yaw: 0.42, roll: 0.0, sep: 0.16, cam: 4.2, zoom: 0.5, alpha: 1, calls: 34, drift: 0.22, spin: [0.30, -0.45, 0.70] },
+    // page headers: the vortex lies back like a portal behind the title
+    portal: { pitch: 1.28, yaw: 0.0, roll: 0.35, sep: 0.06, cam: 4.0, zoom: 0.36, alpha: 0.5, calls: 18, drift: 0.12, spin: [0.18, -0.26, 0.40] },
+    // footer signature: facing the viewer, gently turning
+    footer: { pitch: -0.18, yaw: 0.35, roll: 0.0, sep: 0.14, cam: 4.0, zoom: 0.4, alpha: 1, calls: 24, drift: 0.18, spin: [0.22, -0.34, 0.55] }
+  };
+
+  function rotMat(pitch, yaw, roll) {
+    // object -> world rotation R = Ry(yaw) * Rx(pitch) * Rz(roll), row-major 3x3
+    var cx = Math.cos(pitch), sx = Math.sin(pitch), cy = Math.cos(yaw), sy = Math.sin(yaw), cz = Math.cos(roll), sz = Math.sin(roll);
+    var rz = [cz, -sz, 0, sz, cz, 0, 0, 0, 1];
+    var rx = [1, 0, 0, 0, cx, -sx, 0, sx, cx];
+    var ry = [cy, 0, sy, 0, 1, 0, -sy, 0, cy];
+    function mul(a, b) {
+      var o = [];
+      for (var r = 0; r < 3; r++) for (var c = 0; c < 3; c++) o.push(a[r * 3] * b[c] + a[r * 3 + 1] * b[3 + c] + a[r * 3 + 2] * b[6 + c]);
+      return o;
+    }
+    return mul(ry, mul(rx, rz));
+  }
+
+  function vortex3d(kind, host, onFail) {
+    var P = VX_PRESETS[kind];
+    var wrap = el('div', 'avx-vx3d avx-vx3d-' + kind);
+    wrap.setAttribute('aria-hidden', 'true');
+    var canvas = el('canvas', 'avx-vx3d-gl');
+    var overlay = el('canvas', 'avx-vx3d-calls');
+    wrap.appendChild(canvas);
+    wrap.appendChild(overlay);
+    var gl = canvas.getContext('webgl', { premultipliedAlpha: true, alpha: true, antialias: false }) ||
+      canvas.getContext('experimental-webgl');
+    if (!gl) { wrap.classList.add('avx-vx3d-off'); return wrap; }
+    // ray-marching on a CPU renderer (no GPU acceleration) would stall scrolling: use the light fallback
+    var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    var renderer = String(gl.getParameter(dbg ? dbg.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer) && !/[?&]avxgl=1/.test(location.search)) {
+      wrap.classList.add('avx-vx3d-off');
+      return wrap;
+    }
+
+    function shader(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+    }
+    var vs = shader(gl.VERTEX_SHADER, VX_VERT), fs = shader(gl.FRAGMENT_SHADER, VX_FRAG);
+    if (!vs || !fs) { wrap.classList.add('avx-vx3d-off'); return wrap; }
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { wrap.classList.add('avx-vx3d-off'); return wrap; }
+    gl.useProgram(prog);
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    var aPos = gl.getAttribLocation(prog, 'aPos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+    var U = {};
+    ['uRes', 'uTime', 'uRotT', 'uSpin', 'uCam', 'uSep', 'uAlpha', 'uZoom'].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
+    gl.uniform1f(U.uCam, P.cam);
+    gl.uniform1f(U.uSep, P.sep);
+    gl.uniform1f(U.uAlpha, P.alpha);
+    gl.uniform1f(U.uZoom, P.zoom);
+
+    var ctx2 = overlay.getContext('2d');
+    var W = 0, H = 0, dpr = 1, raf = 0, visible = false, clock = 0, last = 0, lastDraw = 0;
+    var px = 0, py = 0, tx = 0, ty = 0;
+    var calls = [];
+    for (var i = 0; i < P.calls; i++) calls.push({ a: Math.random() * Math.PI * 2, r: 0.4 + Math.random() * 1.3, v: 0.12 + Math.random() * 0.16, z: (Math.random() - 0.5) * 0.3 });
+
+    function size() {
+      var r = wrap.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = Math.max(1, Math.round(r.width));
+      H = Math.max(1, Math.round(r.height));
+      // the sculpture renders supersampled on standard screens (smoother rims), within a pixel budget
+      var ss = Math.max(dpr, 1.6);
+      if (W * H * ss * ss > 1.6e6) ss = Math.max(1, Math.sqrt(1.6e6 / (W * H)));
+      canvas.width = Math.round(W * ss);
+      canvas.height = Math.round(H * ss);
+      overlay.width = Math.round(W * dpr);
+      overlay.height = Math.round(H * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(U.uRes, canvas.width, canvas.height);
+    }
+
+    function draw(t) {
+      px += (tx - px) * 0.06;
+      py += (ty - py) * 0.06;
+      var yaw = P.yaw + Math.sin(t * 0.21) * P.drift + px * 0.5;
+      var pitch = P.pitch + Math.sin(t * 0.17 + 1.3) * P.drift * 0.5 + py * 0.35;
+      var R = rotMat(pitch, yaw, P.roll);
+      // uniformMatrix3fv reads column-major, so R (row-major) arrives as its transpose: world -> object
+      gl.uniformMatrix3fv(U.uRotT, false, new Float32Array(R));
+      gl.uniform1f(U.uTime, t);
+      gl.uniform3f(U.uSpin, t * P.spin[0], t * P.spin[1], t * P.spin[2]);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+      // incoming calls: points spiralling into the core, projected with the shader's camera
+      ctx2.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx2.clearRect(0, 0, W, H);
+      if (!P.calls) return;
+      ctx2.globalCompositeOperation = 'lighter';
+      calls.forEach(function (c) {
+        c.r -= c.v * 0.033 * (0.4 + c.r * 0.6);
+        c.a += 0.033 * (0.9 / Math.max(0.25, c.r));
+        if (c.r < 0.08) { c.r = 1.5 + Math.random() * 0.3; c.a = Math.random() * Math.PI * 2; }
+        var ox = Math.cos(c.a) * c.r, oy = Math.sin(c.a) * c.r, oz = c.z * c.r;
+        var wx = R[0] * ox + R[1] * oy + R[2] * oz, wy = R[3] * ox + R[4] * oy + R[5] * oz, wz = R[6] * ox + R[7] * oy + R[8] * oz;
+        var k = 1 / ((P.cam - wz) * P.zoom);
+        var sx = (wx * k * H + W) / 2, sy = (H - wy * k * H) / 2;
+        var fade = Math.min(1, (1.6 - c.r) * 2) * Math.min(1, c.r * 4);
+        ctx2.globalAlpha = 0.85 * fade * P.alpha;
+        ctx2.fillStyle = c.r < 0.5 ? '#eff6ff' : '#93c5fd';
+        var s = 1.2 + (1.6 - c.r) * 1.1;
+        ctx2.beginPath();
+        ctx2.arc(sx, sy, s, 0, Math.PI * 2);
+        ctx2.fill();
+      });
+      ctx2.globalAlpha = 1;
+      ctx2.globalCompositeOperation = 'source-over';
+    }
+
+    function frame(now) {
+      raf = 0;
+      if (now - lastDraw < 32 || isScrolling()) { schedule(); return; }
+      lastDraw = now;
+      clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
+      last = now;
+      draw(clock + 3);
+      schedule();
+    }
+
+    function schedule() {
+      if (raf || !visible || reduced) return;
+      // paused: hold still, but only after the first frame is on screen
+      if (motionPaused() && lastDraw) { last = 0; setTimeout(schedule, 400); return; }
+      raf = requestAnimationFrame(frame);
+    }
+
+    if (finePointer && host) {
+      host.addEventListener('pointermove', function (e) {
+        var r = host.getBoundingClientRect();
+        tx = (e.clientX - r.left) / r.width - 0.5;
+        ty = (e.clientY - r.top) / r.height - 0.5;
+      });
+      host.addEventListener('pointerleave', function () { tx = 0; ty = 0; });
+    }
+    var resizeT = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(function () { size(); draw(clock + 3); }, 150);
+    });
+    // a driver can compile the shader yet draw nothing: look at the first frame, and if it
+    // came out empty, step aside for the fallback art
+    var checked = false;
+    function selfCheck() {
+      if (checked) return true;
+      checked = true;
+      draw(clock + 3);
+      var w = canvas.width, rows = [0.5, 0.42, 0.58], px = new Uint8Array(w * 4);
+      for (var r = 0; r < rows.length; r++) {
+        gl.readPixels(0, Math.floor(canvas.height * rows[r]), w, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        for (var i = 3; i < px.length; i += 4) if (px[i] > 10) return true;
+      }
+      wrap.classList.add('avx-vx3d-off');
+      visible = false;
+      if (onFail) onFail();
+      return false;
+    }
+
+    setTimeout(function () {
+      onVisible(wrap, function () {
+        if (wrap.classList.contains('avx-vx3d-off')) return;
+        visible = true; last = 0; size();
+        if (!selfCheck()) return;
+        if (reduced) draw(3); else schedule();
+      }, function () { visible = false; }, 0);
+    }, 0);
+    return wrap;
   }
 
   // ---------- Live charts: a tiny SVG chart engine in the site's glass style ----------
@@ -2208,6 +2731,225 @@
     });
   }
 
+  // ---------- Landing hero: the vortex sculpture with its live chips ----------
+
+  function buildVortexCore(hero) {
+    var core;
+    var vx = vortex3d('hero', hero, function () {
+      // the GPU drew nothing: bring back the Signal Core in its place
+      var holo = buildSignalCore();
+      core.parentNode.replaceChild(holo, core);
+      if (!reduced) parallax(hero, holo);
+    });
+    if (vx.classList.contains('avx-vx3d-off')) return buildSignalCore();
+    core = el('div', 'avx-core3d avx-core-vx');
+    core.setAttribute('aria-hidden', 'true');
+    core.appendChild(vx);
+    var chipA = el('div', 'avx-c-chip avx-c-chip-a', '<span>Routed today</span><b>1,283</b>');
+    var chipB = el('div', 'avx-c-chip avx-c-chip-b', '<span>Buyer payout</span><b>$65.00</b>');
+    core.appendChild(chipA);
+    core.appendChild(chipB);
+    var routed = 1283;
+    ticker(core, 1800, function () {
+      routed += 1 + Math.floor(Math.random() * 4);
+      chipA.querySelector('b').textContent = routed.toLocaleString('en-US');
+      chipB.querySelector('b').textContent = '$' + (38 + Math.floor(Math.random() * 40)) + '.00';
+    });
+    return core;
+  }
+
+  // ---------- Footer signature: a monumental wordmark whose "o" is the live vortex ----------
+
+  function initSignature() {
+    var footer = document.querySelector('footer.marketing-footer');
+    var divider = footer && footer.querySelector('.footer-divider');
+    if (!divider || footer.querySelector('.avx-sig')) return;
+    var sig = el('div', 'avx-sig');
+    sig.setAttribute('aria-hidden', 'true');
+    var word = el('div', 'avx-sig-word');
+    var av = el('span', 'avx-sig-txt', 'Av');
+    av.dataset.t = 'Av';
+    word.appendChild(av);
+    var o = el('span', 'avx-sig-o');
+    var vx = vortex3d('footer', sig, function () {
+      var letter = el('span', 'avx-sig-txt', 'o');
+      letter.dataset.t = 'o';
+      o.parentNode.replaceChild(letter, o);
+    });
+    if (vx.classList.contains('avx-vx3d-off')) {
+      // no GPU: a plain letter in the same finish
+      o = el('span', 'avx-sig-txt', 'o');
+      o.dataset.t = 'o';
+    } else {
+      o.appendChild(vx);
+    }
+    word.appendChild(o);
+    var rest = el('span', 'avx-sig-txt', 'rtyx');
+    rest.dataset.t = 'rtyx';
+    word.appendChild(rest);
+    sig.appendChild(word);
+    sig.appendChild(el('p', 'avx-sig-line', 'Every call, accounted for.'));
+    divider.parentNode.insertBefore(sig, divider);
+  }
+
+  // ---------- Product tour: one app window, four live views ----------
+
+  var CALL_SOURCES = ['Google Ads', 'Meta', 'Bing', 'TikTok', 'Email', 'Affiliate', 'Organic'];
+  var CALL_STATES = [['Connected', 'ok'], ['Connected', 'ok'], ['Converted', 'ok'], ['Ringing', 'ring'], ['In queue', 'bid'], ['Missed', 'cap']];
+
+  function callLog(c) {
+    var body = c.querySelector('.avx-cs-body');
+    body.innerHTML = '<div class="avx-kpis avx-kpis-4">' +
+      '<div class="avx-kpi" data-k="live"><span>Live calls</span><b>42</b><em class="avx-up">▲ 6</em></div>' +
+      '<div class="avx-kpi" data-k="today"><span>Calls today</span><b>3,918</b><em class="avx-up">▲ 12.4%</em></div>' +
+      '<div class="avx-kpi" data-k="conv"><span>Converted</span><b>27.8%</b><em class="avx-up">▲ 1.9%</em></div>' +
+      '<div class="avx-kpi" data-k="rev"><span>Revenue today</span><b>$84,210</b><em class="avx-up">▲ 8.1%</em></div></div>' +
+      '<table class="avx-cs-table avx-cs-log"><thead><tr><th>Time</th><th>Caller</th><th>Source</th><th>Buyer</th><th>Duration</th><th>Revenue</th><th>Status</th></tr></thead><tbody></tbody></table>';
+    var tb = body.querySelector('tbody');
+    var k = { live: 42, today: 3918, conv: 27.8, rev: 84210 };
+    function row(fresh) {
+      var st = pick(CALL_STATES), d = new Date();
+      var dur = st[0] === 'Missed' || st[0] === 'Ringing' || st[0] === 'In queue' ? '—' : Math.floor(rnd(1, 9)) + ':' + String(Math.floor(rnd(0, 59))).padStart(2, '0');
+      var tr = document.createElement('tr');
+      if (fresh) tr.className = 'avx-live-new';
+      tr.innerHTML = '<td>' + d.toLocaleTimeString('en-US', { hour12: false }) + '</td><td>(' + Math.floor(rnd(201, 989)) + ') ··' + Math.floor(rnd(10, 99)) +
+        '</td><td>' + pick(CALL_SOURCES) + '</td><td>' + pick(LIVE_BUYERS) + '</td><td>' + dur + '</td><td>' +
+        (st[1] === 'ok' ? '$' + rnd(24, 96).toFixed(2) : '—') + '</td><td><span class="avx-live-pill avx-pill-' + st[1] + '">' + st[0] + '</span></td>';
+      return tr;
+    }
+    for (var i = 0; i < 6; i++) tb.appendChild(row(false));
+    ticker(c, 1600, function () {
+      tb.insertBefore(row(true), tb.firstChild);
+      if (tb.children.length > 6) tb.removeChild(tb.lastChild);
+      k.live = Math.max(28, Math.min(64, k.live + Math.round(rnd(-3, 3))));
+      k.today += Math.floor(rnd(1, 5));
+      k.conv = Math.max(22, Math.min(33, k.conv + rnd(-.3, .3)));
+      k.rev += Math.floor(rnd(20, 140));
+      body.querySelector('[data-k="live"] b').textContent = k.live;
+      body.querySelector('[data-k="today"] b').textContent = fmtInt(k.today);
+      body.querySelector('[data-k="conv"] b').textContent = k.conv.toFixed(1) + '%';
+      body.querySelector('[data-k="rev"] b').textContent = '$' + fmtInt(k.rev);
+    });
+  }
+
+  var TOUR = [
+    ['calls', 'Live calls', 'calls', 'Every call with its source, buyer and revenue', callLog],
+    ['pingpost', 'Ping/Post', 'ping-post', 'Bids, accept rate and the ping-to-post funnel', ppDashboard],
+    ['sources', 'Sources', 'reports', 'Margin by traffic source', ppSources],
+    ['usage', 'Usage', 'billing', 'Usage and cost, updated live', ppUsage]
+  ];
+
+  function initProductTour() {
+    var tour = document.querySelector('[data-avx-tour]');
+    if (!tour) return;
+    var tabs = tour.querySelector('.avx-tour-tabs');
+    var stage = tour.querySelector('.avx-tour-stage');
+    var views = {}, current = null, auto = null, touched = false;
+    TOUR.forEach(function (t, i) {
+      var b = el('button', 'avx-tour-tab', '<span>' + t[1] + '</span><i></i>');
+      b.type = 'button';
+      b.setAttribute('role', 'tab');
+      b.dataset.tour = t[0];
+      b.addEventListener('click', function () { touched = true; tour.classList.add('avx-tour-touched'); show(t[0]); });
+      tabs.appendChild(b);
+    });
+    function show(key) {
+      if (current === key) return;
+      var t = TOUR.filter(function (x) { return x[0] === key; })[0];
+      if (!views[key]) {
+        var c = consoleShell(t[2], t[3]);
+        c.querySelector('.avx-cs-path').innerHTML = 'app.avortyx.com / <b>' + t[2] + '</b>';
+        t[4](c);
+        views[key] = c;
+        stage.appendChild(c);
+      }
+      Object.keys(views).forEach(function (k) { views[k].classList.toggle('avx-tour-on', k === key); });
+      tabs.querySelectorAll('.avx-tour-tab').forEach(function (b) {
+        var on = b.dataset.tour === key;
+        b.classList.toggle('avx-on', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      current = key;
+    }
+    show('calls');
+    // walk through the views on its own until the visitor picks one
+    if (!reduced) {
+      onVisible(tour, function () {
+        if (auto || touched) return;
+        auto = setInterval(function () {
+          if (touched) { clearInterval(auto); return; }
+          if (motionPaused()) return;
+          var i = TOUR.map(function (x) { return x[0]; }).indexOf(current);
+          show(TOUR[(i + 1) % TOUR.length][0]);
+        }, 7000);
+      }, function () { clearInterval(auto); auto = null; }, 0.3);
+    }
+  }
+
+  // ---------- Product screenshots: framed as app windows ----------
+
+  function initWindows() {
+    document.querySelectorAll('main img.img-fluid.rounded.border, main img.img-fluid.rounded.shadow-sm').forEach(function (im) {
+      if (im.closest('.modal, .avx-window') || im.classList.contains('avx-replaced')) return;
+      var w = el('div', 'avx-window', '<div class="avx-window-bar"><i></i><i></i><i></i><span>app.avortyx.com</span></div>');
+      // spacing utilities move to the frame so the layout stays put
+      im.className.split(/\s+/).forEach(function (c) {
+        if (/^m[tbsexy]?-(\d|auto)/.test(c)) { w.classList.add(c); im.classList.remove(c); }
+      });
+      im.parentNode.insertBefore(w, im);
+      w.appendChild(im);
+    });
+  }
+
+  // ---------- Feature pop-ups: "Back to …" closes the pop-up and lands on the parent section ----------
+  // A feature opened from the page it belongs to shows inside a modal; its back link points at
+  // that same page, so the browser would only change the hash and leave the modal open.
+
+  function samePage(url) {
+    function norm(p) { return p.replace(/\/index\.html$/, '/').replace(/\.html$/, '').replace(/\/$/, '') || '/'; }
+    return url.origin === location.origin && norm(url.pathname) === norm(location.pathname);
+  }
+
+  function initBackLinks() {
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('.modal a.mktg-subpage-back');
+      if (!a || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      var url = new URL(a.getAttribute('href'), location.href);
+      if (!samePage(url)) return; // another page: a normal navigation is right
+      // the site script would load /features/… links into the modal itself: handle this one first
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      var modal = a.closest('.modal');
+      var target = url.hash ? document.getElementById(decodeURIComponent(url.hash.slice(1))) : null;
+      var done = false;
+      function land() {
+        if (done) return;
+        done = true;
+        history.replaceState(null, '', url.pathname + url.hash);
+        if (target) target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        else window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+      }
+      modal.addEventListener('hidden.bs.modal', land, { once: true });
+      var close = modal.querySelector('[data-bs-dismiss="modal"]');
+      if (close) close.click();
+      setTimeout(land, 600); // in case the modal library doesn't announce the close
+    }, true);
+  }
+
+  // ---------- Buttons: primary calls to action lean towards the cursor ----------
+
+  function initMagnetic() {
+    if (!finePointer || reduced) return;
+    document.querySelectorAll('main .btn-td-green, .marketing-cta-band .btn').forEach(function (b) {
+      b.addEventListener('pointermove', function (e) {
+        var r = b.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        b.style.translate = (x * 8).toFixed(1) + 'px ' + (y * 6).toFixed(1) + 'px';
+      });
+      b.addEventListener('pointerleave', function () { b.style.translate = ''; });
+    });
+  }
+
   // ---------- Page heroes: ringba portal rings with a counter-rotating shine ----------
 
   function initPortals() {
@@ -2365,6 +3107,10 @@
     initPortals();
     initHeroCharts();
     initPingPostDemos();
+    initProductTour();
+    initBackLinks();
+    initWindows();
+    initSignature();
     initAuthRing();
     initIntegrationsHub();
     initIntegrationsBackdrop();
@@ -2373,7 +3119,6 @@
     initCtaFx();
     initCtaWaves();
     initAurora();
-    initRails();
     initTables();
     initCounters();
     initOffscreenPause();
@@ -2383,6 +3128,7 @@
       initHeadingWords();
       initReveal();
       initTilt();
+      initMagnetic();
     }
     setPaused(motionPaused()); // apply a saved pause to scenes built after the toggle
   }

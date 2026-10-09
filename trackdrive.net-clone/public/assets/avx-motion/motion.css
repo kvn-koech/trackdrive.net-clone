@@ -3815,3 +3815,573 @@ html.avx-booted main {
 .hero-constellation-bg .hero-rings {
   display: none !important;
 }
+
+/* =====================================================================
+   Signature system: one 3D vortex (hero, page headers, footer), a calmer
+   decoration layer, product tour, trust strip and app-window screenshots
+   ===================================================================== */
+
+/* ---------- The vortex sculpture ---------- */
+
+.avx-vx3d {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.avx-vx3d canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.avx-vx3d-off {
+  display: none;
+}
+
+/* landing hero: the sculpture replaces the radar core, chips stay */
+.avx-core-vx .avx-vx3d {
+  inset: -22%;
+}
+
+.avx-core-vx .avx-c-chip-a { top: 8%; left: -6%; }
+.avx-core-vx .avx-c-chip-b { right: -4%; bottom: 14%; }
+
+@media (min-width: 992px) and (max-width: 1279.98px) {
+  .avx-core-vx {
+    position: absolute;
+    top: 50%;
+    right: 1vw;
+    z-index: 0;
+    display: block;
+    width: 250px;
+    aspect-ratio: 1;
+    translate: 0 -50%;
+    opacity: .7;
+  }
+
+  .avx-core-vx .avx-c-chip { display: none; }
+}
+
+/* page headers: the vortex lies back behind the title */
+.avx-sbg-rings.avx-sbg-vx {
+  top: calc(100% + 118px);
+  width: min(800px, 150vw);
+  aspect-ratio: 2.6;
+  perspective: none;
+  -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent);
+  mask-image: radial-gradient(closest-side, #000 70%, transparent);
+}
+
+/* ---------- Footer signature ---------- */
+
+.avx-sig {
+  position: relative;
+  margin: 56px 0 8px;
+  padding: 24px 0 10px;
+  text-align: center;
+  user-select: none;
+}
+
+.avx-sig::before {
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 18%;
+  height: 40%;
+  background: radial-gradient(50% 60% at 50% 100%, rgba(59, 130, 246, .12), transparent 70%);
+  pointer-events: none;
+}
+
+.avx-sig-word {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  font-family: var(--avx-font-display, "Inter Tight", sans-serif);
+  font-size: clamp(76px, 16.5vw, 236px);
+  font-weight: 700;
+  line-height: .95;
+  letter-spacing: -.06em;
+}
+
+.avx-sig-txt {
+  position: relative;
+  /* room for glyph overhang, which background-clip would otherwise cut */
+  padding: 0 .08em;
+  margin: 0 -.08em;
+  color: transparent;
+  background: linear-gradient(180deg, #f6f8fc 0%, #c9d2e1 42%, #55647f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* extrusion: a darker copy stacked a few pixels down */
+.avx-sig-txt::before {
+  content: attr(data-t);
+  position: absolute;
+  inset: 0;
+  padding: 0 .08em;
+  z-index: -1;
+  color: #0c1322;
+  text-shadow:
+    0 1px 0 #111b30, 0 2px 0 #111b30, 0 3px 0 #0f182b, 0 4px 0 #0f182b,
+    0 5px 0 #0d1526, 0 6px 0 #0d1526, 0 7px 0 #0b1221, 0 8px 0 #0b1221,
+    0 22px 34px rgba(0, 0, 0, .65);
+}
+
+/* a slow band of light travelling across the letters */
+.avx-sig-txt::after {
+  content: attr(data-t);
+  position: absolute;
+  inset: 0;
+  padding: 0 .08em;
+  color: transparent;
+  background: linear-gradient(100deg, transparent 42%, rgba(255, 255, 255, .9) 50%, transparent 58%) 0 0 / 300% 100% no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: avxSigSweep 9s ease-in-out infinite;
+}
+
+.avx-sig-txt + .avx-sig-o + .avx-sig-txt::after {
+  animation-delay: .9s;
+}
+
+@keyframes avxSigSweep {
+  0%, 15% { background-position: 110% 0; }
+  60%, 100% { background-position: -10% 0; }
+}
+
+.avx-sig-o {
+  position: relative;
+  display: inline-block;
+  width: .6em;
+  height: .6em;
+  margin: 0 .02em 0 .07em;
+}
+
+.avx-sig-o .avx-vx3d {
+  inset: -30%;
+}
+
+.avx-sig-line {
+  margin: 14px 0 0;
+  font: 500 12px/1 var(--avx-font-mono, monospace);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #7f8aa0;
+}
+
+/* ---------- Trust strip: integrations in a slow marquee ---------- */
+
+.avx-trust {
+  position: relative;
+  padding: 26px 0 34px;
+  border-top: 1px solid rgba(255, 255, 255, .06);
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.avx-trust-label {
+  margin: 0 0 22px;
+  text-align: center;
+  font: 500 12px/1.4 var(--avx-font-mono, monospace);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #7f8aa0;
+}
+
+.avx-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.avx-marquee-track {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: avxMarquee 70s linear infinite;
+}
+
+.avx-marquee:hover .avx-marquee-track {
+  animation-play-state: paused;
+}
+
+.avx-marquee-track li {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 36px;
+  padding: 0 30px;
+}
+
+.avx-marquee-track img {
+  width: auto;
+  max-width: 128px;
+  height: 24px;
+  object-fit: contain;
+  opacity: .5;
+  transition: opacity .3s ease;
+}
+
+.avx-marquee-track li:hover img {
+  opacity: .95;
+}
+
+@keyframes avxMarquee {
+  to { transform: translateX(-50%); }
+}
+
+/* ---------- Product tour ---------- */
+
+.avx-eyebrow {
+  margin: 0 0 14px;
+  font: 500 12px/1 var(--avx-font-mono, monospace) !important;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #93c5fd !important;
+}
+
+.avx-tour-tabs {
+  display: flex;
+  gap: 4px;
+  width: max-content;
+  max-width: 100%;
+  margin: 6px auto 22px;
+  padding: 5px;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 999px;
+  background: rgba(17, 19, 24, .8);
+  scrollbar-width: none;
+}
+
+.avx-tour-tab {
+  position: relative;
+  flex: none;
+  padding: 10px 18px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: 500 14px/1 var(--avx-font-sans, "Inter", sans-serif);
+  color: #a7afbd;
+  white-space: nowrap;
+  transition: color .2s ease, background-color .2s ease;
+}
+
+.avx-tour-tab:hover {
+  color: #e5e9f0;
+}
+
+.avx-tour-tab.avx-on {
+  color: #fff;
+  background: rgba(59, 130, 246, .16);
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, .35);
+}
+
+/* auto-advance progress under the active tab */
+.avx-tour-tab i {
+  position: absolute;
+  right: 18px;
+  bottom: 4px;
+  left: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: #60a5fa;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.avx-tour-tab.avx-on i {
+  animation: avxTourBar 7s linear forwards;
+}
+
+.avx-tour-touched .avx-tour-tab i {
+  display: none;
+}
+
+@keyframes avxTourBar {
+  to { transform: scaleX(1); }
+}
+
+.avx-tour-stage {
+  position: relative;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.avx-tour-stage .avx-console {
+  display: none;
+  min-height: 430px;
+}
+
+.avx-tour-stage .avx-console.avx-tour-on {
+  display: block;
+  animation: avxTourIn .45s var(--avx-ease, ease) both;
+}
+
+@keyframes avxTourIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.avx-kpis.avx-kpis-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 767.98px) {
+  .avx-kpis.avx-kpis-4 { grid-template-columns: repeat(2, 1fr); }
+  .avx-tour-tabs { justify-content: flex-start; }
+}
+
+/* ---------- Calmer decoration: one icon style everywhere ---------- */
+
+[data-bs-theme="dark"] .features-grid-icon {
+  background: linear-gradient(180deg, rgba(59, 130, 246, .16), rgba(59, 130, 246, .05)) !important;
+  color: #93c5fd !important;
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, .22);
+}
+
+[data-bs-theme="dark"] .features-grid-icon i {
+  color: inherit !important;
+}
+
+[data-bs-theme="dark"] .flow-node-icon {
+  background: linear-gradient(180deg, rgba(59, 130, 246, .2), rgba(59, 130, 246, .06)) !important;
+  color: #bfdbfe !important;
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, .28);
+}
+
+[data-bs-theme="dark"] .flow-node-icon i {
+  color: inherit !important;
+}
+
+[data-bs-theme="dark"] .flow-node-icon.avx-active {
+  background: linear-gradient(180deg, #3576f0, #1e4fd0) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 14px 30px -12px rgba(0, 0, 0, .6);
+}
+
+
+/* ---------- Product screenshots as app windows ---------- */
+
+.avx-window {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 14px;
+  background: #0d1016;
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .9), inset 0 1px 0 rgba(255, 255, 255, .03);
+}
+
+.avx-window-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  background: #12151c;
+}
+
+.avx-window-bar i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #2b303b;
+}
+
+.avx-window-bar span {
+  margin: 0 auto;
+  padding: 3px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .04);
+  font: 500 10px/1.4 var(--avx-font-mono, monospace);
+  letter-spacing: .04em;
+  color: #6f7a8e;
+  translate: -24px 0;
+}
+
+.avx-window img {
+  display: block;
+  width: 100%;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* deeper, crisper dark rendering of the light UI captures */
+[data-bs-theme="dark"] main .avx-window img.img-fluid {
+  filter: invert(1) hue-rotate(180deg) saturate(1.15) contrast(1.06) brightness(.84);
+}
+
+/* ---------- Page transitions (cross-document view transitions) ---------- */
+
+@view-transition {
+  navigation: auto;
+}
+
+.navbar {
+  view-transition-name: avx-nav;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: .28s;
+}
+
+/* ---------- "Everything you need": scroll-driven storyline ---------- */
+
+.avx-story .hero-simple-arrow-track {
+  position: relative;
+}
+
+.avx-story .hero-simple-arrow-track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3b82f6, #bfdbfe);
+  transform: scaleX(var(--fill, 0));
+  transform-origin: left center;
+}
+
+.avx-story .hero-simple-node-icon,
+.avx-story .hero-simple-hub-icon {
+  transition: background .5s ease, color .5s ease, box-shadow .5s ease, transform .5s var(--avx-ease, ease);
+}
+
+.avx-story .hero-simple-node:not(.avx-lit) .hero-simple-node-icon,
+.avx-story .hero-simple-hub:not(.avx-lit) .hero-simple-hub-icon {
+  opacity: .55;
+  filter: saturate(.4);
+}
+
+/* the spheres themselves light up as the story reaches them */
+.avx-story .avx-lit .hero-simple-node-icon,
+.avx-story .avx-lit .hero-simple-hub-icon {
+  transform: translateY(-3px);
+}
+
+.avx-story .hero-simple-node .hero-simple-node-icon,
+.avx-story .hero-simple-hub .hero-simple-hub-icon {
+  transition-property: background, color, box-shadow, transform, opacity, filter;
+}
+
+
+/* ---------- Seamless sections: no drawn dividers, so backgrounds and glows fade at the edges ---------- */
+
+.avx-aurora {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
+}
+
+[data-bs-theme="dark"] .mktg-section:nth-of-type(even),
+[data-bs-theme="dark"] .bg-light,
+[data-bs-theme="dark"] .pricing-faq-section {
+  background-color: transparent !important;
+  background-image: linear-gradient(180deg, transparent, rgba(255, 255, 255, .018) 14%, rgba(255, 255, 255, .018) 86%, transparent) !important;
+}
+
+/* ---------- "Everything you need": glass discs on a lit floor, calls arcing between them ---------- */
+
+.avx-lf2 .avx-flow-tilt {
+  position: relative;
+}
+
+.avx-lf-canvas {
+  position: absolute;
+  top: -80px;
+  left: -60px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.avx-lf2 .hero-simple-flow {
+  position: relative;
+  z-index: 1;
+}
+
+/* the drawn arcs replace the flat tracks and their sphere packets */
+.avx-lf2 .hero-simple-arrow-track {
+  background: none !important;
+}
+
+.avx-lf2 .hero-simple-arrow-track::after,
+.avx-lf2 .hero-simple-arrow-dot {
+  display: none !important;
+}
+
+.avx-flow3d.avx-lf2 .hero-simple-node-icon,
+.avx-flow3d.avx-lf2 .hero-simple-hub-icon {
+  width: 76px;
+  height: 76px;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(110% 110% at 30% 22%, #5b9bff 0%, #2563eb 38%, #12307f 72%, #0a1638 100%) !important;
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, .38),
+    inset 0 -12px 22px rgba(3, 8, 24, .55),
+    0 0 0 1px rgba(147, 197, 253, .18) !important;
+  animation: avxLfBob 5.5s ease-in-out infinite !important;
+  transition: scale .35s cubic-bezier(.2, .9, .3, 1.4);
+}
+
+.avx-flow3d.avx-lf2 .hero-simple-hub-icon {
+  width: 100px;
+  height: 100px;
+  background:
+    radial-gradient(110% 110% at 32% 24%, #2b4f9e 0%, #11265e 45%, #070f2a 100%) !important;
+  animation-delay: -1.8s !important;
+}
+
+.avx-flow3d.avx-lf2 .hero-simple-node-revenue .hero-simple-node-icon {
+  animation-delay: -3.4s !important;
+}
+
+/* a glossy cap catching the light */
+.avx-flow3d.avx-lf2 .hero-simple-node-icon::before,
+.avx-flow3d.avx-lf2 .hero-simple-hub-icon::before {
+  content: "";
+  position: absolute;
+  top: 7%;
+  left: 18%;
+  width: 52%;
+  height: 30%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .42), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+.avx-flow3d.avx-lf2 .avx-hit {
+  scale: 1.09;
+}
+
+.avx-flow3d.avx-lf2 .hero-simple-node-icon i {
+  font-size: 1.45rem;
+  color: #fff !important;
+  text-shadow: 0 2px 6px rgba(3, 8, 24, .6);
+}
+
+.avx-lf2 .hero-simple-hub-icon .avx-hub-mark {
+  width: 62%;
+  translate: none;
+}
+
+@keyframes avxLfBob {
+  0%, 100% { transform: translateZ(30px) translateY(0); }
+  50% { transform: translateZ(30px) translateY(-7px); }
+}
+
+.avx-lf-canvas {
+  -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent);
+  mask-image: linear-gradient(180deg, #000 70%, transparent);
+}
