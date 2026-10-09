@@ -3810,3 +3810,8 @@ html.avx-booted main {
   backdrop-filter: none !important;
   background: linear-gradient(180deg, rgba(20, 23, 30, .94), rgba(14, 16, 22, .94)) !important;
 }
+
+/* the landing hero's original rings sit behind the Signal Sea scene: never shown, so never fetched */
+.hero-constellation-bg .hero-rings {
+  display: none !important;
+}
