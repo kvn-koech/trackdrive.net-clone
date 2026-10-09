@@ -55,14 +55,22 @@ function ScrollManager() {
   const { pathname, hash } = useLocation()
 
   useEffect(() => {
+    // Disable smooth scroll for immediate page transition jump
+    document.documentElement.style.scrollBehavior = 'auto'
+    
     if (hash) {
       const target = document.getElementById(hash.slice(1))
       if (target) {
         target.scrollIntoView()
-        return
       }
+    } else {
+      window.scrollTo(0, 0)
     }
-    window.scrollTo(0, 0)
+    
+    // Restore smooth scrolling for user interactions
+    requestAnimationFrame(() => {
+      document.documentElement.style.scrollBehavior = ''
+    })
   }, [pathname, hash])
 
   return null

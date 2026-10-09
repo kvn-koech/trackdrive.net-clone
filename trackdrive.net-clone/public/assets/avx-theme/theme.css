@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
 /*
  * Avortyx color theme — loaded on every page after the site stylesheet.
  *   Backgrounds: clean bright white, subtle off-white/gray card surfaces
