@@ -574,6 +574,7 @@
   }
 
   function initBottomWaves() {
+    if (/^\/features(\.html)?\/?$/.test(location.pathname)) return; // features page ends clean
     var sections = topSections().filter(function (sec) {
       return !sec.classList.contains('marketing-cta-band');
     });
@@ -734,6 +735,8 @@
     // integration logo sections get a slowly turning glow orb
     topSections().forEach(function (section) {
       if (section.querySelectorAll('.integration-logo-card').length < 3) return;
+      var h2 = section.querySelector('h2');
+      if (h2 && /bring your own voip/i.test(h2.textContent)) return;
       section.classList.add('avx-fx-host');
       var orb = sbg('avx-sbg-orb');
       orb.appendChild(baked('orb'));
