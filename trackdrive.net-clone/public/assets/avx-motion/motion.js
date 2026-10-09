@@ -574,7 +574,6 @@
 
     function frame(now) {
       raf = 0;
-      if (isScrolling()) { schedule(); return; }
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
       lastDraw = now;
@@ -865,6 +864,7 @@
 
   function initBottomWaves() {
     if (/^\/features(\.html)?\/?$/.test(location.pathname)) return; // features page ends clean
+    if (pageKey() === '/') return; // the landing page ends on Bring Your Own VoIP, clean
     if (/^\/features\/(voice_agents|ai_sms_bots|transcriptions)\b/.test(location.pathname)) return; // AI pages too
     var sections = topSections().filter(function (sec) {
       return !sec.classList.contains('marketing-cta-band');
@@ -1398,7 +1398,7 @@
 
     hero.insertBefore(buildSignalSea(hero), hero.firstChild);
 
-    var holo = buildVortexCore(hero);
+    var holo = buildVortexCore();
     hero.appendChild(holo);
 
     var panel = el('div', 'avx-live',
@@ -1437,11 +1437,6 @@
 
   var MOTION_KEY = 'avx-motion';
 
-  // true while the page is being scrolled (and briefly after): canvas scenes skip frames then,
-  // leaving the main thread to the scroll itself
-  var scrollingUntil = 0;
-  window.addEventListener('scroll', function () { scrollingUntil = performance.now() + 150; }, { passive: true });
-  function isScrolling() { return performance.now() < scrollingUntil; }
 
   function motionPaused() {
     return document.documentElement.classList.contains('avx-paused');
@@ -1529,7 +1524,7 @@
     function frame(now) {
       raf = 0;
       // the swell is slow, so 30 fps reads the same and halves the work
-      if (!reduced && (now - lastDraw < 32 || isScrolling())) { schedule(); return; }
+      if (!reduced && now - lastDraw < 32) { schedule(); return; }
       lastDraw = now;
       // scene time only advances while running, so a pause resumes without a jump
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
@@ -1636,7 +1631,7 @@
 
     function frame(now) {
       raf = 0;
-      if (!reduced && (now - lastDraw < 32 || isScrolling())) { schedule(); return; }
+      if (!reduced && now - lastDraw < 32) { schedule(); return; }
       lastDraw = now;
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
@@ -2210,7 +2205,7 @@
 
     function frame(now) {
       raf = 0;
-      if (now - lastDraw < 32 || isScrolling()) { schedule(); return; }
+      if (now - lastDraw < 32) { schedule(); return; }
       lastDraw = now;
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
@@ -2733,28 +2728,43 @@
 
   // ---------- Landing hero: the vortex sculpture with its live chips ----------
 
-  function buildVortexCore(hero) {
-    var core;
-    var vx = vortex3d('hero', hero, function () {
-      // the GPU drew nothing: bring back the Signal Core in its place
-      var holo = buildSignalCore();
-      core.parentNode.replaceChild(holo, core);
-      if (!reduced) parallax(hero, holo);
+  var vxcId = 0;
+
+  // the logo's three rings, each spinning in its own plane while that plane rocks on its
+  // own axis (a gyroscope); stacked copies behind each ring give it real thickness
+  function vortexGyro() {
+    var g = el('div', 'avx-vxc');
+    var ARCS = [['M52 32a20 20 0 1 1-13.2-18.8', 3.4], ['M44.5 32a12.5 12.5 0 1 1-8.9-11.9', 3.0], ['M38 32a6 6 0 1 1-4.2-5.7', 2.6]];
+    var SIDES = ['#1d4ed8', '#1e3a8a', '#172554'];
+    g.appendChild(el('div', 'avx-vxc-halo'));
+    ARCS.forEach(function (a, i) {
+      var ring = el('div', 'avx-vxc-ring avx-vxc-r' + (i + 1));
+      var spin = el('div', 'avx-vxc-spin');
+      var html = '';
+      for (var k = 3; k >= 0; k--) {
+        var id = 'avx-vxc-g' + (++vxcId);
+        html += '<svg viewBox="0 0 64 64" fill="none" style="--k:' + k + '">' +
+          (k ? '' : '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eff6ff"/>' +
+            '<stop offset=".45" stop-color="#60a5fa"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>') +
+          '<path d="' + a[0] + '" stroke="' + (k ? SIDES[k - 1] : 'url(#' + id + ')') + '" stroke-width="' + a[1] + '" stroke-linecap="round"/></svg>';
+      }
+      spin.innerHTML = html;
+      ring.appendChild(spin);
+      g.appendChild(ring);
     });
-    if (vx.classList.contains('avx-vx3d-off')) return buildSignalCore();
-    core = el('div', 'avx-core3d avx-core-vx');
-    core.setAttribute('aria-hidden', 'true');
-    core.appendChild(vx);
-    var chipA = el('div', 'avx-c-chip avx-c-chip-a', '<span>Routed today</span><b>1,283</b>');
-    var chipB = el('div', 'avx-c-chip avx-c-chip-b', '<span>Buyer payout</span><b>$65.00</b>');
-    core.appendChild(chipA);
-    core.appendChild(chipB);
-    var routed = 1283;
-    ticker(core, 1800, function () {
-      routed += 1 + Math.floor(Math.random() * 4);
-      chipA.querySelector('b').textContent = routed.toLocaleString('en-US');
-      chipB.querySelector('b').textContent = '$' + (38 + Math.floor(Math.random() * 40)) + '.00';
+    g.appendChild(el('div', 'avx-vxc-dot'));
+    return g;
+  }
+
+  function buildVortexCore() {
+    var core = buildSignalCore();
+    var heart = core.querySelector('.avx-c-core');
+    ['.avx-radar', '.avx-c-gyro'].forEach(function (sel) {
+      var n = heart.querySelector(sel);
+      if (n) n.parentNode.removeChild(n);
     });
+    heart.appendChild(vortexGyro());
+    core.classList.add('avx-core-logo');
     return core;
   }
 
