@@ -404,7 +404,7 @@
 
 /* call-to-action band: brand blue */
 .marketing-cta-band {
-  background: linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #3b82f6 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 55%, #2563eb 100%);
 }
 
 .btn-cta-primary,
@@ -697,7 +697,7 @@ a,
 }
 
 [data-bs-theme="dark"] .marketing-cta-band {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
 }
 
 [data-bs-theme="dark"] .flow-center-box {

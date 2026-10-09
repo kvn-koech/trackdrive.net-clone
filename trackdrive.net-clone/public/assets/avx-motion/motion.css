@@ -2562,7 +2562,7 @@ img.avx-tint {
 /* ---------- CTA band: flowing neon waves ---------- */
 
 [data-bs-theme="dark"] .marketing-cta-band {
-  background: linear-gradient(135deg, #10175a 0%, #1f3bd6 55%, #3b82f6 100%);
+  background: linear-gradient(135deg, #0a0f2b 0%, #101c60 55%, #1e3a8a 100%);
 }
 
 .avx-cta-waves {
