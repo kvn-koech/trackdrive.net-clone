@@ -1479,96 +1479,10 @@ img.avx-tint {
   perspective-origin: 50% 10%;
 }
 
-.avx-ibg-floor {
-  position: absolute;
-  right: -60%;
-  bottom: -20%;
-  left: -60%;
-  height: 170%;
-  overflow: hidden;
-  transform-origin: 50% 100%;
-  transform:
-    rotateX(calc(74deg + var(--avx-hy, 0) * 6deg))
-    rotateZ(calc(var(--avx-hx, 0) * 6deg));
-  -webkit-mask-image: radial-gradient(ellipse 50% 60% at 50% 70%, #000 35%, transparent 80%);
-  mask-image: radial-gradient(ellipse 50% 60% at 50% 70%, #000 35%, transparent 80%);
-}
-
-/* the grid layer is one cell taller than the floor and slides by one cell: a seamless, GPU-only loop */
-.avx-ibg-grid {
-  position: absolute;
-  top: -80px;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background:
-    linear-gradient(rgba(30, 160, 232, .32) 1.5px, transparent 1.5px) 0 0 / 80px 80px,
-    linear-gradient(90deg, rgba(30, 160, 232, .32) 1.5px, transparent 1.5px) 0 0 / 80px 80px;
-  will-change: transform;
-  animation: avxIbgGrid 4s linear infinite;
-}
-
-@keyframes avxIbgGrid {
-  to { transform: translateY(80px); }
-}
-
-.avx-ibg-ribbon {
-  position: absolute;
-  top: 8%;
-  left: -10%;
-  width: 120%;
-  height: 70%;
-  transform-style: preserve-3d;
-  transform: rotateY(calc(var(--avx-hx, 0) * 10deg));
-}
-
-.avx-ibg-ribbon img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  object-fit: cover;
-  opacity: .28;
-  will-change: transform;
-  animation: avxIbgRibbon 18s ease-in-out infinite alternate;
-}
-
-@keyframes avxIbgRibbon {
-  from { transform: rotateX(18deg) rotateY(-14deg) translate3d(-3%, 0, -60px); }
-  to { transform: rotateX(8deg) rotateY(14deg) translate3d(3%, -2%, 40px); }
-}
-
-.avx-ibg-glow {
-  position: absolute;
-  width: 420px;
-  height: 420px;
-  max-width: none;
-  opacity: .16;
-  animation: avxBob 14s ease-in-out infinite alternate;
-}
-
-.avx-ibg-glow-1 { top: 6%; left: -140px; }
-.avx-ibg-glow-2 { right: -140px; bottom: 18%; animation-delay: -6s; }
-
-/* dark mode: soften the backdrop so it doesn't wash out the heading */
-[data-bs-theme="dark"] .avx-ibg-ribbon img {
-  opacity: .14;
-}
-
-[data-bs-theme="dark"] .avx-ibg-grid {
-  opacity: .6;
-}
-
-[data-bs-theme="dark"] .avx-ibg-glow {
-  opacity: .1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .avx-ibg *,
-  .avx-ibg-grid {
-    animation: none !important;
-  }
+/* canvas data streams fill the box; fade them under the heading copy */
+.avx-ibg canvas {
+  -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, .55), #000 45%);
+  mask-image: linear-gradient(90deg, rgba(0, 0, 0, .55), #000 45%);
 }
 
 /* ---------- Count-up stats + button shine ---------- */
@@ -2164,7 +2078,7 @@ img.avx-tint {
   box-shadow: 0 24px 60px -12px rgba(0, 0, 0, .7);
 }
 
-/* ---------- Buttons: ringba pills with a soft glow ---------- */
+/* ---------- Buttons: solid pills, lit from above, no glow ---------- */
 
 .btn-td-green,
 .btn-outline-td-green,
@@ -2179,17 +2093,56 @@ img.avx-tint {
 [data-bs-theme="dark"] .btn-primary,
 [data-bs-theme="dark"] .marketing-hero-simple .btn-outline-td-green {
   color: #fff;
-  background: linear-gradient(180deg, #3b82f6, #2563eb);
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 1px rgba(148, 163, 184, .3) inset, 0 8px 24px -8px rgba(59, 130, 246, .8);
+  background: linear-gradient(180deg, #3576f0 0%, #1e4fd0 100%);
+  border: 1px solid #1a46b8;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .22),
+    inset 0 -1px 0 rgba(0, 0, 0, .18),
+    0 1px 2px rgba(0, 0, 0, .45);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .18);
+  font-weight: 600;
+  letter-spacing: .005em;
+  transition: background-color .2s ease, transform .2s ease, filter .2s ease;
 }
 
 [data-bs-theme="dark"] .btn-td-green:hover,
 [data-bs-theme="dark"] .btn-primary:hover,
+[data-bs-theme="dark"] .btn-td-green:focus,
+[data-bs-theme="dark"] .btn-primary:focus,
 [data-bs-theme="dark"] .marketing-hero-simple .btn-outline-td-green:hover {
   color: #fff;
-  background: linear-gradient(180deg, #60a5fa, #3b82f6);
-  box-shadow: 0 0 0 1px rgba(147, 197, 253, .4) inset, 0 10px 32px -8px rgba(59, 130, 246, 1);
+  background: linear-gradient(180deg, #4483f5 0%, #2459dc 100%);
+  border-color: #1f4fc6;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .28),
+    inset 0 -1px 0 rgba(0, 0, 0, .18),
+    0 1px 2px rgba(0, 0, 0, .45);
+}
+
+[data-bs-theme="dark"] .btn-td-green:active,
+[data-bs-theme="dark"] .btn-primary:active {
+  background: linear-gradient(180deg, #1e4fd0 0%, #2a62e6 100%) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .3) !important;
+}
+
+[data-bs-theme="dark"] .btn-td-green:focus-visible,
+[data-bs-theme="dark"] .btn-primary:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+/* the shine sweep reads as a glow on the solid pill: drop it */
+.btn-td-green::after {
+  content: none !important;
+}
+
+/* navbar sign-up: compact, same scale as the nav links */
+@media (min-width: 992px) {
+  .navbar .btn-td-green.btn-sm {
+    padding: .42rem 1.05rem;
+    font-size: .8125rem;
+    line-height: 1.2;
+  }
 }
 
 [data-bs-theme="dark"] .btn-outline-td-green {
@@ -3785,4 +3738,63 @@ img.avx-tint {
   .avx-cs-grid,
   .avx-cs-grid-wide { grid-template-columns: 1fr; }
   .avx-console { overflow-x: auto; }
+}
+
+/* ---------- Canvas scenes: procedural backdrops (contact globe, sign-up lanes, silk, horizon) ---------- */
+
+.avx-cv {
+  pointer-events: none;
+}
+
+.avx-cv-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.avx-cv-bottom {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  height: 340px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%, #000 82%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 30%, #000 82%, transparent);
+}
+
+.avx-cv-globe {
+  height: 400px;
+}
+
+.avx-cv-horizon {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  -webkit-mask-image: linear-gradient(180deg, #000 90%, transparent);
+  mask-image: linear-gradient(180deg, #000 90%, transparent);
+}
+
+@media (max-width: 767.98px) {
+  .avx-cv-bottom {
+    height: 240px;
+  }
+
+  .avx-cv-globe {
+    height: 280px;
+  }
+}
+
+/* FAQ chevrons: the stock icon is green; draw it in the blue accent */
+[data-bs-theme="dark"] .accordion {
+  --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2393c5fd' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e");
+  --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2393c5fd' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e");
+}
+
+[data-bs-theme="dark"] .accordion-button::after {
+  background-image: var(--bs-accordion-btn-icon) !important;
+}
+
+[data-bs-theme="dark"] .accordion-button:not(.collapsed)::after {
+  background-image: var(--bs-accordion-btn-active-icon) !important;
 }

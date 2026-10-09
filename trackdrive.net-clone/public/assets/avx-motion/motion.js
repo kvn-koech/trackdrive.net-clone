@@ -527,9 +527,13 @@
   };
   var WAVE_ROTATION = ['ribbons', 'mesh', 'grid', 'signal', 'streak'];
 
-  function pageWaveStyle() {
+  function pageKey() {
     var path = location.pathname.replace(/index\.html$/, '').replace(/\/$/, '') || '/';
-    var key = path === '/' ? '/' : (/\.html$/.test(path) ? path : path + '.html');
+    return path === '/' ? '/' : (/\.html$/.test(path) ? path : path + '.html');
+  }
+
+  function pageWaveStyle() {
+    var key = pageKey();
     if (WAVE_BY_PAGE[key]) return WAVE_BY_PAGE[key];
     var h = 0;
     for (var i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
@@ -573,13 +577,38 @@
     });
   }
 
+  // pages whose closing scene is drawn on canvas instead of the baked wave art
+  var BOTTOM_SCENES = {
+    '/p/contact.html': function () { return globeScene('avx-cv-bottom avx-cv-globe'); },
+    '/sign_up.html': function () { return lanesScene('avx-cv-bottom avx-cv-lanes'); },
+    '/pricing.html': function () {
+      return silkScene('avx-cv-bottom', [
+        { color: '59,130,246', lines: 44, alpha: .3, base: .6, amp: .15, spread: .36, freq: 1, phase: 0, speed: .3 },
+        { color: '165,180,252', lines: 16, alpha: .2, base: .64, amp: .1, spread: .18, freq: .7, phase: 2.2, speed: .22 }
+      ]);
+    },
+    '/features/integrations.html': function () {
+      return silkScene('avx-cv-bottom', [
+        { color: '56,189,248', lines: 36, alpha: .28, base: .56, amp: .13, spread: .3, freq: .9, phase: 1, speed: .26 },
+        { color: '99,102,241', lines: 30, alpha: .26, base: .66, amp: .12, spread: .28, freq: 1.2, phase: 3.6, speed: .2 }
+      ]);
+    }
+  };
+
   function initBottomWaves() {
     if (/^\/features(\.html)?\/?$/.test(location.pathname)) return; // features page ends clean
+    if (/^\/features\/(voice_agents|ai_sms_bots|transcriptions)\b/.test(location.pathname)) return; // AI pages too
     var sections = topSections().filter(function (sec) {
       return !sec.classList.contains('marketing-cta-band');
     });
     var host = sections[sections.length - 1];
     if (!host) return;
+    var scene = BOTTOM_SCENES[pageKey()];
+    if (scene) {
+      host.classList.add('avx-fx-host', 'avx-bwaves-host');
+      host.appendChild(scene());
+      return;
+    }
     var style = WAVE_STYLES[pageWaveStyle()];
     host.classList.add('avx-fx-host', 'avx-bwaves-host');
 
@@ -678,23 +707,16 @@
     if (!section) return;
     section.classList.add('avx-fx-host');
 
-    var bg = document.createElement('div');
-    bg.className = 'avx-ibg';
-    bg.setAttribute('aria-hidden', 'true');
-    var floor = document.createElement('div');
-    floor.className = 'avx-ibg-floor';
-    var ribbon = document.createElement('div');
-    ribbon.className = 'avx-ibg-ribbon';
-    ribbon.appendChild(baked('ribbons'));
-    var grid = document.createElement('div');
-    grid.className = 'avx-ibg-grid';
-    floor.appendChild(grid);
-    bg.appendChild(floor);
-    bg.appendChild(ribbon);
-    bg.appendChild(bakedFile('blue-sphere-soft.png', 'avx-ibg-glow avx-ibg-glow-1'));
-    bg.appendChild(bakedFile('icon-sphere-blue-soft.png', 'avx-ibg-glow avx-ibg-glow-2'));
-    section.insertBefore(bg, section.firstChild);
-    reactive(section, bg, true);
+    section.insertBefore(streamsScene('avx-ibg', section), section.firstChild);
+  }
+
+  // ---------- Pricing header: eclipse horizon ----------
+
+  function initPricingHorizon() {
+    var hero = document.querySelector('main section.pricing-hero');
+    if (!hero) return;
+    hero.classList.add('avx-fx-host');
+    hero.insertBefore(horizonScene('avx-cv-horizon'), hero.firstChild);
   }
 
   // ---------- Section backgrounds ----------
@@ -708,7 +730,7 @@
 
   function initSectionBackgrounds() {
     // page-hero titles get tilted portal rings, like the landing page hero
-    document.querySelectorAll('main section.mktg-subpage-hero h1, main section.pricing-hero h1').forEach(function (h1) {
+    document.querySelectorAll('main section.mktg-subpage-hero h1').forEach(function (h1) {
       var wrap = document.createElement('div');
       wrap.className = 'avx-h1wrap';
       h1.parentNode.insertBefore(wrap, h1);
@@ -1103,7 +1125,8 @@
       });
     }, { threshold: 0.3 });
     document.querySelectorAll('main h1, main h2, .marketing-cta-band h2').forEach(function (h) {
-      if (h.closest('.modal') || h.textContent.trim().length > 90) return;
+      // accordion headers wrap a flex button: split words would lose their spaces
+      if (h.closest('.modal') || h.querySelector('button') || h.textContent.trim().length > 90) return;
       splitWords(h, { n: 0 });
       h.classList.add('avx-words');
       io.observe(h);
@@ -1338,6 +1361,377 @@
     window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(function () { size(); if (reduced) frame(performance.now()); }, 150); });
     onVisible(hero, function () { visible = true; last = 0; start(); }, function () { visible = false; }, 0);
     return wrap;
+  }
+
+  // ---------- Canvas scenes: procedural backdrops drawn edge-free (no image tiles or seams) ----------
+
+  // shared runner: sizes to its box, 30 fps, pauses off-screen and with the motion toggle
+  function canvasScene(cls, draw) {
+    var wrap = el('div', 'avx-cv ' + cls);
+    wrap.setAttribute('aria-hidden', 'true');
+    var canvas = el('canvas', 'avx-cv-canvas');
+    wrap.appendChild(canvas);
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return wrap;
+    var W = 0, H = 0, dpr = 1, raf = 0, visible = false, clock = 0, last = 0, lastDraw = 0, state = {};
+
+    function size() {
+      var r = wrap.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      W = Math.max(1, Math.round(r.width));
+      H = Math.max(1, Math.round(r.height));
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      state.sized = false;
+    }
+
+    function frame(now) {
+      raf = 0;
+      if (!reduced && now - lastDraw < 32) { schedule(); return; }
+      lastDraw = now;
+      clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
+      last = now;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, W, H);
+      draw(ctx, W, H, clock + 4, state, wrap);
+      schedule();
+    }
+
+    function schedule() {
+      if (raf || !visible || reduced) return;
+      if (motionPaused()) { last = 0; setTimeout(schedule, 400); return; }
+      raf = requestAnimationFrame(frame);
+    }
+
+    var resizeT = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(function () { size(); if (reduced) frame(performance.now()); }, 150);
+    });
+    setTimeout(function () {
+      onVisible(wrap, function () {
+        visible = true; last = 0; size();
+        if (reduced) frame(performance.now()); else schedule();
+      }, function () { visible = false; }, 0);
+    }, 0);
+    return wrap;
+  }
+
+  function rgba(c, a) { return 'rgba(' + c + ',' + a.toFixed(3) + ')'; }
+
+  // silk: bundles of hairline strands that twist around each other like a ribbon
+  function silkScene(cls, ribbons) {
+    return canvasScene(cls, function (ctx, W, H, t) {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.lineWidth = 1;
+      var step = W > 900 ? 10 : 8;
+      ribbons.forEach(function (rb) {
+        var grad = ctx.createLinearGradient(0, 0, W, 0);
+        grad.addColorStop(0, rgba(rb.color, 0));
+        grad.addColorStop(0.18, rgba(rb.color, 1));
+        grad.addColorStop(0.82, rgba(rb.color, 1));
+        grad.addColorStop(1, rgba(rb.color, 0));
+        ctx.strokeStyle = grad;
+        for (var i = 0; i < rb.lines; i++) {
+          var k = i / (rb.lines - 1), mid = Math.sin(k * Math.PI);
+          ctx.globalAlpha = rb.alpha * (0.25 + 0.75 * mid);
+          ctx.beginPath();
+          for (var x = -step; x <= W + step; x += step) {
+            var u = x / W, ts = t * rb.speed;
+            var y = H * rb.base +
+              rb.amp * H * Math.sin(u * 6.2 * rb.freq + ts + rb.phase) * Math.cos(u * 3.1 - ts * 0.6 + k * 0.6) +
+              (k - 0.5) * rb.spread * H * Math.sin(u * 5.4 + ts * 0.8 + rb.phase);
+            if (x < 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      });
+    });
+  }
+
+  // contact: a dotted planet rising over the horizon, calls arcing between cities
+  function globeScene(cls) {
+    return canvasScene(cls, function (ctx, W, H, t, s) {
+      if (!s.pts) {
+        s.pts = [];
+        var N = 2000, ga = Math.PI * (3 - Math.sqrt(5));
+        for (var i = 0; i < N; i++) {
+          var y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), th = ga * i;
+          s.pts.push([Math.cos(th) * r, y, Math.sin(th) * r]);
+        }
+        s.arcs = []; s.next = 0;
+      }
+      var R = Math.min(W * 0.36, 460), cx = W / 2, cy = H + R * 0.38;
+      var rot = t * 0.06, tilt = -0.42, cr = Math.cos(rot), sr = Math.sin(rot), ct = Math.cos(tilt), st = Math.sin(tilt);
+      function proj(p, lift) {
+        var x = p[0] * cr - p[2] * sr, z = p[0] * sr + p[2] * cr, y = p[1];
+        var y2 = y * ct - z * st, z2 = y * st + z * ct, m = R * (lift || 1);
+        return [cx + x * m, cy - y2 * m, z2];
+      }
+
+      // atmosphere: a thin lit limb, brightest along the top
+      var limb = ctx.createRadialGradient(cx, cy, R * 0.94, cx, cy, R * 1.16);
+      limb.addColorStop(0, 'rgba(59,130,246,0)');
+      limb.addColorStop(0.3, 'rgba(96,165,250,.22)');
+      limb.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.fillStyle = limb;
+      ctx.beginPath(); ctx.arc(cx, cy, R * 1.16, 0, Math.PI * 2); ctx.fill();
+      var body = ctx.createRadialGradient(cx, cy - R * 0.6, R * 0.1, cx, cy, R);
+      body.addColorStop(0, '#0d1730');
+      body.addColorStop(1, '#05070d');
+      ctx.fillStyle = body;
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(147,197,253,.55)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI * 1.08, Math.PI * 1.92); ctx.stroke();
+
+      // faint graticule: a few parallels and meridians on the front face
+      ctx.lineWidth = 0.8;
+      ctx.strokeStyle = 'rgba(96,165,250,.16)';
+      for (var g = 0; g < 12; g++) {
+        var lat = g < 5 ? -0.6 + g * 0.3 : null, lon = g >= 5 ? (g - 5) * Math.PI / 7 : 0, started = false;
+        ctx.beginPath();
+        for (var u = 0; u <= 48; u++) {
+          var a0 = u / 48 * Math.PI * 2, pp;
+          if (lat !== null) { var rr = Math.sqrt(1 - lat * lat); pp = [Math.cos(a0) * rr, lat, Math.sin(a0) * rr]; }
+          else pp = [Math.cos(a0) * Math.cos(lon), Math.sin(a0), Math.cos(a0) * Math.sin(lon)];
+          var q0 = proj(pp);
+          if (q0[2] < 0) { started = false; continue; }
+          if (started) ctx.lineTo(q0[0], q0[1]); else { ctx.moveTo(q0[0], q0[1]); started = true; }
+        }
+        ctx.stroke();
+      }
+
+      // land-like dots: only the front hemisphere, dimmer towards the limb
+      ctx.fillStyle = '#93c5fd';
+      for (var j = 0; j < s.pts.length; j++) {
+        var q = proj(s.pts[j]);
+        if (q[2] < 0.05 || q[1] > H + 2) continue;
+        ctx.globalAlpha = 0.1 + q[2] * 0.55;
+        var d = 0.7 + q[2] * 1.1;
+        ctx.fillRect(q[0] - d / 2, q[1] - d / 2, d, d);
+      }
+
+      // a new call every ~1.3s: an arc lifts between two visible points and runs end to end
+      if (t > s.next && !reduced) {
+        // endpoints come from the lit, on-screen face of the globe
+        var seen = s.pts.filter(function (p) { var q = proj(p); return q[2] > 0.3 && q[1] < H - 40 && q[0] > 20 && q[0] < W - 20; });
+        if (seen.length > 10) {
+          var a = seen[(Math.random() * seen.length) | 0], b, tries = 0;
+          do { b = seen[(Math.random() * seen.length) | 0]; tries++; }
+          while (tries < 20 && Math.abs(proj(a)[0] - proj(b)[0]) < R * 0.25);
+          s.arcs.push({ a: a, b: b, t: t });
+        }
+        s.next = t + 1.1 + Math.random() * 0.8;
+      }
+      s.arcs = s.arcs.filter(function (c) { return t - c.t < 2.6; });
+      ctx.lineWidth = 1.3;
+      s.arcs.forEach(function (c) {
+        var age = (t - c.t) / 2.6, head = Math.min(1, age * 1.8), tail = Math.max(0, age * 1.8 - 0.8);
+        var fade = age > 0.75 ? (1 - age) / 0.25 : 1, n = 28, pts = [];
+        for (var i = 0; i <= n; i++) {
+          var u = i / n, p = [c.a[0] + (c.b[0] - c.a[0]) * u, c.a[1] + (c.b[1] - c.a[1]) * u, c.a[2] + (c.b[2] - c.a[2]) * u];
+          var len = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]) || 1;
+          pts.push(proj([p[0] / len, p[1] / len, p[2] / len], 1 + Math.sin(u * Math.PI) * 0.22));
+        }
+        var i0 = Math.floor(tail * n), i1 = Math.ceil(head * n);
+        ctx.strokeStyle = 'rgba(191,219,254,' + (0.75 * fade).toFixed(3) + ')';
+        ctx.beginPath();
+        for (i = i0; i <= i1; i++) { if (i === i0) ctx.moveTo(pts[i][0], pts[i][1]); else ctx.lineTo(pts[i][0], pts[i][1]); }
+        ctx.stroke();
+        [pts[0], pts[n]].forEach(function (e, k) {
+          var on = k ? head >= 1 : true;
+          if (!on) return;
+          var ring = ((t - c.t) * 1.6) % 1;
+          ctx.globalAlpha = fade;
+          ctx.fillStyle = '#dbeafe';
+          ctx.fillRect(e[0] - 1.5, e[1] - 1.5, 3, 3);
+          ctx.globalAlpha = fade * (1 - ring) * 0.8;
+          ctx.strokeStyle = '#60a5fa';
+          ctx.beginPath(); ctx.ellipse(e[0], e[1], 3 + ring * 12, (3 + ring * 12) * 0.45, 0, 0, Math.PI * 2); ctx.stroke();
+          ctx.globalAlpha = 1;
+        });
+      });
+    });
+  }
+
+  // sign up: light trails racing in from the horizon along a fan of lanes
+  function lanesScene(cls) {
+    return canvasScene(cls, function (ctx, W, H, t, s) {
+      var LANES = 31, vx = W / 2, vy = H * 0.3, spread = W * 2.4;
+      if (!s.trails) {
+        s.trails = [];
+        for (var i = 0; i < 34; i++) s.trails.push({ lane: (Math.random() * LANES) | 0, p: Math.random(), v: 0.16 + Math.random() * 0.2 });
+      }
+      function at(lane, p) {
+        // p: 0 at the horizon, 1 at the viewer; perspective squeezes the far end
+        var e = p, x0 = vx + (lane / (LANES - 1) - 0.5) * spread;
+        return [vx + (x0 - vx) * e, vy + (H + 40 - vy) * e];
+      }
+      function edge(x) { var d = Math.abs(x - vx) / (W / 2); return Math.max(0, 1 - d * d); }
+
+      // horizon: a thin bright line where the lanes meet
+      var hz = ctx.createLinearGradient(0, 0, W, 0);
+      hz.addColorStop(0, 'rgba(96,165,250,0)');
+      hz.addColorStop(0.5, 'rgba(191,219,254,.55)');
+      hz.addColorStop(1, 'rgba(96,165,250,0)');
+      ctx.fillStyle = hz;
+      ctx.fillRect(0, vy - 0.5, W, 1);
+      ctx.save();
+      ctx.translate(vx, vy);
+      ctx.scale(1, 0.12);
+      var sky = ctx.createRadialGradient(0, 0, 0, 0, 0, W * 0.45);
+      sky.addColorStop(0, 'rgba(96,165,250,.16)');
+      sky.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.fillStyle = sky;
+      ctx.beginPath(); ctx.arc(0, 0, W * 0.45, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+      ctx.lineWidth = 1;
+      for (var l = 0; l < LANES; l++) {
+        var a = at(l, 0.02), b = at(l, 1);
+        var g = ctx.createLinearGradient(a[0], a[1], b[0], b[1]);
+        g.addColorStop(0, 'rgba(59,130,246,0)');
+        g.addColorStop(1, 'rgba(59,130,246,' + (0.22 * edge(b[0])).toFixed(3) + ')');
+        ctx.strokeStyle = g;
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+      }
+
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.lineCap = 'round';
+      s.trails.forEach(function (tr) {
+        tr.p += tr.v * 0.033 * (0.35 + tr.p);
+        if (tr.p > 1.15) { tr.p = 0; tr.lane = (Math.random() * LANES) | 0; tr.v = 0.16 + Math.random() * 0.2; }
+        var head = at(tr.lane, Math.min(1.1, tr.p)), tail = at(tr.lane, Math.max(0, tr.p - 0.05 - tr.p * 0.12));
+        var vis = edge(head[0]) * Math.min(1, tr.p / 0.15);
+        if (vis < 0.02) return;
+        var g = ctx.createLinearGradient(tail[0], tail[1], head[0], head[1]);
+        g.addColorStop(0, 'rgba(96,165,250,0)');
+        g.addColorStop(1, 'rgba(219,234,254,' + (0.9 * vis).toFixed(3) + ')');
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 0.6 + tr.p * 1.8;
+        ctx.beginPath(); ctx.moveTo(tail[0], tail[1]); ctx.lineTo(head[0], head[1]); ctx.stroke();
+      });
+    });
+  }
+
+  // pricing header: an eclipse horizon, a light sweeping slowly along its rim
+  function horizonScene(cls) {
+    return canvasScene(cls, function (ctx, W, H, t, s) {
+      if (!s.stars) {
+        s.stars = [];
+        for (var i = 0; i < 90; i++) s.stars.push([Math.random(), Math.random() * 0.8, Math.random() * Math.PI * 2, 0.4 + Math.random() * 0.9]);
+      }
+      var R = Math.max(W * 0.72, 640), cx = W / 2, cy = H * 0.8 + R;
+      function rimY(x) { return cy - Math.sqrt(Math.max(0, R * R - (x - cx) * (x - cx))); }
+      ctx.fillStyle = '#c7dcff';
+      s.stars.forEach(function (st) {
+        var x = st[0] * W, y = st[1] * H;
+        if (y > rimY(x) - 6) return;
+        ctx.globalAlpha = (0.18 + 0.32 * Math.abs(Math.sin(t * 0.6 + st[2]))) * Math.min(1, Math.abs(x - cx) / (W * 0.18));
+        ctx.fillRect(x, y, st[3], st[3]);
+      });
+      ctx.globalAlpha = 1;
+
+      // the atmosphere: layered faint arcs above the rim (clipped to the sky, the planet stays see-through)
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.clip('evenodd');
+      for (var k = 6; k >= 1; k--) {
+        ctx.strokeStyle = 'rgba(59,130,246,' + (0.09 / k + 0.02).toFixed(3) + ')';
+        ctx.lineWidth = k * 9;
+        ctx.beginPath(); ctx.arc(cx, cy, R + k * 4, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+      }
+      ctx.restore();
+      // just under the rim, a faint lit surface
+      var surf = ctx.createRadialGradient(cx, cy, R - 70, cx, cy, R);
+      surf.addColorStop(0, 'rgba(59,130,246,0)');
+      surf.addColorStop(1, 'rgba(59,130,246,.16)');
+      ctx.fillStyle = surf;
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+
+      // the rim, lit by a highlight that drifts back and forth across the top
+      var sweep = 0.5 + 0.32 * Math.sin(t * 0.18);
+      var g = ctx.createLinearGradient(0, 0, W, 0);
+      g.addColorStop(0, 'rgba(96,165,250,0)');
+      g.addColorStop(Math.max(0.01, sweep - 0.3), 'rgba(96,165,250,.35)');
+      g.addColorStop(sweep, 'rgba(239,246,255,.95)');
+      g.addColorStop(Math.min(0.99, sweep + 0.3), 'rgba(96,165,250,.35)');
+      g.addColorStop(1, 'rgba(96,165,250,0)');
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI * 1.02, Math.PI * 1.98); ctx.stroke();
+
+      // a faint light column where the highlight sits
+      var hx = sweep * W, top = rimY(hx);
+      var col = ctx.createRadialGradient(hx, top, 0, hx, top, H * 0.9);
+      col.addColorStop(0, 'rgba(147,197,253,.16)');
+      col.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.fillStyle = col;
+      ctx.fillRect(0, 0, W, top);
+    });
+  }
+
+  // integrations header: data streams curving in from the edges and feeding the hub
+  function streamsScene(cls, host) {
+    return canvasScene(cls, function (ctx, W, H, t, s, wrap) {
+      if (!s.sized) {
+        s.sized = true;
+        var hub = host.querySelector('.avx-ihub-stage') || host.querySelector('.avx-ihub');
+        var wr = wrap.getBoundingClientRect(), hr = hub && hub.getBoundingClientRect();
+        s.hx = hr && hr.width ? hr.left + hr.width / 2 - wr.left : W * 0.5;
+        s.hy = hr && hr.height ? hr.top + hr.height / 2 - wr.top : H * 0.75;
+        s.lines = [];
+        for (var i = 0; i < 30; i++) {
+          var left = i < 22, k = left ? i / 21 : (i - 22) / 7;
+          s.lines.push({
+            sx: left ? -30 : W + 30, sy: H * (0.04 + k * 0.92),
+            bend: (Math.random() - 0.5) * H * 0.5, ph: Math.random(), v: 0.08 + Math.random() * 0.1
+          });
+        }
+      }
+      var hx = s.hx, hy = s.hy;
+      var halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, Math.min(W, 900) * 0.42);
+      halo.addColorStop(0, 'rgba(59,130,246,.16)');
+      halo.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, W, H);
+
+      function pt(L, u) {
+        var mx = (L.sx + hx) / 2, my = (L.sy + hy) / 2 + L.bend, v = 1 - u;
+        return [v * v * L.sx + 2 * v * u * mx + u * u * hx, v * v * L.sy + 2 * v * u * my + u * u * hy];
+      }
+      ctx.lineWidth = 1;
+      s.lines.forEach(function (L) {
+        var g = ctx.createLinearGradient(L.sx, L.sy, hx, hy);
+        g.addColorStop(0, 'rgba(59,130,246,0)');
+        g.addColorStop(0.5, 'rgba(59,130,246,.09)');
+        g.addColorStop(0.92, 'rgba(96,165,250,.22)');
+        g.addColorStop(1, 'rgba(96,165,250,0)');
+        ctx.strokeStyle = g;
+        ctx.beginPath();
+        for (var i = 0; i <= 32; i++) { var p = pt(L, i / 32); if (i) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]); }
+        ctx.stroke();
+      });
+
+      // a packet rides each stream into the hub
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.lineCap = 'round';
+      s.lines.forEach(function (L) {
+        var u = (t * L.v + L.ph) % 1, u0 = Math.max(0, u - 0.07);
+        var a = pt(L, u0), b = pt(L, u), vis = Math.sin(u * Math.PI);
+        var g = ctx.createLinearGradient(a[0], a[1], b[0], b[1]);
+        g.addColorStop(0, 'rgba(96,165,250,0)');
+        g.addColorStop(1, 'rgba(219,234,254,' + (0.85 * vis).toFixed(3) + ')');
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        for (var i = 0; i <= 6; i++) { var p = pt(L, u0 + (u - u0) * i / 6); if (i) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]); }
+        ctx.stroke();
+      });
+    });
   }
 
   // ---------- Live charts: a tiny SVG chart engine in the site's glass style ----------
@@ -1934,6 +2328,7 @@
     initAuthRing();
     initIntegrationsHub();
     initIntegrationsBackdrop();
+    initPricingHorizon();
     initFlowSequences();
     initCtaFx();
     initCtaWaves();
