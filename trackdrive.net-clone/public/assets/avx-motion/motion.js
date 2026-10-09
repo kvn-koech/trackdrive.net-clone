@@ -1152,7 +1152,7 @@
       var items = Array.prototype.filter.call(group.children, function (c) {
         return c.matches('.spotlight-flow-step, .spotlight-flow-arrow, .flow-node, .flow-arrow, .flow-arrow-down');
       });
-      if (items.length < 2) return;
+      if (items.length < 2 || group.classList.contains('avx-replaced')) return;
       var index = -1, timer = null, lastNode = null;
       function target(item) {
         return item.classList.contains('flow-node') ? item.querySelector('.flow-node-icon') || item : item;
@@ -3009,6 +3009,406 @@
     divider.parentNode.insertBefore(sig, divider);
   }
 
+  // ---------- Homepage feature sections: one small, live product screen each ----------
+
+  // run(at) plays one cycle; at(ms, fn) schedules a beat inside it. The first cycle is
+  // applied instantly (every beat at once, so it shows the cycle's end state) and the
+  // screen is never empty; later cycles only play while in view and motion is on.
+  function demoLoop(host, period, run) {
+    var now = function (ms, f) { f(); };
+    now.instant = true;
+    run(now);
+    if (reduced) return;
+    var timers = [], next = null, on = false;
+    function at(ms, f) { timers.push(setTimeout(f, ms)); }
+    function cycle() {
+      timers = [];
+      if (motionPaused()) { next = setTimeout(cycle, 600); return; }
+      run(at);
+      next = setTimeout(cycle, period);
+    }
+    onVisible(host, function () { if (on) return; on = true; next = setTimeout(cycle, 300); },
+      function () { on = false; clearTimeout(next); timers.forEach(clearTimeout); timers = []; }, 0.2);
+  }
+
+  function demoShell(path, foot) {
+    return el('div', 'avx-console avx-demo',
+      '<div class="avx-cs-bar"><i></i><i></i><i></i><span class="avx-cs-path">app.avortyx.com / <b>' + path + '</b></span>' +
+      '<span class="avx-cs-live"><i class="avx-live-dot"></i>Live</span></div>' +
+      '<div class="avx-cs-body"></div><div class="avx-cs-foot">' + foot + ' · demo data</div>');
+  }
+
+  var DEMO_BUYERS = ['Apex Insurance', 'Northwind Benefits', 'Meridian Health', 'Summit Direct', 'Harbor Home'];
+  var DEMO_NAMES = ['Maria G.', 'Daniel R.', 'Aisha K.', 'Tom B.', 'Lena P.', 'Chris O.', 'Priya S.', 'Marcus L.', 'Elena V.', 'Sam W.'];
+  var DEMO_STATES = ['TX', 'FL', 'CA', 'OH', 'AZ', 'GA', 'NC'];
+  var demoPhone = function () { return '(' + Math.floor(rnd(201, 989)) + ') 555-01' + Math.floor(rnd(10, 99)); };
+  var initials = function (n) { return n.split(' ').map(function (w) { return w[0]; }).join(''); };
+  var clock = function (s) { return '00:' + String(s).padStart(2, '0'); };
+  var pill = function (cls, text) { return '<span class="avx-live-pill avx-pill-' + cls + '">' + text + '</span>'; };
+
+  // Ping/Post: one ping, five buyers bid, the best bid wins and the call is posted
+  function demoPingPost(c) {
+    var body = c.querySelector('.avx-cs-body');
+    body.innerHTML =
+      '<div class="avx-pp-ping"><span class="avx-pp-tag">Ping</span><b class="avx-pp-lead"></b><em class="avx-pp-ms"></em></div>' +
+      '<div class="avx-pp-bids">' + DEMO_BUYERS.map(function (b) {
+        return '<div class="avx-pp-bid"><span>' + b + '</span><b></b></div>';
+      }).join('') + '</div>' +
+      '<div class="avx-pp-post"><span class="avx-pp-tag">Post</span><span class="avx-pp-num"></span>' + pill('ok', 'Connected') + '</div>';
+    var rows = body.querySelectorAll('.avx-pp-bid'), lead = body.querySelector('.avx-pp-lead'),
+      ms = body.querySelector('.avx-pp-ms'), post = body.querySelector('.avx-pp-post'), num = body.querySelector('.avx-pp-num');
+    demoLoop(c, 6600, function (at) {
+      lead.textContent = pick(PP_OFFERS) + ' · caller in ' + pick(DEMO_STATES);
+      ms.textContent = '';
+      post.classList.remove('avx-on');
+      num.textContent = 'Waiting for the winning bid';
+      var bids = [];
+      rows.forEach(function (r) {
+        r.className = 'avx-pp-bid avx-wait';
+        r.querySelector('b').innerHTML = '<i class="avx-pp-dots"><i></i><i></i><i></i></i>';
+        var roll = Math.random();
+        bids.push(roll < 0.16 ? 'cap' : roll < 0.28 ? 'geo' : Math.round(rnd(22, 64)));
+      });
+      if (bids.every(function (b) { return typeof b !== 'number'; })) bids[1] = Math.round(rnd(30, 60));
+      var win = bids.reduce(function (w, b, i) { return typeof b === 'number' && (w < 0 || b > bids[w]) ? i : w; }, -1);
+      [0, 1, 2, 3, 4].sort(function () { return Math.random() - 0.5; }).forEach(function (i, k) {
+        at(400 + k * 260, function () {
+          var b = bids[i];
+          rows[i].className = 'avx-pp-bid ' + (typeof b === 'number' ? 'avx-bid' : 'avx-no');
+          rows[i].querySelector('b').innerHTML = typeof b === 'number' ? '$' + b + '.00' : pill('cap', b === 'geo' ? 'Filtered · geo' : 'Cap reached');
+        });
+      });
+      at(2000, function () {
+        ms.textContent = Math.round(rnd(28, 64)) + ' ms';
+        rows.forEach(function (r, i) { r.classList.add(i === win ? 'avx-win' : 'avx-lose'); });
+      });
+      at(2900, function () {
+        num.innerHTML = '<b>+1 (888) 555-0' + Math.floor(rnd(100, 199)) + '</b> → ' + DEMO_BUYERS[win];
+        post.classList.add('avx-on');
+      });
+    });
+  }
+
+  // Power Dialer: the next lead is dialed the moment the agent is free; machines are skipped
+  function demoDialer(c) {
+    var body = c.querySelector('.avx-cs-body');
+    body.innerHTML =
+      '<div class="avx-dl">' +
+        '<div class="avx-dl-phone">' +
+          '<div class="avx-dl-agent"><i class="avx-av">JM</i><div><b>Jordan M.</b><span class="avx-dl-status"></span></div></div>' +
+          '<div class="avx-dl-call"><span class="avx-dl-who"></span><b class="avx-dl-time">00:00</b></div>' +
+          '<div class="avx-dl-keys"><i class="fa-solid fa-microphone-slash"></i><i class="fa-solid fa-pause"></i>' +
+            '<i class="fa-solid fa-right-left"></i><i class="avx-dl-end fa-solid fa-phone-slash"></i></div>' +
+        '</div>' +
+        '<div class="avx-dl-queue"><h6>Lead queue</h6><div class="avx-dl-rows"></div></div>' +
+      '</div>' +
+      '<div class="avx-demo-stats"><span>Dialed today <b class="avx-dl-n"></b></span><span>Connect rate <b>31%</b></span><span>Avg agent wait <b>4s</b></span></div>';
+    var rowsEl = body.querySelector('.avx-dl-rows'), status = body.querySelector('.avx-dl-status'),
+      who = body.querySelector('.avx-dl-who'), time = body.querySelector('.avx-dl-time'),
+      phone = body.querySelector('.avx-dl-phone'), dialed = body.querySelector('.avx-dl-n');
+    var queue = [], n = 0, dialedN = 412;
+    function lead() { n++; return { name: DEMO_NAMES[n % DEMO_NAMES.length], phone: demoPhone() }; }
+    function setStatus(text, cls) { status.textContent = text; phone.className = 'avx-dl-phone avx-' + cls; }
+    function setRow(i, html) { rowsEl.children[i].querySelector('em').innerHTML = html; }
+    demoLoop(c, 7800, function (at) {
+      // drop the leads handled last cycle, top the queue back up to four
+      queue = queue.filter(function (l) { return !l.done; });
+      while (queue.length < 4) queue.push(lead());
+      rowsEl.innerHTML = queue.map(function (l) {
+        return '<div class="avx-dl-row"><b>' + l.name + '</b><span>' + l.phone + '</span><em>' + pill('bid', 'Queued') + '</em></div>';
+      }).join('');
+      dialed.textContent = fmtInt(dialedN);
+      setStatus('Available', 'free');
+      who.textContent = 'Waiting for the next lead';
+      time.textContent = '00:00';
+      var machine = Math.random() < 0.4, idx = machine ? 1 : 0, up = machine ? 2700 : 1500;
+      at(300, function () { setRow(0, pill('ring', 'Dialing…')); setStatus('Dialing', 'dial'); who.textContent = 'Calling ' + queue[0].name; dialed.textContent = fmtInt(++dialedN); });
+      if (machine) {
+        at(1300, function () { setRow(0, pill('cap', 'Machine · skipped')); queue[0].done = true; });
+        at(1500, function () { setRow(1, pill('ring', 'Dialing…')); who.textContent = 'Calling ' + queue[1].name; dialed.textContent = fmtInt(++dialedN); });
+      }
+      at(up, function () {
+        setRow(idx, pill('ok', 'Human · live'));
+        setStatus('On call', 'call');
+        who.textContent = queue[idx].name + ' · ' + queue[idx].phone;
+      });
+      for (var s = 1; s <= 4; s++) (function (s) { at(up + s * 1000, function () { time.textContent = clock(s); }); })(s);
+      at(up + 4300, function () {
+        setRow(idx, pill('ok', pick(['Sale', 'Qualified', 'Callback set'])));
+        queue[idx].done = true;
+        setStatus('Wrap-up', 'wrap');
+      });
+    });
+  }
+
+  // Call Tracking: a call rides the flow (number -> IVR -> router), two buyers ring, first to answer wins
+  function demoTracking(c) {
+    var body = c.querySelector('.avx-cs-body');
+    var buyers = [['Apex Insurance', 45], ['Northwind', 38], ['Meridian Health', 41]];
+    body.innerHTML =
+      '<div class="avx-ct">' +
+        '<svg class="avx-ct-wires" aria-hidden="true"></svg>' +
+        '<div class="avx-ct-node" data-n="num"><i class="fa-solid fa-hashtag"></i><b>Tracking number</b><span class="avx-ct-sub">+1 (888) 555-0142</span></div>' +
+        '<div class="avx-ct-node" data-n="ivr"><i class="fa-solid fa-list-ol"></i><b>IVR menu</b><span class="avx-ct-sub"></span></div>' +
+        '<div class="avx-ct-node" data-n="route"><i class="fa-solid fa-diagram-project"></i><b>Router</b><span class="avx-ct-sub"></span></div>' +
+        buyers.map(function (b, i) {
+          return '<div class="avx-ct-node avx-ct-buyer" data-n="b' + i + '"><i class="fa-solid fa-building"></i><b>' + b[0] + '</b><span class="avx-ct-sub">$' + b[1] + ' / call</span></div>';
+        }).join('') +
+        '<i class="avx-ct-dot"></i>' +
+      '</div>' +
+      '<div class="avx-ct-status"><span class="avx-ct-pill"></span><span class="avx-ct-line"></span></div>';
+    var stage = body.querySelector('.avx-ct'), svg = stage.querySelector('svg'), dot = stage.querySelector('.avx-ct-dot');
+    var node = function (k) { return stage.querySelector('[data-n="' + k + '"]'); };
+    var P = {};
+    function measure() {
+      ['num', 'ivr', 'route', 'b0', 'b1', 'b2'].forEach(function (k) {
+        var e = node(k);
+        P[k] = { x: e.offsetLeft + e.offsetWidth / 2, y: e.offsetTop + e.offsetHeight / 2, top: e.offsetTop, bottom: e.offsetTop + e.offsetHeight };
+      });
+      svg.setAttribute('viewBox', '0 0 ' + stage.offsetWidth + ' ' + stage.offsetHeight);
+      svg.innerHTML = ['num>ivr', 'ivr>route', 'route>b0', 'route>b1', 'route>b2'].map(function (w) {
+        return '<path data-w="' + w + '" d="' + wire(w) + '"/>';
+      }).join('');
+    }
+    function wire(w) {
+      var a = P[w.split('>')[0]], b = P[w.split('>')[1]];
+      if (w.indexOf('route>') < 0) return 'M' + a.x + ' ' + a.y + 'L' + b.x + ' ' + b.y;
+      var y0 = a.bottom, y1 = b.top, my = (y0 + y1) / 2;
+      return 'M' + a.x + ' ' + a.y + 'L' + a.x + ' ' + y0 + 'C' + a.x + ' ' + my + ' ' + b.x + ' ' + my + ' ' + b.x + ' ' + y1 + 'L' + b.x + ' ' + b.y;
+    }
+    function leg(at, w, dur) {
+      if (at.instant || !dot.animate) return;
+      dot.style.offsetPath = "path('" + wire(w) + "')";
+      dot.animate([{ offsetDistance: '0%', opacity: 1 }, { offsetDistance: '100%', opacity: 1 }], { duration: dur, easing: 'cubic-bezier(.45,0,.25,1)' });
+    }
+    function wireOn(w, on) { var p = svg.querySelector('[data-w="' + w + '"]'); if (p) p.classList.toggle('avx-on', on); }
+    function status(cls, text, line) { body.querySelector('.avx-ct-pill').innerHTML = pill(cls, text); body.querySelector('.avx-ct-line').innerHTML = line; }
+    measure();
+    window.addEventListener('resize', measure);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    demoLoop(c, 6600, function (at) {
+      stage.querySelectorAll('.avx-ct-node').forEach(function (e) { e.classList.remove('avx-on', 'avx-ring', 'avx-won', 'avx-lost'); });
+      svg.querySelectorAll('path').forEach(function (p) { p.classList.remove('avx-on'); });
+      node('ivr').querySelector('.avx-ct-sub').textContent = 'Press 1 for quotes';
+      node('route').querySelector('.avx-ct-sub').textContent = 'Tier 1 · best EPC';
+      var ring = [0, 1, 2].sort(function () { return Math.random() - 0.5; }).slice(0, 2), won = ring[0], lost = ring[1];
+      var caller = demoPhone(), src = pick(CALL_SOURCES);
+      status('ring', 'Incoming', caller + ' · ' + src);
+      node('num').classList.add('avx-on');
+      at(250, function () { wireOn('num>ivr', true); leg(at, 'num>ivr', 700); });
+      at(950, function () { node('ivr').classList.add('avx-on'); node('ivr').querySelector('.avx-ct-sub').textContent = 'Caller pressed 1'; });
+      at(1450, function () { wireOn('ivr>route', true); leg(at, 'ivr>route', 600); });
+      at(2050, function () {
+        node('route').classList.add('avx-on');
+        node('route').querySelector('.avx-ct-sub').textContent = 'Ringing 2 buyers';
+        ring.forEach(function (i) { node('b' + i).classList.add('avx-ring'); wireOn('route>b' + i, true); });
+        status('bid', 'Ringing', 'Simultaneous ring · first to answer wins');
+      });
+      at(3100, function () {
+        node('b' + lost).classList.remove('avx-ring'); node('b' + lost).classList.add('avx-lost'); wireOn('route>b' + lost, false);
+        leg(at, 'route>b' + won, 750);
+      });
+      at(3850, function () {
+        node('b' + won).classList.remove('avx-ring'); node('b' + won).classList.add('avx-won');
+        status('ok', 'Connected', buyers[won][0] + ' answered · <b>+$' + buyers[won][1] + '.00</b>');
+      });
+    });
+  }
+
+  // Lead Automation: a web lead walks a sequence of SMS, wait, email and call until it connects
+  function demoAutomation(c) {
+    var body = c.querySelector('.avx-cs-body');
+    var STEPS = [['comment-sms', 'SMS'], ['clock', 'Wait 5m'], ['envelope', 'Email'], ['phone-volume', 'Call'], ['circle-check', 'Live call']];
+    body.innerHTML =
+      '<div class="avx-la-lead"><i class="avx-av"></i><div><b class="avx-la-name"></b><span class="avx-la-what"></span></div><span class="avx-la-state"></span></div>' +
+      '<div class="avx-la-track"><div class="avx-la-line"><b></b></div>' +
+        STEPS.map(function (s) { return '<div class="avx-la-step"><i class="fa-solid fa-' + s[0] + '"></i><span>' + s[1] + '</span><em></em></div>'; }).join('') +
+      '</div>' +
+      '<div class="avx-la-log"></div>';
+    var steps = body.querySelectorAll('.avx-la-step'), fill = body.querySelector('.avx-la-line b'), log = body.querySelector('.avx-la-log'),
+      state = body.querySelector('.avx-la-state'), n = 3;
+    var mins = 0;
+    function stamp() { mins += 1 + Math.floor(Math.random() * 4); var m = 42 + mins; return '09:' + String(m % 60).padStart(2, '0'); }
+    function note(text) {
+      var r = el('div', 'avx-la-row', '<time>' + stamp() + '</time><span>' + text + '</span>');
+      log.insertBefore(r, log.firstChild);
+      while (log.children.length > 3) log.removeChild(log.lastChild);
+    }
+    function step(i, cls, text) { steps[i].className = 'avx-la-step avx-' + cls; steps[i].querySelector('em').textContent = text; }
+    function progress(i) { fill.style.transform = 'scaleX(' + (i / (STEPS.length - 1)).toFixed(3) + ')'; }
+    demoLoop(c, 8400, function (at) {
+      var name = DEMO_NAMES[n++ % DEMO_NAMES.length], offer = pick(['Solar quote', 'Auto insurance', 'Medicare plan', 'Home warranty']);
+      body.querySelector('.avx-la-name').textContent = name;
+      body.querySelector('.avx-la-what').textContent = offer + ' · web form';
+      body.querySelector('.avx-la-lead .avx-av').textContent = initials(name);
+      state.innerHTML = pill('ring', 'New lead');
+      steps.forEach(function (s, i) { step(i, 'todo', ''); });
+      progress(0);
+      log.innerHTML = '';
+      mins = 0;
+      note('Lead received from web form');
+      var retry = Math.random() < 0.45;
+      at(300, function () { step(0, 'run', 'Sending'); state.innerHTML = pill('bid', 'In sequence'); });
+      at(900, function () { step(0, 'done', 'Delivered'); note('SMS delivered · “Hi ' + name.split(' ')[0] + ', your quote is ready”'); progress(1); });
+      at(1200, function () { step(1, 'run', '5:00'); });
+      at(1700, function () { step(1, 'run', '2:30'); });
+      at(2200, function () { step(1, 'done', 'Waited'); progress(2); });
+      at(2500, function () { step(2, 'run', 'Sending'); });
+      at(3100, function () { step(2, 'done', 'Opened'); note('Email opened'); progress(3); });
+      at(3400, function () { step(3, 'run', 'Ringing'); });
+      var t = 4400;
+      if (retry) {
+        at(4400, function () { step(3, 'run', 'No answer'); note('No answer · retry in 30 min'); });
+        at(5200, function () { step(3, 'run', 'Retry…'); });
+        t = 6000;
+      }
+      at(t, function () { step(3, 'done', 'Answered'); progress(4); });
+      at(t + 400, function () { step(4, 'done', 'Connected'); state.innerHTML = pill('ok', 'Connected'); note('Connected to ' + pick(DEMO_BUYERS)); });
+    });
+  }
+
+  // Agent Control Center: the agent qualifies a caller with a script, transfers, then dispositions
+  function demoAgent(c) {
+    var body = c.querySelector('.avx-cs-body');
+    var Q = ['Valid driver’s license?', 'Vehicles to insure', 'Current insurer', 'ZIP code'];
+    body.innerHTML =
+      '<div class="avx-ag">' +
+        '<div class="avx-ag-caller"><i class="avx-av"></i><b class="avx-ag-name"></b><span class="avx-ag-ph"></span>' +
+          '<span class="avx-ag-src"></span><b class="avx-ag-time">00:00</b></div>' +
+        '<div class="avx-ag-script"><h6>Script · Qualify the caller</h6>' +
+          Q.map(function (q) { return '<div class="avx-ag-q"><span>' + q + '</span><b></b></div>'; }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="avx-ag-actions"><span class="avx-ag-xfer"></span><span class="avx-ag-dispo">' +
+        ['Qualified', 'Callback', 'Not interested'].map(function (d) { return '<i>' + d + '</i>'; }).join('') + '</span></div>';
+    var qs = body.querySelectorAll('.avx-ag-q'), xfer = body.querySelector('.avx-ag-xfer'), time = body.querySelector('.avx-ag-time'),
+      chips = body.querySelectorAll('.avx-ag-dispo i'), n = 5;
+    demoLoop(c, 8200, function (at) {
+      var name = DEMO_NAMES[n++ % DEMO_NAMES.length];
+      body.querySelector('.avx-ag-caller .avx-av').textContent = initials(name);
+      body.querySelector('.avx-ag-name').textContent = name;
+      body.querySelector('.avx-ag-ph').textContent = demoPhone();
+      body.querySelector('.avx-ag-src').textContent = pick(CALL_SOURCES) + ' · Auto insurance';
+      time.textContent = '00:00';
+      qs.forEach(function (q) { q.className = 'avx-ag-q'; q.querySelector('b').textContent = ''; });
+      xfer.className = 'avx-ag-xfer';
+      xfer.innerHTML = '<i class="fa-solid fa-right-left"></i>Transfer to buyer';
+      chips.forEach(function (ch) { ch.className = ''; });
+      var A = ['Yes', String(1 + Math.floor(Math.random() * 3)), pick(['State Farm', 'GEICO', 'Progressive', 'Allstate']), '787' + Math.floor(rnd(10, 99))];
+      for (var s = 1; s <= 7; s++) (function (s) { at(s * 1000, function () { time.textContent = clock(s); }); })(s);
+      qs.forEach(function (q, i) {
+        at(800 + i * 800, function () { q.className = 'avx-ag-q avx-done'; q.querySelector('b').textContent = A[i]; });
+      });
+      var buyer = pick(DEMO_BUYERS);
+      at(4100, function () { xfer.className = 'avx-ag-xfer avx-busy'; xfer.innerHTML = '<i class="fa-solid fa-right-left"></i>Transferring to ' + buyer + '…'; });
+      at(5300, function () { xfer.className = 'avx-ag-xfer avx-done'; xfer.innerHTML = '<i class="fa-solid fa-check"></i>Transferred · ' + buyer; });
+      at(6000, function () { chips[0].className = 'avx-on'; });
+    });
+  }
+
+  var DEMOS = {
+    pingpost: ['ping-post', 'Live auction', demoPingPost],
+    dialer: ['dialer', 'Power dialer', demoDialer],
+    tracking: ['call-flows', 'Inbound call flow', demoTracking],
+    automation: ['automations', 'Lead sequence', demoAutomation],
+    agent: ['agent', 'Agent console', demoAgent]
+  };
+
+  function initFeatureDemos() {
+    document.querySelectorAll('[data-avx-demo]').forEach(function (host) {
+      var d = DEMOS[host.getAttribute('data-avx-demo')];
+      var steps = host.querySelector('.spotlight-flow-steps');
+      if (!d || !steps) return;
+      var c = demoShell(d[0], d[1]);
+      // the step list stays the accessible description of the screen
+      c.setAttribute('role', 'img');
+      c.setAttribute('aria-label', Array.prototype.map.call(steps.querySelectorAll('.spotlight-flow-step'), function (s) {
+        return s.textContent.replace(/\s+/g, ' ').trim();
+      }).join('; '));
+      steps.classList.add('avx-replaced');
+      host.classList.add('avx-has-demo');
+      host.appendChild(c);
+      d[2](c);
+    });
+  }
+
+  // ---------- "More ways to win the call": a small live preview on each card ----------
+
+  var VOICE_SCRIPT = [
+    ['Are you currently insured?', 'Yes, with GEICO.', 'Apex Insurance'],
+    ['How many vehicles are on the policy?', 'Two cars.', 'Northwind Benefits'],
+    ['What ZIP code are you calling from?', '78704.', 'Summit Direct'],
+    ['Are you 65 or older?', 'I turn 66 next month.', 'Meridian Health']
+  ];
+
+  // the voice agent asks, the caller answers, the agent warm-transfers
+  function miniVoice(m) {
+    var ai = m.querySelector('.avx-mv-ai'), caller = m.querySelector('.avx-mv-caller'), tag = m.querySelector('.avx-mv-tag'), n = 0;
+    ai.insertAdjacentHTML('beforeend', '<i class="avx-mv-wave"><i></i><i></i><i></i><i></i></i>');
+    demoLoop(m, 6400, function (at) {
+      var s = VOICE_SCRIPT[n++ % VOICE_SCRIPT.length];
+      ai.querySelector('span').textContent = s[0];
+      caller.querySelector('span').textContent = s[1];
+      tag.innerHTML = '<i class="fa-solid fa-right-left"></i>Warm transfer → ' + s[2];
+      [ai, caller, tag].forEach(function (x) { x.classList.remove('avx-on', 'avx-talk'); });
+      at(200, function () { ai.classList.add('avx-on', 'avx-talk'); });
+      at(1800, function () { ai.classList.remove('avx-talk'); caller.classList.add('avx-on'); });
+      at(3200, function () { tag.classList.add('avx-on'); });
+    });
+  }
+
+  // revenue ticks up while the chart scrolls
+  function miniAnalytics(m) {
+    var chart = makeChart({ type: 'area', points: 24, min: 100, max: 400, start: 240, step: 40, bare: true });
+    m.querySelector('.avx-ma-chart').appendChild(chart.svg);
+    var b = m.querySelector('.avx-ma-kpi b'), em = m.querySelector('.avx-ma-kpi em'), pct = m.querySelector('.avx-ma-src span');
+    var rev = 84210, up = 8.1;
+    ticker(m, 2000, function () {
+      rev += Math.floor(rnd(40, 220));
+      up = Math.max(6, Math.min(11, up + rnd(-0.2, 0.25)));
+      b.textContent = fmtMoney(rev);
+      em.textContent = '▲ ' + up.toFixed(1) + '%';
+      pct.textContent = Math.round(rnd(36, 41)) + '%';
+      chart.update();
+    });
+  }
+
+  var API_CALLS = [
+    ['POST', '/v1/calls', '201', [['id', '"call_8f2k1x"'], ['buyer', '"Apex Insurance"'], ['payout', '45.00']]],
+    ['GET', '/v1/buyers?cap=open', '200', [['count', '4'], ['top', '"Northwind"'], ['bid', '38.00']]],
+    ['POST', '/v1/leads', '202', [['id', '"lead_31qz7a"'], ['sequence', '"solar-quote"'], ['status', '"queued"']]]
+  ];
+
+  // a request goes out and its JSON response arrives line by line
+  function miniApi(m) {
+    var req = m.querySelector('.avx-mapi-req'), code = m.querySelector('.avx-mapi-res code'), n = 0;
+    demoLoop(m, 5600, function (at) {
+      var c = API_CALLS[n++ % API_CALLS.length];
+      var body = c[3].map(function (kv, i) {
+        var v = kv[1].charAt(0) === '"' ? '<s>' + kv[1] + '</s>' : '<u>' + kv[1] + '</u>';
+        return '  <i>"' + kv[0] + '"</i>: ' + v + (i < c[3].length - 1 ? ',' : '');
+      });
+      var lines = ['{'].concat(body, ['}']);
+      req.innerHTML = '<b>' + c[0] + '</b> ' + c[1] + ' <em></em>';
+      code.innerHTML = '';
+      at(450, function () { req.querySelector('em').textContent = c[2] + ' · ' + Math.round(rnd(48, 120)) + ' ms'; });
+      lines.forEach(function (l, i) {
+        at(650 + i * 240, function () { code.insertAdjacentHTML('beforeend', (i ? '\n' : '') + l); });
+      });
+    });
+  }
+
+  var MINIS = { voice: miniVoice, analytics: miniAnalytics, api: miniApi };
+
+  function initMiniPreviews() {
+    document.querySelectorAll('[data-avx-mini]').forEach(function (m) {
+      var f = MINIS[m.getAttribute('data-avx-mini')];
+      if (!f) return;
+      m.classList.add('avx-mini-live');
+      f(m);
+    });
+  }
+
   // ---------- Product tour: one app window, four live views ----------
 
   var CALL_SOURCES = ['Google Ads', 'Meta', 'Bing', 'TikTok', 'Email', 'Affiliate', 'Organic'];
@@ -3034,10 +3434,10 @@
         (st[1] === 'ok' ? '$' + rnd(24, 96).toFixed(2) : '—') + '</td><td><span class="avx-live-pill avx-pill-' + st[1] + '">' + st[0] + '</span></td>';
       return tr;
     }
-    for (var i = 0; i < 6; i++) tb.appendChild(row(false));
+    for (var i = 0; i < 7; i++) tb.appendChild(row(false));
     ticker(c, 1600, function () {
       tb.insertBefore(row(true), tb.firstChild);
-      if (tb.children.length > 6) tb.removeChild(tb.lastChild);
+      if (tb.children.length > 7) tb.removeChild(tb.lastChild);
       k.live = Math.max(28, Math.min(64, k.live + Math.round(rnd(-3, 3))));
       k.today += Math.floor(rnd(1, 5));
       k.conv = Math.max(22, Math.min(33, k.conv + rnd(-.3, .3)));
@@ -3309,7 +3709,7 @@
   function init() {
     // calm set: product UI, data and gentle reveals; no game-like decoration
     var steps = [initMotionToggle, initProgress, initRingbaHero, initLeadFlow, initPlatformFlow,
-      initBottomWaves, initHeroCharts, initPingPostDemos, initProductTour,
+      initBottomWaves, initHeroCharts, initPingPostDemos, initProductTour, initFeatureDemos, initMiniPreviews,
       initBackLinks, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
       initPricingHorizon, initIntegrationWaves, initFlowSequences, initTables, initCounters,
       initOffscreenPause, initScrollHints];
