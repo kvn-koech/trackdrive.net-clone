@@ -498,13 +498,8 @@
     function draw(t) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
-      drawFloor();
-      drawPedestal(pos.leads, false);
-      drawPedestal(pos.hub, true);
-      drawPedestal(pos.revenue, false);
       drawTrack(pos.leads, pos.hub, t);
       drawTrack(pos.hub, pos.revenue, t);
-      drawHubOrbits(t, false);
 
       // a new call every ~0.9s while running
       if (!reduced && !motionPaused() && t > nextBead) {
@@ -545,7 +540,8 @@
         return false;
       });
 
-      // pulse rings where calls land
+      // (pulse rings are kept off in the calm design)
+      rings = [];
       rings = rings.filter(function (r) {
         var a = (t - r.t) / 0.9;
         if (a > 1) return false;
@@ -556,7 +552,6 @@
         return true;
       });
 
-      drawHubOrbits(t, true);
 
       // payout labels rising off the revenue disc
       ctx.font = '600 12px "JetBrains Mono", ui-monospace, monospace';
@@ -1059,10 +1054,6 @@
   ];
 
   function initFlowSequences() {
-    document.querySelectorAll('.flow-node-icon').forEach(function (icon) {
-      var match = ORB_BY_BG.filter(function (m) { return icon.classList.contains(m[0]); })[0];
-      icon.insertBefore(img(match ? match[1] : 'purple-sphere-120.png', 'avx-orb avx-keep'), icon.firstChild);
-    });
     if (reduced) return;
 
     document.querySelectorAll('.spotlight-flow-steps, .flow-diagram, .flow-diagram-vertical').forEach(function (group) {
@@ -1147,22 +1138,26 @@
   var SVGNS = 'http://www.w3.org/2000/svg';
 
   // the avortyx.com vortex mark; rings carry classes so CSS can spin them
+  // the vortex mark as three stacked layers (one per ring) so each ring rotates on the GPU;
+  // animating paths inside an SVG would re-run style and layout every frame
   function vortexSvg(id, className) {
-    var svg = document.createElementNS(SVGNS, 'svg');
-    svg.setAttribute('viewBox', '0 0 64 64');
-    svg.setAttribute('fill', 'none');
-    svg.setAttribute('aria-hidden', 'true');
-    if (className) svg.setAttribute('class', className);
-    svg.innerHTML =
-      '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0%" style="stop-color: var(--vortyx-bright)"/>' +
-      '<stop offset="55%" style="stop-color: var(--vortyx-teal)"/>' +
-      '<stop offset="100%" style="stop-color: var(--vortyx-deep)"/></linearGradient></defs>' +
-      '<path class="avx-vx-r1" d="M52 32a20 20 0 1 1-13.2-18.8" stroke="url(#' + id + ')" stroke-width="3" stroke-linecap="round"/>' +
-      '<path class="avx-vx-r2" d="M44.5 32a12.5 12.5 0 1 1-8.9-11.9" stroke="url(#' + id + ')" stroke-width="2.5" stroke-linecap="round" opacity=".9"/>' +
-      '<path class="avx-vx-r3" d="M38 32a6 6 0 1 1-4.2-5.7" stroke="url(#' + id + ')" stroke-width="2" stroke-linecap="round" opacity=".8"/>' +
-      '<circle cx="32" cy="32" r="1.7" style="fill: var(--vortyx-ultra)"/>';
-    return svg;
+    var wrap = document.createElement('span');
+    wrap.className = 'avx-vxl' + (className ? ' ' + className : '');
+    wrap.setAttribute('aria-hidden', 'true');
+    var RINGS = [['M52 32a20 20 0 1 1-13.2-18.8', 3, 1], ['M44.5 32a12.5 12.5 0 1 1-8.9-11.9', 2.5, .9], ['M38 32a6 6 0 1 1-4.2-5.7', 2, .8]];
+    var html = '';
+    RINGS.forEach(function (r, i) {
+      var gid = id + '-' + (i + 1);
+      html += '<span class="avx-vx-r' + (i + 1) + '"><svg viewBox="0 0 64 64" fill="none">' +
+        '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0%" style="stop-color: var(--vortyx-bright)"/>' +
+        '<stop offset="55%" style="stop-color: var(--vortyx-teal)"/>' +
+        '<stop offset="100%" style="stop-color: var(--vortyx-deep)"/></linearGradient></defs>' +
+        '<path d="' + r[0] + '" stroke="url(#' + gid + ')" stroke-width="' + r[1] + '" stroke-linecap="round" opacity="' + r[2] + '"/></svg></span>';
+    });
+    html += '<span class="avx-vx-c"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="1.7" style="fill: var(--vortyx-ultra)"/></svg></span>';
+    wrap.innerHTML = html;
+    return wrap;
   }
 
   // layout position inside root (ignores transforms, so 3D tilt never skews the wires)
@@ -1394,43 +1389,64 @@
   function initRingbaHero() {
     var hero = document.querySelector('.marketing-hero-simple.hero-constellation-bg');
     if (!hero) return;
-    hero.classList.add('avx-rb-hero');
+    hero.classList.add('avx-rb-hero', 'avx-hero-calm');
 
-    hero.insertBefore(buildSignalSea(hero), hero.firstChild);
+    // a quiet 3D floor: a perspective grid reaching back to a soft horizon
+    hero.insertBefore(el('div', 'avx-hero-3d', '<div class="avx-hero-3d-plane"><div class="avx-hero-3d-grid"></div></div><div class="avx-hero-3d-horizon"></div>'), hero.firstChild);
 
-    var holo = buildVortexCore();
-    hero.appendChild(holo);
+    // two quiet side animations: a call ringing in, and that call being routed to a buyer
+    hero.appendChild(el('div', 'avx-side avx-side-l',
+      '<div class="avx-ringing"><i></i><i></i><i></i><span class="avx-ringing-badge">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>' +
+      '</svg></span></div>' +
+      '<p class="avx-side-cap"><b>Inbound call</b><span>Tracked to its ad, keyword and source</span></p>'));
+    hero.appendChild(el('div', 'avx-side avx-side-r',
+      '<div class="avx-route"><div class="avx-route-line"><i class="avx-route-dot"></i></div>' +
+      '<span class="avx-route-n avx-route-n1"><i></i>Caller</span>' +
+      '<span class="avx-route-n avx-route-n2"><i></i>Avortyx</span>' +
+      '<span class="avx-route-n avx-route-n3"><i></i>Buyer</span></div>' +
+      '<p class="avx-side-cap"><b>Routed in milliseconds</b><span>To the right buyer, by your rules</span></p>'));
+    hero.querySelectorAll('.avx-side').forEach(function (n) { n.setAttribute('aria-hidden', 'true'); });
+  }
 
-    var panel = el('div', 'avx-live',
-      '<div class="avx-live-head"><span><i class="avx-live-dot"></i>Live routing</span><b class="avx-live-count">18 live</b></div>' +
-      '<div class="avx-live-cols"><span>Caller</span><span>Buyer</span><span>Payout</span><span>Status</span></div>' +
-      '<div class="avx-live-rows"></div>' +
-      '<div class="avx-live-spark"></div>' +
-      '<div class="avx-live-foot"><span>Avg. decision</span><b class="avx-live-ms">41 ms</b></div>');
-    panel.setAttribute('aria-hidden', 'true');
-    hero.appendChild(panel);
-    var rows = panel.querySelector('.avx-live-rows');
-    for (var i = 0; i < 5; i++) rows.appendChild(liveRow());
-    if (!reduced) {
-      parallax(hero, holo);
-      var spark = makeChart({ type: 'area', points: 28, min: 40, max: 96, start: 64, step: 9, bare: true });
-      panel.querySelector('.avx-live-spark').appendChild(spark.svg);
-      liveChart(hero, spark, 1600);
-      var live = 18, timer = null;
-      function tick() {
-        if (motionPaused()) { timer = setTimeout(tick, 800); return; }
-        var row = liveRow();
-        row.classList.add('avx-live-new');
-        rows.insertBefore(row, rows.firstChild);
-        if (rows.children.length > 5) rows.removeChild(rows.lastChild);
-        live = Math.max(9, Math.min(31, live + (Math.random() > .5 ? 1 : -1)));
-        panel.querySelector('.avx-live-count').textContent = live + ' live';
-        panel.querySelector('.avx-live-ms').textContent = (34 + Math.floor(Math.random() * 14)) + ' ms';
-        timer = setTimeout(tick, 2200);
-      }
-      onVisible(hero, function () { if (!timer) timer = setTimeout(tick, 1200); },
-        function () { clearTimeout(timer); timer = null; }, 0.1);
+
+  // ---------- Hero: a call attribution card (source, campaign, keyword, buyer, revenue) ----------
+
+  var ATTR_CALLS = [
+    { caller: '(312) 555-0142', number: '(888) 571-0429', source: 'Google Ads', campaign: 'Medicare · Brand', keyword: 'medicare plans near me', buyer: 'Apex Insurance', dur: '6:42', rev: '$64.00' },
+    { caller: '(646) 555-0188', number: '(855) 204-7731', source: 'Meta', campaign: 'Solar · Lookalike', keyword: 'Lead form · solar quote', buyer: 'Summit Solar', dur: '4:18', rev: '$48.00' },
+    { caller: '(213) 555-0117', number: '(877) 390-1158', source: 'Bing Ads', campaign: 'Auto Ins. · Generic', keyword: 'cheap car insurance quote', buyer: 'Pinnacle Auto', dur: '8:05', rev: '$72.00' },
+    { caller: '(404) 555-0163', number: '(866) 742-0915', source: 'Organic', campaign: 'Legal · SEO', keyword: 'injury lawyer free consult', buyer: 'Lakeside Legal', dur: '11:27', rev: '$95.00' }
+  ];
+
+  function attributionCard() {
+    var card = el('div', 'avx-attr');
+    card.setAttribute('aria-hidden', 'true');
+    function fill(c) {
+      card.innerHTML =
+        '<div class="avx-attr-head"><span><i class="avx-live-dot"></i>Call attributed</span><em>just now</em></div>' +
+        '<div class="avx-attr-num"><b>' + c.caller + '</b><span>called tracking number ' + c.number + '</span></div>' +
+        '<dl class="avx-attr-rows">' +
+        '<div><dt>Source</dt><dd>' + c.source + '</dd></div>' +
+        '<div><dt>Campaign</dt><dd>' + c.campaign + '</dd></div>' +
+        '<div><dt>Keyword</dt><dd>' + c.keyword + '</dd></div>' +
+        '<div><dt>Buyer</dt><dd>' + c.buyer + '</dd></div></dl>' +
+        '<div class="avx-attr-path"><span>Ad click</span><i></i><span>Call</span><i></i><span>Routed</span><i></i><span>Converted</span></div>' +
+        '<div class="avx-attr-foot"><span>Duration <b>' + c.dur + '</b></span><span>Revenue <b>' + c.rev + '</b></span></div>';
     }
+    var i = 0;
+    fill(ATTR_CALLS[0]);
+    // a new attributed call every few seconds, swapped with a quiet fade
+    ticker(card, 7000, function () {
+      card.classList.add('avx-attr-out');
+      setTimeout(function () {
+        i = (i + 1) % ATTR_CALLS.length;
+        fill(ATTR_CALLS[i]);
+        card.classList.remove('avx-attr-out');
+      }, 300);
+    });
+    return card;
   }
 
   // ---------- Motion toggle: one button pauses every 3D scene and live feed ----------
@@ -2117,32 +2133,38 @@
       return wrap;
     }
 
-    function shader(type, src) {
-      var s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+    // the shader is compiled only when the sculpture first comes into view: compiling a
+    // ray-marcher can take a noticeable moment, and the footer copy may never be reached
+    var prog = null, U = {};
+    function setup() {
+      function shader(type, src) {
+        var s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+      }
+      var vs = shader(gl.VERTEX_SHADER, VX_VERT), fs = shader(gl.FRAGMENT_SHADER, VX_FRAG);
+      if (!vs || !fs) return false;
+      var p = gl.createProgram();
+      gl.attachShader(p, vs);
+      gl.attachShader(p, fs);
+      gl.linkProgram(p);
+      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) return false;
+      gl.useProgram(p);
+      var buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      var aPos = gl.getAttribLocation(p, 'aPos');
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+      ['uRes', 'uTime', 'uRotT', 'uSpin', 'uCam', 'uSep', 'uAlpha', 'uZoom'].forEach(function (k) { U[k] = gl.getUniformLocation(p, k); });
+      gl.uniform1f(U.uCam, P.cam);
+      gl.uniform1f(U.uSep, P.sep);
+      gl.uniform1f(U.uAlpha, P.alpha);
+      gl.uniform1f(U.uZoom, P.zoom);
+      prog = p;
+      return true;
     }
-    var vs = shader(gl.VERTEX_SHADER, VX_VERT), fs = shader(gl.FRAGMENT_SHADER, VX_FRAG);
-    if (!vs || !fs) { wrap.classList.add('avx-vx3d-off'); return wrap; }
-    var prog = gl.createProgram();
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { wrap.classList.add('avx-vx3d-off'); return wrap; }
-    gl.useProgram(prog);
-    var buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-    var aPos = gl.getAttribLocation(prog, 'aPos');
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-    var U = {};
-    ['uRes', 'uTime', 'uRotT', 'uSpin', 'uCam', 'uSep', 'uAlpha', 'uZoom'].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
-    gl.uniform1f(U.uCam, P.cam);
-    gl.uniform1f(U.uSep, P.sep);
-    gl.uniform1f(U.uAlpha, P.alpha);
-    gl.uniform1f(U.uZoom, P.zoom);
 
     var ctx2 = overlay.getContext('2d');
     var W = 0, H = 0, dpr = 1, raf = 0, visible = false, clock = 0, last = 0, lastDraw = 0;
@@ -2231,7 +2253,7 @@
     var resizeT = 0;
     window.addEventListener('resize', function () {
       clearTimeout(resizeT);
-      resizeT = setTimeout(function () { size(); draw(clock + 3); }, 150);
+      resizeT = setTimeout(function () { if (prog) { size(); draw(clock + 3); } }, 150);
     });
     // a driver can compile the shader yet draw nothing: look at the first frame, and if it
     // came out empty, step aside for the fallback art
@@ -2254,6 +2276,11 @@
     setTimeout(function () {
       onVisible(wrap, function () {
         if (wrap.classList.contains('avx-vx3d-off')) return;
+        if (!prog && !setup()) {
+          wrap.classList.add('avx-vx3d-off');
+          if (onFail) onFail();
+          return;
+        }
         visible = true; last = 0; size();
         if (!selfCheck()) return;
         if (reduced) draw(3); else schedule();
@@ -2466,6 +2493,8 @@
   function initHeroCharts() {
     var hero = document.querySelector('main section.mktg-subpage-hero, main section.pricing-hero');
     if (!hero) return;
+    // the cards are positioned inside the header itself
+    hero.classList.add('avx-fx-host');
     var key = hero.classList.contains('pricing-hero') ? 'pricing' :
       ((hero.querySelector('.mktg-subpage-hero-eyebrow') || {}).textContent || '').trim().toLowerCase();
     // feature pages without a category label fall back on their address
@@ -2496,8 +2525,8 @@
     core.appendChild(stage);
 
     var floor = el('div', 'avx-c-floor');
-    floor.appendChild(rb('pt-hero-rings.webp', 'avx-c-portal'));
-    floor.appendChild(rb('platform-ring-indigo.webp', 'avx-c-dots'));
+    floor.appendChild(rb('pt-hero-rings-blue.webp', 'avx-c-portal'));
+    floor.appendChild(rb('platform-ring-blue.webp', 'avx-c-dots'));
     stage.appendChild(floor);
     stage.appendChild(el('div', 'avx-c-beam'));
 
@@ -2514,7 +2543,7 @@
 
     var heart = el('div', 'avx-c-core');
     heart.appendChild(radar);
-    heart.appendChild(rb('ct-features-img--transparent-702.webp', 'avx-c-neon'));
+    heart.appendChild(rb('neon-ring-blue.webp', 'avx-c-neon'));
     var gyro = el('div', 'avx-c-gyro');
     gyro.appendChild(rb('icon-sphere--blue.webp'));
     heart.appendChild(gyro);
@@ -2741,14 +2770,15 @@
     ARCS.forEach(function (a, i) {
       var ring = el('div', 'avx-vxc-ring avx-vxc-r' + (i + 1));
       var spin = el('div', 'avx-vxc-spin');
-      var html = '';
-      for (var k = 3; k >= 0; k--) {
-        var id = 'avx-vxc-g' + (++vxcId);
-        html += '<svg viewBox="0 0 64 64" fill="none" style="--k:' + k + '">' +
-          (k ? '' : '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eff6ff"/>' +
-            '<stop offset=".45" stop-color="#60a5fa"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>') +
-          '<path d="' + a[0] + '" stroke="' + (k ? SIDES[k - 1] : 'url(#' + id + ')') + '" stroke-width="' + a[1] + '" stroke-linecap="round"/></svg>';
-      }
+      var id = 'avx-vxc-g' + (++vxcId);
+      // back layer: the ring's darker edge; front layer: the gradient face with a soft glow
+      var html = '<svg viewBox="0 0 64 64" fill="none" style="--k:1"><path d="' + a[0] + '" stroke="' + SIDES[1] +
+        '" stroke-width="' + a[1] + '" stroke-linecap="round"/></svg>' +
+        '<svg viewBox="0 0 64 64" fill="none" style="--k:0"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="#eff6ff"/><stop offset=".45" stop-color="#60a5fa"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient>' +
+        '<filter id="' + id + 'f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.1" result="b"/>' +
+        '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' +
+        '<path d="' + a[0] + '" stroke="url(#' + id + ')" stroke-width="' + a[1] + '" stroke-linecap="round" filter="url(#' + id + 'f)"/></svg>';
       spin.innerHTML = html;
       ring.appendChild(spin);
       g.appendChild(ring);
@@ -2782,18 +2812,7 @@
     av.dataset.t = 'Av';
     word.appendChild(av);
     var o = el('span', 'avx-sig-o');
-    var vx = vortex3d('footer', sig, function () {
-      var letter = el('span', 'avx-sig-txt', 'o');
-      letter.dataset.t = 'o';
-      o.parentNode.replaceChild(letter, o);
-    });
-    if (vx.classList.contains('avx-vx3d-off')) {
-      // no GPU: a plain letter in the same finish
-      o = el('span', 'avx-sig-txt', 'o');
-      o.dataset.t = 'o';
-    } else {
-      o.appendChild(vx);
-    }
+    o.appendChild(vortexSvg('avx-vx-sig', 'avx-sig-mark'));
     word.appendChild(o);
     var rest = el('span', 'avx-sig-txt', 'rtyx');
     rest.dataset.t = 'rtyx';
@@ -2966,8 +2985,8 @@
   function initPortals() {
     document.querySelectorAll('.avx-sbg-rings-tilt').forEach(function (tilt) {
       tilt.innerHTML = '';
-      tilt.appendChild(rb('pt-hero-rings.webp', 'avx-portal-rings'));
-      tilt.appendChild(rb('pt-hero-shine.webp', 'avx-portal-shine'));
+      tilt.appendChild(rb('pt-hero-rings-blue.webp', 'avx-portal-rings'));
+      tilt.appendChild(rb('pt-hero-shine-blue.webp', 'avx-portal-shine'));
     });
   }
 
@@ -3098,50 +3117,29 @@
     }
   }
 
+  // start-up runs in short slices (same order), yielding between them so a tap or click
+  // is never stuck behind one long block of set-up work
   function init() {
-    try {
-      build();
-    } finally {
-      reveal();
+    // calm set: product UI, data and gentle reveals; no game-like decoration
+    var steps = [initMotionToggle, initProgress, initRingbaHero, initLeadFlow, initPlatformFlow,
+      initBottomWaves, initHeroCharts, initPingPostDemos, initProductTour,
+      initBackLinks, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
+      initPricingHorizon, initFlowSequences, initTables, initCounters,
+      initOffscreenPause, initScrollHints];
+    if (!reduced) steps.push(initReveal);
+    // apply a saved pause to scenes built after the toggle
+    steps.push(function () { setPaused(motionPaused()); });
+    var i = 0;
+    function slice() {
+      var t0 = performance.now();
+      while (i < steps.length && performance.now() - t0 < 10) {
+        try { steps[i](); } catch (e) { if (window.console) console.error(e); }
+        i++;
+      }
+      if (i < steps.length) setTimeout(slice, 0);
+      else reveal();
     }
-  }
-
-  function build() {
-    initMotionToggle();
-    initProgress();
-    initRingbaHero();
-    initLeadFlow();
-    initPlatformFlow();
-    initHeadingFx();
-    initBottomWaves();
-    initSectionBackgrounds();
-    initPortals();
-    initHeroCharts();
-    initPingPostDemos();
-    initProductTour();
-    initBackLinks();
-    initWindows();
-    initSignature();
-    initAuthRing();
-    initIntegrationsHub();
-    initIntegrationsBackdrop();
-    initPricingHorizon();
-    initFlowSequences();
-    initCtaFx();
-    initCtaWaves();
-    initAurora();
-    initTables();
-    initCounters();
-    initOffscreenPause();
-    initScrollHints();
-    initSpotlight();
-    if (!reduced) {
-      initHeadingWords();
-      initReveal();
-      initTilt();
-      initMagnetic();
-    }
-    setPaused(motionPaused()); // apply a saved pause to scenes built after the toggle
+    slice();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

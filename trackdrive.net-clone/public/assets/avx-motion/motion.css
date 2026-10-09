@@ -4424,11 +4424,7 @@ html.avx-booted main {
   height: 100%;
   overflow: visible;
   /* stacked copies step back in depth: the ring has a real edge when it tilts */
-  transform: translateZ(calc(var(--k) * -2.4px));
-}
-
-.avx-vxc-spin svg:last-child {
-  filter: drop-shadow(0 0 5px rgba(59, 130, 246, .55));
+  transform: translateZ(calc(var(--k) * -3.5px));
 }
 
 /* each ring precesses like a spinning top: the direction of its tilt sweeps round in a
@@ -4509,4 +4505,581 @@ body:has(#okCookie) .avx-motion-toggle {
 .avx-sbg-orb {
   -webkit-mask-image: linear-gradient(180deg, transparent, #000 15%, #000 72%, transparent 96%);
   mask-image: linear-gradient(180deg, transparent, #000 15%, #000 72%, transparent 96%);
+}
+
+/* ---------- Performance: the hero art ships pre-tinted, so nothing is re-filtered per frame ---------- */
+
+.avx-c-portal,
+.avx-c-dots,
+.avx-c-neon,
+.avx-portal-rings,
+.avx-portal-shine {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* the neon ring's soft edge is baked into the image */
+.avx-c-neon {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* spinning pieces keep their own layer, rasterised once */
+.avx-c-portal,
+.avx-c-dots,
+.avx-c-neon,
+.avx-c-slot,
+.avx-c-sat,
+.avx-vxc-dot {
+  will-change: transform;
+}
+
+/* the beam's softness comes from its gradients alone (a blur filter would be redone every frame) */
+.avx-c-beam {
+  filter: none !important;
+  background: linear-gradient(0deg, rgba(96, 165, 250, .42), rgba(96, 165, 250, .07) 70%, transparent) !important;
+}
+
+/* ---------- Vortex mark as GPU layers (hub, features diagram) ---------- */
+
+.avx-vxl {
+  position: relative;
+  display: inline-block;
+  flex: none;
+}
+
+.avx-vxl > span {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.avx-vxl > span > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* the glow on the features diagram's vortex was a filter redone every frame */
+.avx-plat-vortex {
+  filter: none !important;
+}
+
+/* =====================================================================
+   Calm, product-first design: simple hero background, flat product cards,
+   no game-like decoration (assessor feedback: read as call tracking)
+   ===================================================================== */
+
+/* ---------- Hero: a simple, quiet background ---------- */
+
+.avx-hero-calm.hero-constellation-bg,
+[data-bs-theme="dark"] .avx-hero-calm.hero-constellation-bg {
+  background:
+    radial-gradient(900px 460px at 50% -6%, rgba(37, 99, 235, .22), transparent 70%),
+    linear-gradient(180deg, #0c0e15 0%, #0a0b10 100%) !important;
+}
+
+.avx-hero-calm .hero-home__bg,
+.avx-hero-calm .avx-intro,
+.avx-hero-calm .hero-rings {
+  display: none !important;
+}
+
+/* the live routing panel sits flat, like a real app window */
+.avx-hero-calm .avx-live {
+  transform: translateY(-50%) !important;
+}
+
+/* ---------- Hero: call attribution card ---------- */
+
+.avx-attr {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .avx-attr {
+    position: absolute;
+    top: 50%;
+    right: max(1.5vw, calc(50% - 720px));
+    z-index: 1;
+    display: block;
+    width: clamp(290px, 23vw, 340px);
+    padding: 14px 16px 14px;
+    border: 1px solid var(--avx-glass-border, rgba(148, 163, 184, .16));
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(20, 23, 30, .94), rgba(14, 16, 22, .94));
+    box-shadow: 0 30px 80px -24px rgba(0, 0, 0, .8);
+    font: 500 12px/1.35 var(--avx-font-sans, "Inter", sans-serif);
+    color: #bbc2cf;
+    text-align: left;
+    transform: translateY(-50%);
+    transition: opacity .3s ease;
+  }
+}
+
+.avx-attr.avx-attr-out {
+  opacity: 0;
+}
+
+.avx-attr-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font: 600 10px/1 var(--avx-font-mono, monospace);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #e5e9f0;
+}
+
+.avx-attr-head span {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.avx-attr-head em {
+  font-style: normal;
+  letter-spacing: .04em;
+  text-transform: none;
+  color: #6ee7b7;
+}
+
+.avx-attr-num b {
+  display: block;
+  font: 700 19px/1.15 var(--avx-font-display, sans-serif);
+  letter-spacing: -.01em;
+  color: #f3f5f8;
+}
+
+.avx-attr-num span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #8a93a3;
+}
+
+.avx-attr-rows {
+  margin: 12px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, .06);
+}
+
+.avx-attr-rows div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.avx-attr-rows dt {
+  font-weight: 500;
+  color: #7f8aa0;
+}
+
+.avx-attr-rows dd {
+  margin: 0;
+  overflow: hidden;
+  font-weight: 600;
+  color: #e5e9f0;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* the call's journey, every step completed */
+.avx-attr-path {
+  display: flex;
+  align-items: center;
+  margin: 12px 0 10px;
+  font: 600 9px/1 var(--avx-font-mono, monospace);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #93c5fd;
+}
+
+.avx-attr-path span {
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(59, 130, 246, .14);
+  white-space: nowrap;
+}
+
+.avx-attr-path i {
+  flex: 1;
+  height: 1px;
+  margin: 0 3px;
+  background: rgba(96, 165, 250, .45);
+}
+
+.avx-attr-foot {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, .06);
+  color: #8a93a3;
+}
+
+.avx-attr-foot b {
+  margin-left: 4px;
+  color: #f3f5f8;
+}
+
+.avx-attr-foot span:last-child b {
+  color: #6ee7b7;
+}
+
+/* ---------- "Everything you need": flat, still diagram; only the calls move ---------- */
+
+.avx-flow3d .avx-flow-tilt,
+.avx-flow3d:not(.avx-seen) .avx-flow-tilt {
+  transform: none !important;
+  transition: none !important;
+}
+
+.avx-flow3d .hero-simple-flow {
+  animation: none !important;
+  transform: none !important;
+}
+
+.avx-flow3d.avx-lf2 .hero-simple-node-icon,
+.avx-flow3d.avx-lf2 .hero-simple-hub-icon {
+  background: linear-gradient(180deg, #2f6fe8, #1d4ed8) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 12px 28px -14px rgba(0, 0, 0, .8) !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.avx-flow3d.avx-lf2 .hero-simple-hub-icon {
+  background: linear-gradient(180deg, #16213d, #0d1428) !important;
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, .35), 0 12px 28px -14px rgba(0, 0, 0, .8) !important;
+}
+
+.avx-flow3d.avx-lf2 .hero-simple-node-icon::before,
+.avx-flow3d.avx-lf2 .hero-simple-hub-icon::before {
+  display: none;
+}
+
+.avx-flow3d.avx-lf2 .avx-hit {
+  scale: 1;
+}
+
+.avx-lf-canvas {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* the hub's mark stays still; the calls arriving are the motion */
+.avx-lf2 .avx-hub-mark,
+.avx-lf2 .avx-hub-mark > span {
+  animation: none !important;
+}
+
+/* ---------- Footer: the wordmark with the logo mark as its "o", no light sweep ---------- */
+
+.avx-sig-txt::after {
+  display: none;
+}
+
+.avx-sig-mark {
+  position: absolute;
+  inset: -4%;
+  width: 108%;
+  height: 108%;
+}
+
+/* wide Bootstrap gutters (row g-5) poke past the container on phones: never let a section widen the page */
+main > section {
+  overflow-x: clip;
+}
+
+/* ---------- Hero: a very simple background ---------- */
+
+.avx-hero-calm.hero-constellation-bg,
+[data-bs-theme="dark"] .avx-hero-calm.hero-constellation-bg {
+  background: #0b0d12 !important;
+}
+
+/* ---------- Hero: two simple side animations ---------- */
+
+.avx-side {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .avx-side {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    display: block;
+    width: 250px;
+    text-align: center;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .avx-side-l { left: max(3vw, calc(50% - 670px)); }
+  .avx-side-r { right: max(3vw, calc(50% - 670px)); }
+}
+
+.avx-side-cap {
+  margin: 22px 0 0 !important;
+  font-size: 13px !important;
+  line-height: 1.45;
+  color: #8a93a3 !important;
+}
+
+.avx-side-cap b {
+  display: block;
+  margin-bottom: 2px;
+  font: 600 15px/1.3 var(--avx-font-sans, "Inter", sans-serif);
+  color: #e5e9f0;
+}
+
+/* left: a call ringing in */
+.avx-ringing {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+}
+
+.avx-ringing i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border: 1.5px solid rgba(96, 165, 250, .55);
+  border-radius: 50%;
+  opacity: 0;
+  animation: avxRingOut 2.4s cubic-bezier(.2, .7, .3, 1) infinite;
+}
+
+.avx-ringing i:nth-child(2) { animation-delay: .8s; }
+.avx-ringing i:nth-child(3) { animation-delay: 1.6s; }
+
+@keyframes avxRingOut {
+  0% { opacity: .75; transform: scale(.95); }
+  100% { opacity: 0; transform: scale(2.05); }
+}
+
+.avx-ringing-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #3576f0, #1e4fd0);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 14px 30px -12px rgba(0, 0, 0, .8);
+  color: #fff;
+}
+
+.avx-ringing-badge svg {
+  width: 30px;
+  height: 30px;
+  animation: avxPhoneShake 2.4s ease-in-out infinite;
+}
+
+@keyframes avxPhoneShake {
+  0%, 24%, 100% { transform: rotate(0deg); }
+  4% { transform: rotate(-14deg); }
+  8% { transform: rotate(12deg); }
+  12% { transform: rotate(-10deg); }
+  16% { transform: rotate(7deg); }
+  20% { transform: rotate(-3deg); }
+}
+
+/* right: that call routed caller -> Avortyx -> buyer */
+.avx-route {
+  position: relative;
+  width: 220px;
+  height: 150px;
+  margin: 0 auto;
+}
+
+.avx-route-line {
+  position: absolute;
+  top: 66px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(96, 165, 250, .25), rgba(96, 165, 250, .5), rgba(96, 165, 250, .25));
+}
+
+.avx-route-dot {
+  position: absolute;
+  top: -4px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #eff6ff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, .35);
+  animation: avxRouteDot 3.2s ease-in-out infinite;
+}
+
+@keyframes avxRouteDot {
+  0% { opacity: 0; transform: translateX(0); }
+  6% { opacity: 1; transform: translateX(0); }
+  40%, 52% { opacity: 1; transform: translateX(110px); }
+  86% { opacity: 1; transform: translateX(220px); }
+  96%, 100% { opacity: 0; transform: translateX(220px); }
+}
+
+.avx-route-n {
+  position: absolute;
+  top: 54px;
+  width: 80px;
+  margin-left: -40px;
+  padding-top: 34px;
+  font: 600 10px/1 var(--avx-font-mono, monospace);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #93c5fd;
+}
+
+.avx-route-n1 { left: 0; }
+.avx-route-n2 { left: 50%; }
+.avx-route-n3 { left: 100%; }
+
+.avx-route-n i {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  border-radius: 50%;
+  background: #0f1a33;
+  box-shadow: inset 0 0 0 1.5px rgba(96, 165, 250, .6);
+  opacity: .6;
+}
+
+.avx-route-n2 i {
+  background: linear-gradient(180deg, #3576f0, #1e4fd0);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+
+.avx-route-n1 i { animation: avxRouteN1 3.2s ease-in-out infinite; }
+.avx-route-n2 i { animation: avxRouteN2 3.2s ease-in-out infinite; }
+.avx-route-n3 i { animation: avxRouteN3 3.2s ease-in-out infinite; }
+
+@keyframes avxRouteN1 {
+  0%, 10% { opacity: 1; transform: scale(1.18); }
+  22%, 100% { opacity: .6; transform: scale(1); }
+}
+
+@keyframes avxRouteN2 {
+  0%, 32% { opacity: .75; transform: scale(1); }
+  42%, 54% { opacity: 1; transform: scale(1.18); }
+  66%, 100% { opacity: .75; transform: scale(1); }
+}
+
+@keyframes avxRouteN3 {
+  0%, 78% { opacity: .6; transform: scale(1); }
+  88%, 97% { opacity: 1; transform: scale(1.18); }
+  100% { opacity: .6; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-ringing i,
+  .avx-ringing-badge svg,
+  .avx-route-dot,
+  .avx-route-n i {
+    animation: none !important;
+  }
+
+  .avx-ringing i:first-child { opacity: .5; }
+}
+
+/* ---------- Hero: a simple 3D floor behind the headline ---------- */
+
+.avx-hero-calm {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.avx-hero-calm > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.avx-hero-3d {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 520px;
+  perspective-origin: 50% 30%;
+}
+
+/* the floor: tilted far back, fading out towards the horizon and the sides */
+.avx-hero-3d-plane {
+  position: absolute;
+  right: -60%;
+  bottom: -8%;
+  left: -60%;
+  height: 120%;
+  overflow: hidden;
+  transform-origin: 50% 100%;
+  transform: rotateX(76deg);
+  -webkit-mask-image:
+    linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .6) 35%, transparent 80%),
+    radial-gradient(60% 100% at 50% 100%, #000 40%, transparent 85%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .6) 35%, transparent 80%),
+    radial-gradient(60% 100% at 50% 100%, #000 40%, transparent 85%);
+  mask-composite: intersect;
+}
+
+/* the grid is one cell taller than the floor and slides by one cell: a seamless, GPU-only drift */
+.avx-hero-3d-grid {
+  position: absolute;
+  top: -72px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    linear-gradient(rgba(96, 165, 250, .32) 1.5px, transparent 1.5px) 0 0 / 72px 72px,
+    linear-gradient(90deg, rgba(96, 165, 250, .32) 1.5px, transparent 1.5px) 0 0 / 72px 72px;
+  will-change: transform;
+  animation: avxHeroFloor 7s linear infinite;
+}
+
+@keyframes avxHeroFloor {
+  to { transform: translateY(72px); }
+}
+
+/* a faint line of light where the floor meets the sky */
+.avx-hero-3d-horizon {
+  position: absolute;
+  top: 52%;
+  left: 15%;
+  right: 15%;
+  height: 120px;
+  margin-top: -60px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(59, 130, 246, .14), transparent 70%);
+}
+
+@media (max-width: 767.98px) {
+  .avx-hero-3d-plane {
+    height: 90%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-hero-3d-grid {
+    animation: none;
+  }
 }
