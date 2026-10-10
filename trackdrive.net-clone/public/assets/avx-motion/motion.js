@@ -710,6 +710,7 @@
 
   // pages whose closing scene is drawn on canvas instead of the baked wave art
   var BOTTOM_SCENES = {
+    '/features/data_export.html': function () { return dataSeaScene('avx-cv-bottom avx-cv-sea'); },
     '/p/contact.html': function () { return globeScene('avx-cv-bottom avx-cv-globe'); },
     '/sign_up.html': function () { return lanesScene('avx-cv-bottom avx-cv-lanes'); },
     '/features/integrations.html': function () {
@@ -1331,6 +1332,67 @@
           }
           ctx.stroke();
         }
+      });
+    });
+  }
+
+  // data exports: a rolling sea of data points in perspective, with packets running along
+  // its rows; every dot fades toward the sides and the horizon, so the scene has no edges
+  function dataSeaScene(cls) {
+    return canvasScene(cls, function (ctx, W, H, t, s) {
+      var COLS = W > 900 ? 96 : 56, ROWS = 26;
+      if (!s.packets) {
+        s.packets = [];
+        for (var p = 0; p < 9; p++) s.packets.push({ row: 6 + Math.floor(Math.random() * (ROWS - 8)), u: Math.random(), v: 0.05 + Math.random() * 0.07 });
+      }
+      var horizon = H * 0.18, near = H * 1.02;
+      function point(c, r) {
+        var d = r / (ROWS - 1);                         // 0 far .. 1 near
+        var depth = 0.35 + 0.65 * d;
+        var u = c / (COLS - 1) - 0.5;
+        var x = W / 2 + u * W * (0.75 + 0.85 * d);
+        var wave = Math.sin(u * 7 + t * 0.55 + d * 3.2) * 0.55 + Math.sin(u * 3.1 - t * 0.35 + d * 5.1) * 0.45;
+        var y = horizon + (near - horizon) * Math.pow(d, 1.35) - wave * H * 0.13 * depth;
+        // fade toward the sides and the horizon
+        var side = Math.max(0, 1 - Math.pow(Math.abs(u) * 2, 2.4));
+        return { x: x, y: y, a: side * Math.pow(d, 0.9), s: depth, wave: wave };
+      }
+      ctx.globalCompositeOperation = 'lighter';
+      // faint row lines give the surface its shape
+      for (var r = 0; r < ROWS; r += 2) {
+        ctx.beginPath();
+        for (var c = 0; c < COLS; c++) { var q = point(c, r); if (c) ctx.lineTo(q.x, q.y); else ctx.moveTo(q.x, q.y); }
+        var g = ctx.createLinearGradient(0, 0, W, 0);
+        var la = (0.08 + 0.2 * (r / ROWS)).toFixed(3);
+        g.addColorStop(0, 'rgba(59,130,246,0)'); g.addColorStop(0.5, 'rgba(59,130,246,' + la + ')'); g.addColorStop(1, 'rgba(59,130,246,0)');
+        ctx.strokeStyle = g; ctx.lineWidth = 1; ctx.stroke();
+      }
+      // the points: brighter on the crests
+      for (r = 0; r < ROWS; r++) {
+        for (c = 0; c < COLS; c++) {
+          q = point(c, r);
+          if (q.a < 0.02) continue;
+          var lit = 0.45 + 0.55 * Math.max(0, q.wave);
+          ctx.fillStyle = 'rgba(' + Math.round(96 + 110 * lit) + ',' + Math.round(150 + 75 * lit) + ',255,' + Math.min(1, q.a * 1.25 * lit).toFixed(3) + ')';
+          var z = 1 + 2.2 * q.s;
+          ctx.fillRect(q.x - z / 2, q.y - z / 2, z, z);
+        }
+      }
+      // packets: exported rows streaming toward the right
+      s.packets.forEach(function (pk) {
+        pk.u += pk.v * 0.016;
+        if (pk.u > 1.05) { pk.u = -0.05; pk.row = 6 + Math.floor(Math.random() * (ROWS - 8)); }
+        var cf = pk.u * (COLS - 1), c0 = Math.max(0, Math.min(COLS - 2, Math.floor(cf)));
+        var a = point(c0, pk.row), b = point(c0 + 1, pk.row), f = cf - c0;
+        var x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f, al = a.a;
+        if (al < 0.05) return;
+        var rad = 10 + 10 * a.s;
+        var glow = ctx.createRadialGradient(x, y, 0, x, y, rad);
+        glow.addColorStop(0, 'rgba(191,219,254,' + (0.9 * al).toFixed(3) + ')');
+        glow.addColorStop(0.25, 'rgba(96,165,250,' + (0.45 * al).toFixed(3) + ')');
+        glow.addColorStop(1, 'rgba(59,130,246,0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(x - rad, y - rad, rad * 2, rad * 2);
       });
     });
   }
