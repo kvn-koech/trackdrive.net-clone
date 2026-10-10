@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HD8WHHFDQV"></script>
   <script>
@@ -27,36 +28,33 @@
   <style>html.avx-boot main { opacity: 0 !important; animation: none !important; }</style>
   <link rel="preload" href="/assets/avx-motion/motion.js" as="script">
   <link rel="preload" href="/assets/avx-motion/motion.css" as="style">
-  <link rel="preload" href="/assets/avx-theme/theme.css?v=2" as="style">
+  <link rel="preload" href="/assets/avx-theme/theme.css?v=3" as="style">
 
   <title>
       AI Call Transcriptions - Summaries, Sentiment &amp; Live Analytics | Avortyx
 
 
   </title>
-
-
-  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:site_name" content="Avortyx Prototype">
   <meta property="og:type" content="website">
   <meta property="og:title" content="AI Call Transcriptions - Summaries, Sentiment &amp; Live Analytics | Avortyx">
   <meta property="og:description" content="Every recorded call, transcribed and enriched with AI: summaries, sentiment, topics, and a live analytics dashboard.">
   <meta property="og:url" content="https://avortyx-prototype.vercel.app/features/transcriptions.html">
-  <meta property="og:image" content="https://avortyx-prototype.vercel.app/og-image.png">
+  <meta property="og:image" content="https://avortyx-prototype.vercel.app/og-image.png?v=2">
   <meta property="og:image:width" content="1440">
   <meta property="og:image:height" content="756">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="AI Call Transcriptions - Summaries, Sentiment &amp; Live Analytics | Avortyx">
   <meta name="twitter:description" content="Every recorded call, transcribed and enriched with AI: summaries, sentiment, topics, and a live analytics dashboard.">
-  <meta name="twitter:image" content="https://avortyx-prototype.vercel.app/og-image.png">
+  <meta name="twitter:image" content="https://avortyx-prototype.vercel.app/og-image.png?v=2">
   <meta name="application-name" content="Avortyx Prototype">
   <meta name="apple-mobile-web-app-title" content="Avortyx Prototype">
   <meta name="description" content="Every recorded call, transcribed and enriched with AI: summaries, sentiment, topics, and a live analytics dashboard.">
 
 
 
-    <link rel="canonical" href="/features/transcriptions.html">
+    <link rel="canonical" href="https://avortyx-prototype.vercel.app/features/transcriptions.html">
 
   <link rel="icon" href="/favicon.ico?v=3" sizes="48x48" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
@@ -69,14 +67,15 @@
   <script defer="" src="https://kit.fontawesome.com/97f7211792.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Inter+Tight:wght@500..800&family=JetBrains+Mono:wght@400..600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Inter+Tight:wght@500..800&family=JetBrains+Mono:wght@400..600&display=swap"></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500..800&family=JetBrains+Mono:wght@400..600&display=optional" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap"></noscript>
 
-  <link rel="stylesheet" href="https://d15iqiuf0x41sc.cloudfront.net/assets/homepage-c8012cd3e5f36c72a6b0d84f765761516a73e1ce38de268efeca6a6833769c1d.css" media="all" />
-  <script src="https://d15iqiuf0x41sc.cloudfront.net/assets/homepage-ccf194c6e49e498a071f19add478b7d9e46bbb086358e92d1b8d07c290992369.js" defer></script>
+  <link rel="stylesheet" href="/assets/avx-site/site.css" media="all" />
+  <script src="/assets/avx-site/site.js" defer></script>
 
   
-  <link rel="stylesheet" href="/assets/avx-theme/theme.css?v=2" />
+  <link rel="stylesheet" href="/assets/avx-theme/theme.css?v=3" />
   <link rel="stylesheet" href="/assets/avx-motion/motion.css" />
   <script src="/assets/avx-motion/motion.js" defer></script>
 </head>
@@ -172,7 +171,7 @@
   <p>From the waveform to the words &mdash; every call is playable, readable, and searchable.</p>
 
   <p class="text-muted mb-1"><strong>Hear and read every call.</strong> An interactive waveform of both channels with sentiment markers, above a timestamped, speaker-labeled transcript &mdash; click any line to jump the audio there.</p>
-  <img alt="Interactive call recording waveform with sentiment markers above a speaker-labeled AI transcript" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/features-transcription-call-recording-49ceb863f5552b7602be1f3294da1c975403315bd3ba9a0e0ddc060b6bf159ca.jpg" />
+  <img alt="Interactive call recording waveform with sentiment markers above a speaker-labeled AI transcript" class="img-fluid rounded border mb-4" src="/assets/avx-shots/features-transcription-call-recording.webp" width="1800" height="1311" srcset="/assets/avx-shots/features-transcription-call-recording-1000.webp 1000w, /assets/avx-shots/features-transcription-call-recording.webp 1800w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" />
 
   <div class="row">
     <div class="col-md-6">
@@ -199,28 +198,28 @@
   </div>
 
   <p class="text-muted mb-1"><strong>Live in one click.</strong> Enable transcription from the setup page and pick the AI features each offer runs.</p>
-  <img alt="Transcription setup page with a one-click enable button and AI feature overview" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/features-transcription-setup-c4b122edbad563ebdd0ec2bf6a9276bdf736b40b7d1d72d7cd4e4de9e5e20943.jpg" />
+  <img alt="Transcription setup page with a one-click enable button and AI feature overview" class="img-fluid rounded border mb-4" src="/assets/avx-shots/features-transcription-setup.webp" width="2000" height="1476" srcset="/assets/avx-shots/features-transcription-setup-1000.webp 1000w, /assets/avx-shots/features-transcription-setup.webp 2000w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" />
 
   <h3>Search Every Transcript</h3>
   <p>Every word of every call, filterable and findable.</p>
 
   <p class="text-muted mb-1"><strong>Slice every transcript.</strong> Sentiment, topics, keywords, talk ratio, language, and cost &mdash; every column filterable and sortable.</p>
-  <img alt="Transcripts grid with AI insight columns, filters, and sorting" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/features-transcription-transcripts-grid-5e459e0ccd5e417d6667c8a9ff841dee80817fe6d45575b04c09beb501916d4c.jpg" />
+  <img alt="Transcripts grid with AI insight columns, filters, and sorting" class="img-fluid rounded border mb-4" src="/assets/avx-shots/features-transcription-transcripts-grid.webp" width="1800" height="831" srcset="/assets/avx-shots/features-transcription-transcripts-grid-1000.webp 1000w, /assets/avx-shots/features-transcription-transcripts-grid.webp 1800w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" />
 
   <p class="text-muted mb-1"><strong>Find the exact moment.</strong> Search every word spoken on every call, with keyword hits highlighted in context.</p>
-  <img alt="Searching every transcript for a phrase with highlighted matches" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/features-transcription-transcripts-search-e8eededc9615bf200c0c159fdf15cce11f083249166e9768b3143a3254a19f4a.jpg" />
+  <img alt="Searching every transcript for a phrase with highlighted matches" class="img-fluid rounded border mb-4" src="/assets/avx-shots/features-transcription-transcripts-search.webp" width="2000" height="1414" srcset="/assets/avx-shots/features-transcription-transcripts-search-1000.webp 1000w, /assets/avx-shots/features-transcription-transcripts-search.webp 2000w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" />
 
   <h3>Live Transcription Analytics</h3>
   <p>Every transcript rolls up into a live dashboard the moment it finishes processing &mdash; no exports, no waiting.</p>
 
   <p class="text-muted mb-1"><strong>One dashboard for every call.</strong> Volume, sentiment mix, talk ratio, minutes, and cost &mdash; live.</p>
-  <img alt="Avortyx transcription analytics dashboard" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/features-transcription-analytics-dashboard-8736e71f9904b38ed994d5e5188cb663498d62feb123c84e59a05165d25ccbaa.jpg" />
+  <img alt="Avortyx transcription analytics dashboard" class="img-fluid rounded border mb-4" src="/assets/avx-shots/features-transcription-analytics-dashboard.webp" width="1800" height="1320" srcset="/assets/avx-shots/features-transcription-analytics-dashboard-1000.webp 1000w, /assets/avx-shots/features-transcription-analytics-dashboard.webp 1800w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" />
 
   <p class="text-muted mb-1"><strong>Watch sentiment move.</strong> Positive-sentiment trends by offer, agent, and call center.</p>
-  <img alt="Positive-sentiment trends by offer, agent, and call center" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/features-transcription-sentiment-breakdowns-865cd9f930937086a53c745034215b163afc07c3917ea60ca379e38da3c3f503.jpg" />
+  <img alt="Positive-sentiment trends by offer, agent, and call center" class="img-fluid rounded border mb-4" src="/assets/avx-shots/features-transcription-sentiment-breakdowns.webp" width="1800" height="1320" srcset="/assets/avx-shots/features-transcription-sentiment-breakdowns-1000.webp 1000w, /assets/avx-shots/features-transcription-sentiment-breakdowns.webp 1800w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" />
 
   <p class="text-muted mb-1"><strong>Map it.</strong> Positive sentiment by caller state on a U.S. heat map.</p>
-  <img alt="Positive sentiment by caller state on a U.S. heat map" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/features-transcription-sentiment-by-state-47f2343c4cfa7ff53c17b272d25389d9b2c0e44d453a07644361516c736e2c25.jpg" />
+  <img alt="Positive sentiment by caller state on a U.S. heat map" class="img-fluid rounded border mb-4" src="/assets/avx-shots/features-transcription-sentiment-by-state.webp" width="1800" height="1320" srcset="/assets/avx-shots/features-transcription-sentiment-by-state-1000.webp 1000w, /assets/avx-shots/features-transcription-sentiment-by-state.webp 1800w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" />
 
   <h3>Simple Per-Minute Pricing</h3>
   <p>
@@ -254,7 +253,7 @@ curl -H "Authorization: Basic BASE64_ENCODED_PUBLIC_KEY_AND_PRIVATE_KEY" \
 </section>
   <section class="marketing-cta-band">
   <div class="marketing-cta-band__bg" aria-hidden="true">
-    <img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/constellation-light-33dc8d522be07d051bde04620da8741af1d4aa6a922bac4fa2ed96e39c42215e.svg" />
+    <img alt="" src="/assets/avx-site/img/constellation-light.svg" />
   </div>
   <div class="container">
     <h2 class="marketing-cta-band__title">Ready to get started?</h2>

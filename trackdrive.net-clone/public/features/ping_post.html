@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HD8WHHFDQV"></script>
   <script>
@@ -27,36 +28,33 @@
   <style>html.avx-boot main { opacity: 0 !important; animation: none !important; }</style>
   <link rel="preload" href="/assets/avx-motion/motion.js" as="script">
   <link rel="preload" href="/assets/avx-motion/motion.css" as="style">
-  <link rel="preload" href="/assets/avx-theme/theme.css?v=2" as="style">
+  <link rel="preload" href="/assets/avx-theme/theme.css?v=3" as="style">
 
   <title>
       Ping/Post &amp; Real-Time Bidding (RTB) | Lead Distribution &amp; Buyer Matching | Avortyx
 
 
   </title>
-
-
-  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:site_name" content="Avortyx Prototype">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Ping/Post &amp; Real-Time Bidding (RTB) | Lead Distribution &amp; Buyer Matching | Avortyx">
   <meta property="og:description" content="Real-time bidding (RTB) for inbound leads and calls. Publishers PING to find available buyers and collect live bids, then POST to get a tracking number and…">
   <meta property="og:url" content="https://avortyx-prototype.vercel.app/features/ping_post.html">
-  <meta property="og:image" content="https://avortyx-prototype.vercel.app/og-image.png">
+  <meta property="og:image" content="https://avortyx-prototype.vercel.app/og-image.png?v=2">
   <meta property="og:image:width" content="1440">
   <meta property="og:image:height" content="756">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Ping/Post &amp; Real-Time Bidding (RTB) | Lead Distribution &amp; Buyer Matching | Avortyx">
   <meta name="twitter:description" content="Real-time bidding (RTB) for inbound leads and calls. Publishers PING to find available buyers and collect live bids, then POST to get a tracking number and…">
-  <meta name="twitter:image" content="https://avortyx-prototype.vercel.app/og-image.png">
+  <meta name="twitter:image" content="https://avortyx-prototype.vercel.app/og-image.png?v=2">
   <meta name="application-name" content="Avortyx Prototype">
   <meta name="apple-mobile-web-app-title" content="Avortyx Prototype">
   <meta name="description" content="Real-time bidding (RTB) for inbound leads and calls. Publishers PING to find available buyers and collect live bids, then POST to get a tracking number and…">
 
 
 
-    <link rel="canonical" href="/features/ping_post.html">
+    <link rel="canonical" href="https://avortyx-prototype.vercel.app/features/ping_post.html">
 
   <link rel="icon" href="/favicon.ico?v=3" sizes="48x48" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
@@ -69,14 +67,15 @@
   <script defer="" src="https://kit.fontawesome.com/97f7211792.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Inter+Tight:wght@500..800&family=JetBrains+Mono:wght@400..600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Inter+Tight:wght@500..800&family=JetBrains+Mono:wght@400..600&display=swap"></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500..800&family=JetBrains+Mono:wght@400..600&display=optional" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap"></noscript>
 
-  <link rel="stylesheet" href="https://d15iqiuf0x41sc.cloudfront.net/assets/homepage-c8012cd3e5f36c72a6b0d84f765761516a73e1ce38de268efeca6a6833769c1d.css" media="all" />
-  <script src="https://d15iqiuf0x41sc.cloudfront.net/assets/homepage-ccf194c6e49e498a071f19add478b7d9e46bbb086358e92d1b8d07c290992369.js" defer></script>
+  <link rel="stylesheet" href="/assets/avx-site/site.css" media="all" />
+  <script src="/assets/avx-site/site.js" defer></script>
 
   
-  <link rel="stylesheet" href="/assets/avx-theme/theme.css?v=2" />
+  <link rel="stylesheet" href="/assets/avx-theme/theme.css?v=3" />
   <link rel="stylesheet" href="/assets/avx-motion/motion.css" />
   <script src="/assets/avx-motion/motion.js" defer></script>
 </head>
@@ -176,17 +175,17 @@
   <p>Every ping is measured &mdash; follow the funnel from ping to conversion, by buyer and traffic source, as leads flow in.</p>
 
   <p class="text-muted mb-1"><strong>One dashboard for the whole auction.</strong> Live KPIs, the ping-to-post funnel, and per-buyer economics in a single view.</p>
-  <a class="zoomable-marketing-image" target="_blank" rel="noopener" href="https://d15iqiuf0x41sc.cloudfront.net/assets/ping-post/ping-post-dashboard-1-bcd424aa2c46112e6a3d561a69c801881ff89fa2ce85aa604dd9a11d385aa857.jpg"><img alt="Real-Time Ping/Post dashboard: KPIs and the ping-to-post funnel" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/ping-post/ping-post-dashboard-1-bcd424aa2c46112e6a3d561a69c801881ff89fa2ce85aa604dd9a11d385aa857.jpg" /></a>
+  <a class="zoomable-marketing-image" target="_blank" rel="noopener" href="/assets/avx-shots/ping-post-dashboard-1.webp"><img alt="Real-Time Ping/Post dashboard: KPIs and the ping-to-post funnel" class="img-fluid rounded border mb-4" src="/assets/avx-shots/ping-post-dashboard-1.webp" width="1400" height="1032" srcset="/assets/avx-shots/ping-post-dashboard-1-1000.webp 1000w, /assets/avx-shots/ping-post-dashboard-1.webp 1400w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" /></a>
 
   <p class="text-muted mb-1"><strong>Know your economics by source.</strong> Pings, accept rate, conversions, revenue, payout, and margin for every publisher and offer.</p>
-  <a class="zoomable-marketing-image" target="_blank" rel="noopener" href="https://d15iqiuf0x41sc.cloudfront.net/assets/ping-post/ping-post-dashboard-3-43b75171447e3682b98fafc71ca80fb485c768ed325fc28f67f7541911c9c6f9.jpg"><img alt="Per-traffic-source performance: accept rate, conversions, revenue, payout, and margin" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/ping-post/ping-post-dashboard-3-43b75171447e3682b98fafc71ca80fb485c768ed325fc28f67f7541911c9c6f9.jpg" /></a>
+  <a class="zoomable-marketing-image" target="_blank" rel="noopener" href="/assets/avx-shots/ping-post-dashboard-3.webp"><img alt="Per-traffic-source performance: accept rate, conversions, revenue, payout, and margin" class="img-fluid rounded border mb-4" src="/assets/avx-shots/ping-post-dashboard-3.webp" width="1400" height="1029" srcset="/assets/avx-shots/ping-post-dashboard-3-1000.webp 1000w, /assets/avx-shots/ping-post-dashboard-3.webp 1400w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" /></a>
 
   <p class="text-muted mb-1"><strong>Watch it happen live.</strong> A real-time log of every ping &mdash; the buyers it matched, the winning bid, and the accept/reject outcome.</p>
-  <a class="zoomable-marketing-image" target="_blank" rel="noopener" href="https://d15iqiuf0x41sc.cloudfront.net/assets/ping-post/ping-post-dashboard-5-e96b7d2dacd158edc14cd2bb0fb813b890259c380e8abbe0c6fc1f5278343677.jpg"><img alt="Real-Time ping log: each ping with its offer, source, matched buyers, winning bid, and status" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/ping-post/ping-post-dashboard-5-e96b7d2dacd158edc14cd2bb0fb813b890259c380e8abbe0c6fc1f5278343677.jpg" /></a>
+  <a class="zoomable-marketing-image" target="_blank" rel="noopener" href="/assets/avx-shots/ping-post-dashboard-5.webp"><img alt="Real-Time ping log: each ping with its offer, source, matched buyers, winning bid, and status" class="img-fluid rounded border mb-4" src="/assets/avx-shots/ping-post-dashboard-5.webp" width="1400" height="1019" srcset="/assets/avx-shots/ping-post-dashboard-5-1000.webp 1000w, /assets/avx-shots/ping-post-dashboard-5.webp 1400w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" /></a>
 
   <h3>Usage &amp; Cost Tracking</h3>
   <p><strong>Know what you're spending.</strong> Avortyx tracks every inbound webhook request with daily usage and cost, broken down by offer and traffic source.</p>
-  <a class="zoomable-marketing-image" target="_blank" rel="noopener" href="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/ping-post/ping-post-analytics-1-0e4ac5d31df77bd2a7c00c5d10c159b9ea6bf0be31bc2271f7797f84c66f0654.png"><img alt="Ping/Post usage over time with a daily usage and cost breakdown" class="img-fluid rounded border mb-4" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/ping-post/ping-post-analytics-1-0e4ac5d31df77bd2a7c00c5d10c159b9ea6bf0be31bc2271f7797f84c66f0654.png" /></a>
+  <a class="zoomable-marketing-image" target="_blank" rel="noopener" href="/assets/avx-shots/ping-post-analytics-1.webp"><img alt="Ping/Post usage over time with a daily usage and cost breakdown" class="img-fluid rounded border mb-4" src="/assets/avx-shots/ping-post-analytics-1.webp" width="2000" height="419" srcset="/assets/avx-shots/ping-post-analytics-1-1000.webp 1000w, /assets/avx-shots/ping-post-analytics-1.webp 2000w" sizes="(min-width: 992px) 860px, 100vw" loading="lazy" decoding="async" /></a>
 
 
 
@@ -199,7 +198,7 @@
 </section>
   <section class="marketing-cta-band">
   <div class="marketing-cta-band__bg" aria-hidden="true">
-    <img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/constellation-light-33dc8d522be07d051bde04620da8741af1d4aa6a922bac4fa2ed96e39c42215e.svg" />
+    <img alt="" src="/assets/avx-site/img/constellation-light.svg" />
   </div>
   <div class="container">
     <h2 class="marketing-cta-band__title">Ready to get started?</h2>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HD8WHHFDQV"></script>
   <script>
@@ -24,35 +25,33 @@
       setTimeout(lift, 12000);
     })();
   </script>
-  <style>html.avx-boot main { opacity: 0 !important; animation: none !important; }</style>
+  <style>html.avx-boot main > :not(.marketing-hero-simple) { opacity: 0 !important; animation: none !important; }</style>
   <link rel="preload" href="/assets/avx-motion/motion.js" as="script">
   <link rel="preload" href="/assets/avx-motion/motion.css" as="style">
-  <link rel="preload" href="/assets/avx-theme/theme.css?v=2" as="style">
+  <link rel="preload" href="/assets/avx-theme/theme.css?v=3" as="style">
 
   <title>Avortyx Prototype · Call Tracking &amp; Lead Automation</title>
-
-
-  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:site_name" content="Avortyx Prototype">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Avortyx Prototype">
   <meta property="og:description" content="Call tracking, real-time ping/post and lead-to-call automation in one platform. Route every call to the right buyer and see the revenue behind it.">
   <meta property="og:url" content="https://avortyx-prototype.vercel.app/">
-  <meta property="og:image" content="https://avortyx-prototype.vercel.app/og-image.png">
+  <meta property="og:image" content="https://avortyx-prototype.vercel.app/og-image.png?v=2">
   <meta property="og:image:width" content="1440">
   <meta property="og:image:height" content="756">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Avortyx Prototype">
   <meta name="twitter:description" content="Call tracking, real-time ping/post and lead-to-call automation in one platform. Route every call to the right buyer and see the revenue behind it.">
-  <meta name="twitter:image" content="https://avortyx-prototype.vercel.app/og-image.png">
+  <meta name="twitter:image" content="https://avortyx-prototype.vercel.app/og-image.png?v=2">
   <meta name="application-name" content="Avortyx Prototype">
   <meta name="apple-mobile-web-app-title" content="Avortyx Prototype">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://avortyx-prototype.vercel.app/#org","name":"Avortyx","url":"https://avortyx-prototype.vercel.app/","logo":"https://avortyx-prototype.vercel.app/favicon-192.png"},{"@type":"SoftwareApplication","name":"Avortyx","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://avortyx-prototype.vercel.app/","image":"https://avortyx-prototype.vercel.app/og-image.png?v=2","description":"Call tracking, real-time ping/post and lead-to-call automation in one platform. Route every call to the right buyer and see the revenue behind it.","publisher":{"@id":"https://avortyx-prototype.vercel.app/#org"}}]}</script>
   <meta name="description" content="Call tracking, real-time ping/post and lead-to-call automation in one platform. Route every call to the right buyer and see the revenue behind it.">
 
 
 
-    <link rel="canonical" href="#">
+    <link rel="canonical" href="https://avortyx-prototype.vercel.app/">
 
   <link rel="icon" href="/favicon.ico?v=3" sizes="48x48" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
@@ -65,10 +64,11 @@
   <script defer="" src="https://kit.fontawesome.com/97f7211792.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Inter+Tight:wght@500..800&family=JetBrains+Mono:wght@400..600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Inter+Tight:wght@500..800&family=JetBrains+Mono:wght@400..600&display=swap"></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500..800&family=JetBrains+Mono:wght@400..600&display=optional" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap"></noscript>
 
-  <link rel="stylesheet" href="https://d15iqiuf0x41sc.cloudfront.net/assets/homepage-c8012cd3e5f36c72a6b0d84f765761516a73e1ce38de268efeca6a6833769c1d.css" media="all" />
+  <link rel="stylesheet" href="/assets/avx-site/site.css" media="all" />
   <style>
     /* Hero rings: centered behind the h1, tilted in 3D and slowly spinning */
     .hero-heading { position: relative; }
@@ -104,10 +104,10 @@
       .hero-rings-tilt { transform: rotateX(24deg); }
     }
   </style>
-  <script src="https://d15iqiuf0x41sc.cloudfront.net/assets/homepage-ccf194c6e49e498a071f19add478b7d9e46bbb086358e92d1b8d07c290992369.js" defer></script>
+  <script src="/assets/avx-site/site.js" defer></script>
 
   
-  <link rel="stylesheet" href="/assets/avx-theme/theme.css?v=2" />
+  <link rel="stylesheet" href="/assets/avx-theme/theme.css?v=3" />
   <link rel="stylesheet" href="/assets/avx-motion/motion.css" />
   <script src="/assets/avx-motion/motion.js" defer></script>
 </head>
@@ -186,6 +186,7 @@
   <div class="container">
     <div class="row justify-content-center text-center">
       <div class="col-lg-9">
+        <a class="avx-ribbon" href="/features/transcriptions.html"><span>AI</span>Summaries, sentiment and topics on every call<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         <div class="hero-heading">
           <div class="hero-rings" aria-hidden="true">
             <div class="hero-rings-tilt">
@@ -207,19 +208,42 @@
           <a href="/p/request_demo.html" class="btn btn-outline-td-green btn-lg fw-semibold">Request Demo</a>
           <a href="#product-tour" class="btn avx-btn-ghost avx-hero-ghost">See it live <span aria-hidden="true">&darr;</span></a>
         </div>
-        <div class="d-flex flex-wrap gap-4 gap-md-5 mt-5 justify-content-center hero-proof-stats">
-          <div>
-            <div class="fs-3 fw-bold lh-1">99.9%</div>
-            <small class="text-muted">Uptime</small>
-          </div>
-          <div>
-            <div class="fs-3 fw-bold lh-1">85ms</div>
-            <small class="text-muted">Avg routing time</small>
-          </div>
-          <div>
-            <div class="fs-3 fw-bold lh-1">10+</div>
-            <small class="text-muted">Buyer match rules</small>
-          </div>
+      </div>
+    </div>
+    <!-- live decision: one call scored, bid on and routed; motion.js replays it with new calls -->
+    <div class="avx-decide" data-avx-decide aria-label="Live demo: an incoming call is scored for intent and sentiment, three buyers bid, and it is routed to the winner">
+      <div class="avx-dc-bar">
+        <span class="avx-dc-live"><i class="avx-live-dot"></i>Live decision</span>
+        <span class="avx-dc-id" data-dc="id">Call #48,213</span>
+        <span class="avx-dc-time">Decided in <b data-dc="ms">84ms</b></span>
+      </div>
+      <div class="avx-dc-steps">
+        <div class="avx-dc-step avx-dc-on" data-step="call">
+          <p class="avx-dc-k"><span>01</span>Incoming call</p>
+          <p class="avx-dc-num" data-dc="num">(312) 555-0142</p>
+          <p class="avx-dc-meta" data-dc="meta">Google Ads &middot; Medicare &middot; Chicago, IL</p>
+          <p class="avx-dc-quote" data-dc="quote">&ldquo;Hi, I&rsquo;m looking to switch my Medicare plan before the deadline.&rdquo;</p>
+        </div>
+        <div class="avx-dc-step avx-dc-on" data-step="score">
+          <p class="avx-dc-k"><span>02</span>AI score</p>
+          <div class="avx-dc-intent"><b data-dc="intent">0.91</b><span>intent</span></div>
+          <div class="avx-dc-meter"><i data-dc="intent-bar" style="--v: .91"></i></div>
+          <p class="avx-dc-sent">Sentiment <b data-dc="sent">Positive</b></p>
+          <p class="avx-dc-tags" data-dc="tags"><span>Plan switch</span><span>Deadline</span><span>Ready to enroll</span></p>
+        </div>
+        <div class="avx-dc-step avx-dc-on" data-step="bids">
+          <p class="avx-dc-k"><span>03</span>Buyers bidding</p>
+          <ul class="avx-dc-bids" data-dc="bids">
+            <li class="avx-dc-win"><span>Apex Insurance</span><i style="--v: 1"></i><b>$64</b></li>
+            <li><span>Meridian Health</span><i style="--v: .9"></i><b>$58</b></li>
+            <li><span>Northwind Benefits</span><i style="--v: .81"></i><b>$52</b></li>
+          </ul>
+        </div>
+        <div class="avx-dc-step avx-dc-on" data-step="route">
+          <p class="avx-dc-k"><span>04</span>Routed</p>
+          <p class="avx-dc-to"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><b data-dc="winner">Apex Insurance</b></p>
+          <p class="avx-dc-meta" data-dc="why">Highest bid &middot; intent above 0.80 &middot; licensed in IL</p>
+          <p class="avx-dc-pay"><span>Payout</span><b data-dc="pay">$64.00</b></p>
         </div>
       </div>
     </div>
@@ -252,7 +276,7 @@
     <p class="avx-trust-label">Plugs into the carriers and ad platforms you already run</p>
   </div>
   <div class="avx-marquee">
-    <ul class="avx-marquee-track avx-marquee-color"><li><img alt="Twilio" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/twilio-0b98cc930031db95706be9ca3dbb4d143b22c4416dfd1b0d33ce559bed5b312f.png" loading="lazy" decoding="async"></li><li><img alt="Telnyx" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/telnyx-564b8722392f0bf1b119daa51a08488560582e43dd07c227b4fa70310fe21386.png" loading="lazy" decoding="async"></li><li><img alt="Plivo" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/plivo-35fc37923e230463beea5008a723828975cca42ee2deefc37d3a466cf9665631.png" loading="lazy" decoding="async"></li><li><img alt="Google Ads" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/ga-282ea0ae2a4210bd0b3facf6d99b9d8c733dabd6f6bd1d195135b4c4e3a18557.png" loading="lazy" decoding="async"></li><li><img alt="Voluum" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/voluum-e51ff4b11aa9073ef5c7d794225ef9bbd3c646beee0150204473fd0655a1db9d.png" loading="lazy" decoding="async"></li><li><img alt="Cake" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/cake-956ab3f8f9fb4dac14fd4fd16550491ce19aa774d513179e472aeb8a1dc41a36.png" loading="lazy" decoding="async"></li><li><img alt="Linktrust" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/linktrust-9a3f2423affaa658a70f29a5b7f56fac494ca5fead8b67b091a59da5c94a1bb3.png" loading="lazy" decoding="async"></li><li><img alt="HasOffers" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/hasoffers-227afa2ae382c2d35b071b2981cecc7d4c339d0fbb4d2e0888260c626a373115.png" loading="lazy" decoding="async"></li><li><img alt="OnSIP" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/onsip-16c77cbfae1e51eb79f9386a484ba346cebfc8720b51a230a5e24880f2410d42.png" loading="lazy" decoding="async"></li><li><img alt="Avoxi" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/avoxi-5d3e44f6b5c92be53796d6f27664b0eb6f99ef8c63ff83a525e4ef5246237b24.png" loading="lazy" decoding="async"></li><li><img alt="Zadarma" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zadarma-217d211820c3d5c48fe3a94db4f2f76eca3c58aec47c64dce4dc9cbc26658516.png" loading="lazy" decoding="async"></li><li><img alt="Sonetel" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/sonetel-e9621ef69e1edc2bf3c6a87ee7f0d1714a3e004c710f6f1900636b1f8a2961d7.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/twilio-0b98cc930031db95706be9ca3dbb4d143b22c4416dfd1b0d33ce559bed5b312f.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/telnyx-564b8722392f0bf1b119daa51a08488560582e43dd07c227b4fa70310fe21386.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/plivo-35fc37923e230463beea5008a723828975cca42ee2deefc37d3a466cf9665631.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/ga-282ea0ae2a4210bd0b3facf6d99b9d8c733dabd6f6bd1d195135b4c4e3a18557.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/voluum-e51ff4b11aa9073ef5c7d794225ef9bbd3c646beee0150204473fd0655a1db9d.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/cake-956ab3f8f9fb4dac14fd4fd16550491ce19aa774d513179e472aeb8a1dc41a36.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/linktrust-9a3f2423affaa658a70f29a5b7f56fac494ca5fead8b67b091a59da5c94a1bb3.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/hasoffers-227afa2ae382c2d35b071b2981cecc7d4c339d0fbb4d2e0888260c626a373115.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/onsip-16c77cbfae1e51eb79f9386a484ba346cebfc8720b51a230a5e24880f2410d42.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/avoxi-5d3e44f6b5c92be53796d6f27664b0eb6f99ef8c63ff83a525e4ef5246237b24.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zadarma-217d211820c3d5c48fe3a94db4f2f76eca3c58aec47c64dce4dc9cbc26658516.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/sonetel-e9621ef69e1edc2bf3c6a87ee7f0d1714a3e004c710f6f1900636b1f8a2961d7.png" loading="lazy" decoding="async"></li></ul>
+    <ul class="avx-marquee-track avx-marquee-color"><li><img alt="Twilio" src="/assets/avx-site/img/twilio.png" loading="lazy" decoding="async"></li><li><img alt="Telnyx" src="/assets/avx-site/img/telnyx.png" loading="lazy" decoding="async"></li><li><img alt="Plivo" src="/assets/avx-site/img/plivo.png" loading="lazy" decoding="async"></li><li><img alt="Google Ads" src="/assets/avx-site/img/ga.png" loading="lazy" decoding="async"></li><li><img alt="Voluum" src="/assets/avx-site/img/voluum.png" loading="lazy" decoding="async"></li><li><img alt="Cake" src="/assets/avx-site/img/cake.png" loading="lazy" decoding="async"></li><li><img alt="Linktrust" src="/assets/avx-site/img/linktrust.png" loading="lazy" decoding="async"></li><li><img alt="HasOffers" src="/assets/avx-site/img/hasoffers.png" loading="lazy" decoding="async"></li><li><img alt="OnSIP" src="/assets/avx-site/img/onsip.png" loading="lazy" decoding="async"></li><li><img alt="Avoxi" src="/assets/avx-site/img/avoxi.png" loading="lazy" decoding="async"></li><li><img alt="Zadarma" src="/assets/avx-site/img/zadarma.png" loading="lazy" decoding="async"></li><li><img alt="Sonetel" src="/assets/avx-site/img/sonetel.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/twilio.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/telnyx.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/plivo.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/ga.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/voluum.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/cake.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/linktrust.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/hasoffers.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/onsip.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/avoxi.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/zadarma.png" loading="lazy" decoding="async"></li><li aria-hidden="true"><img alt="" src="/assets/avx-site/img/sonetel.png" loading="lazy" decoding="async"></li></ul>
   </div>
 </section>
 
@@ -327,6 +351,126 @@
     </div>
     <div class="avx-tour-tabs" role="tablist" aria-label="Product views"></div>
     <div class="avx-tour-stage"></div>
+  </div>
+</section>
+
+<section class="mktg-section avx-ai" id="ai-at-work" data-avx-ai>
+  <div class="container">
+    <div class="mktg-section-header text-center">
+      <p class="avx-eyebrow">AI at work</p>
+      <h2 class="fw-bold">Ask it. Hear it. Let it take the call.</h2>
+      <p class="text-muted">Answers from your call data, transcripts that score themselves, and voice agents that qualify callers before a buyer is dialed.</p>
+    </div>
+    <div class="avx-tour-tabs avx-ai-tabs" role="tablist" aria-label="AI demos">
+      <button type="button" class="avx-tour-tab avx-on" role="tab" aria-selected="true" aria-controls="avx-ai-ask" id="avx-ai-tab-ask" data-ai="ask"><span><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Ask Avortyx</span></button>
+      <button type="button" class="avx-tour-tab" role="tab" aria-selected="false" aria-controls="avx-ai-listen" id="avx-ai-tab-listen" data-ai="listen" tabindex="-1"><span><i class="fa-solid fa-wave-square" aria-hidden="true"></i> Live transcript</span></button>
+      <button type="button" class="avx-tour-tab" role="tab" aria-selected="false" aria-controls="avx-ai-voice" id="avx-ai-tab-voice" data-ai="voice" tabindex="-1"><span><i class="fa-solid fa-headset" aria-hidden="true"></i> Voice agent</span></button>
+    </div>
+
+    <div class="avx-ai-panel avx-on" id="avx-ai-ask" role="tabpanel" aria-labelledby="avx-ai-tab-ask" data-panel="ask">
+      <div class="avx-console avx-ask">
+        <div class="avx-cs-bar"><i></i><i></i><i></i><span class="avx-cs-path">app.avortyx.com / <b>ask</b></span><span class="avx-cs-live"><i class="avx-live-dot"></i>AI</span></div>
+        <div class="avx-ask-log" aria-live="polite">
+          <div class="avx-ask-hello">
+            <span class="avx-ask-av" aria-hidden="true"></span>
+            <p>Ask anything about your calls, sources and buyers. Try one of these:</p>
+          </div>
+        </div>
+        <div class="avx-ask-chips">
+          <button type="button" data-q="margin">Which traffic source had the best margin last week?</button>
+          <button type="button" data-q="drop">Why did connect rate dip yesterday afternoon?</button>
+          <button type="button" data-q="buyer">Which buyer should get more Medicare calls?</button>
+          <button type="button" data-q="today">Summarize today&rsquo;s calls</button>
+        </div>
+        <form class="avx-ask-form">
+          <input type="text" name="q" autocomplete="off" placeholder="Ask about your calls, buyers or sources&hellip;" aria-label="Ask Avortyx a question">
+          <button type="submit" aria-label="Ask"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+        </form>
+        <div class="avx-cs-foot">Answers drawn from your workspace &middot; demo data</div>
+      </div>
+    </div>
+
+    <div class="avx-ai-panel" id="avx-ai-listen" role="tabpanel" aria-labelledby="avx-ai-tab-listen" data-panel="listen" hidden>
+      <div class="avx-console avx-listen">
+        <div class="avx-cs-bar"><i></i><i></i><i></i><span class="avx-cs-path">app.avortyx.com / calls / <b>live transcript</b></span><span class="avx-cs-live"><i class="avx-live-dot"></i>Live</span></div>
+        <div class="avx-listen-body">
+          <div class="avx-listen-main">
+            <div class="avx-listen-head">
+              <span class="avx-listen-wave" aria-hidden="true"></span>
+              <span><b>(415) 555-0133</b> &rarr; Apex Insurance</span>
+              <span class="avx-listen-clock" data-ls="clock">0:00</span>
+            </div>
+            <ol class="avx-listen-lines" data-ls="lines"></ol>
+          </div>
+          <aside class="avx-listen-side">
+            <p class="avx-listen-k">Sentiment</p>
+            <svg class="avx-listen-spark" viewBox="0 0 200 48" preserveAspectRatio="none" aria-hidden="true"><path data-ls="spark" d="M0 24"/></svg>
+            <p class="avx-listen-k">Topics</p>
+            <p class="avx-listen-topics" data-ls="topics"></p>
+            <p class="avx-listen-k">AI summary</p>
+            <p class="avx-listen-sum" data-ls="sum">Builds as the call goes on&hellip;</p>
+          </aside>
+        </div>
+        <div class="avx-cs-foot">Transcribed, scored and summarized in real time &middot; demo data</div>
+      </div>
+    </div>
+
+    <div class="avx-ai-panel" id="avx-ai-voice" role="tabpanel" aria-labelledby="avx-ai-tab-voice" data-panel="voice" hidden>
+      <div class="avx-console avx-voice">
+        <div class="avx-cs-bar"><i></i><i></i><i></i><span class="avx-cs-path">app.avortyx.com / voice agents / <b>medicare intake</b></span><span class="avx-cs-live"><i class="avx-live-dot"></i>Agent</span></div>
+        <div class="avx-voice-body">
+          <div class="avx-voice-orb" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="avx-voice-main">
+            <p class="avx-voice-state" data-vc="state">Ready &middot; press play to hear a sample call</p>
+            <button type="button" class="avx-voice-play" data-vc="play"><i class="fa-solid fa-play" aria-hidden="true"></i><span>Play sample call</span></button>
+            <ol class="avx-voice-lines" data-vc="lines" aria-live="polite"></ol>
+            <ul class="avx-voice-steps" data-vc="steps">
+              <li>Greets and confirms consent</li>
+              <li>Qualifies: age, ZIP, current plan</li>
+              <li>Scores intent</li>
+              <li>Warm-transfers to the best buyer</li>
+            </ul>
+          </div>
+        </div>
+        <div class="avx-cs-foot">Voice agents through the ElevenLabs integration &middot; this sample uses your browser&rsquo;s voice</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mktg-section avx-how" id="how-it-decides">
+  <div class="container">
+    <div class="mktg-section-header text-center">
+      <p class="avx-eyebrow">How it decides</p>
+      <h2 class="fw-bold">Signal. Score. Route.</h2>
+      <p class="text-muted">Every call goes through the same three steps before a buyer&rsquo;s phone rings.</p>
+    </div>
+    <div class="avx-how-flow" data-avx-how>
+      <div class="avx-how-step">
+        <span class="avx-how-n">01</span>
+        <i class="avx-how-ic fa-solid fa-tower-broadcast" aria-hidden="true"></i>
+        <h3>Signal</h3>
+        <p>Everything known the moment the call connects.</p>
+        <ul><li>Caller ID and line type</li><li>Source, campaign and keyword</li><li>Geo, time and day</li><li>The caller&rsquo;s first words</li></ul>
+      </div>
+      <div class="avx-how-link" aria-hidden="true"><i></i></div>
+      <div class="avx-how-step">
+        <span class="avx-how-n">02</span>
+        <i class="avx-how-ic fa-solid fa-brain" aria-hidden="true"></i>
+        <h3>Score</h3>
+        <p>The call is screened and scored before anyone is dialed.</p>
+        <ul><li>Intent and sentiment</li><li>Spam and duplicate checks</li><li>TCPA, DNC and VOIP screening</li><li>State rules and consent</li></ul>
+      </div>
+      <div class="avx-how-link" aria-hidden="true"><i></i></div>
+      <div class="avx-how-step">
+        <span class="avx-how-n">03</span>
+        <i class="avx-how-ic fa-solid fa-route" aria-hidden="true"></i>
+        <h3>Route</h3>
+        <p>The best eligible buyer wins the call.</p>
+        <ul><li>Buyer match rules</li><li>Live bids and ping/post</li><li>Caps, hours and concurrency</li><li>Failover if a buyer misses</li></ul>
+      </div>
+    </div>
+    <p class="avx-how-note"><b>85ms</b> average routing time, from first ring to buyer.</p>
   </div>
 </section>
 
@@ -654,7 +798,7 @@
   <h2 class="fw-bold mb-3">More Capabilities</h2>
 </div>
 
-    <div class="avx-cap-grid text-start">
+    <div class="avx-cap-grid avx-bento text-start" data-avx-bento>
       <a href="/features/spam_tag_mitigation.html" class="avx-cap">
         <i class="avx-cap-ic fa-solid fa-shield-halved" aria-hidden="true"></i>
         <b>Spam Tag Mitigation</b>
@@ -719,8 +863,8 @@
 </div>
 
         <div class="avx-int-rows">
-      <div class="avx-int-row"><div class="avx-int-track"><a href="/features/voice_agents/elevenlabs.html" class="avx-int-tile"><img alt="ElevenLabs" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/elevenlabs-b5513fd356d27c799f4bdc10fd9e6b5e1d5fcb259a1cd6a230a7eecdf1ad513a.png" loading="lazy" decoding="async"></a><a href="/features/zoho_crm.html" class="avx-int-tile"><img alt="Zoho CRM" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zoho_crm-768a52b84b6e4f330ed5f3fd447a0489b6d0184f1e81754acc199b13a15c6f44.png" loading="lazy" decoding="async"></a><a href="/features/aws_s3.html" class="avx-int-tile"><img alt="AWS S3" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/aws_s3-d990e90945de90b2be08e2ee7926c9a3f1fb15fd613e6cc114d1cc32b1a174d3.png" loading="lazy" decoding="async"></a><a href="/features/cake.html" class="avx-int-tile"><img alt="Cake" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/cake-956ab3f8f9fb4dac14fd4fd16550491ce19aa774d513179e472aeb8a1dc41a36.png" loading="lazy" decoding="async"></a><a href="/features/adwords.html" class="avx-int-tile"><img alt="Google Ads" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/ga-282ea0ae2a4210bd0b3facf6d99b9d8c733dabd6f6bd1d195135b4c4e3a18557.png" loading="lazy" decoding="async"></a><a href="/features/hasoffers.html" class="avx-int-tile"><img alt="HasOffers" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/hasoffers-227afa2ae382c2d35b071b2981cecc7d4c339d0fbb4d2e0888260c626a373115.png" loading="lazy" decoding="async"></a><a href="/features/infusionsoft.html" class="avx-int-tile"><img alt="Infusionsoft" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/infusionsoft-blue-1396799e7336c91e12a0fd63f86d84d147fab576934de00eaa4c110c45719ca0.png" loading="lazy" decoding="async"></a><a href="/features/linktrust.html" class="avx-int-tile"><img alt="Linktrust" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/linktrust-9a3f2423affaa658a70f29a5b7f56fac494ca5fead8b67b091a59da5c94a1bb3.png" loading="lazy" decoding="async"></a><a href="/features/voice_agents/elevenlabs.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/elevenlabs-b5513fd356d27c799f4bdc10fd9e6b5e1d5fcb259a1cd6a230a7eecdf1ad513a.png" loading="lazy" decoding="async"></a><a href="/features/zoho_crm.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zoho_crm-768a52b84b6e4f330ed5f3fd447a0489b6d0184f1e81754acc199b13a15c6f44.png" loading="lazy" decoding="async"></a><a href="/features/aws_s3.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/aws_s3-d990e90945de90b2be08e2ee7926c9a3f1fb15fd613e6cc114d1cc32b1a174d3.png" loading="lazy" decoding="async"></a><a href="/features/cake.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/cake-956ab3f8f9fb4dac14fd4fd16550491ce19aa774d513179e472aeb8a1dc41a36.png" loading="lazy" decoding="async"></a><a href="/features/adwords.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/ga-282ea0ae2a4210bd0b3facf6d99b9d8c733dabd6f6bd1d195135b4c4e3a18557.png" loading="lazy" decoding="async"></a><a href="/features/hasoffers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/hasoffers-227afa2ae382c2d35b071b2981cecc7d4c339d0fbb4d2e0888260c626a373115.png" loading="lazy" decoding="async"></a><a href="/features/infusionsoft.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/infusionsoft-blue-1396799e7336c91e12a0fd63f86d84d147fab576934de00eaa4c110c45719ca0.png" loading="lazy" decoding="async"></a><a href="/features/linktrust.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/linktrust-9a3f2423affaa658a70f29a5b7f56fac494ca5fead8b67b091a59da5c94a1bb3.png" loading="lazy" decoding="async"></a></div></div>
-      <div class="avx-int-row avx-int-rev"><div class="avx-int-track"><a href="/features/mailchimp.html" class="avx-int-tile"><img alt="MailChimp" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/mailchimp-b3c74873bfb67129c787998f13f15a1e74d9ed47822d71ff2153913ef4807d2e.png" loading="lazy" decoding="async"></a><a href="/features/mailgun.html" class="avx-int-tile"><img alt="Mailgun" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/mailgun-d6b5ee626060dc4d602e7f9cd6c854d10b010592cc5f0c4b5e0a1aaf923240c0.png" loading="lazy" decoding="async"></a><a href="/features/salesforce.html" class="avx-int-tile"><img alt="Salesforce" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/salesforce-a21fa35fb18263007a227565fb1c11d7a8e7d3be29e8f774d608ca235952921e.png" loading="lazy" decoding="async"></a><a href="/features/sendgrid.html" class="avx-int-tile"><img alt="Sendgrid" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/sendgrid-5ed1a34ef10000dd16db972e9ee19c1cde2ea7dfb063759d2666c2af51367039.png" loading="lazy" decoding="async"></a><a href="/features/slack.html" class="avx-int-tile"><img alt="Slack" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/slack-49c9905640dcb9becc91d5238eb7576c4495e4d3096d6582b48c528a89765251.png" loading="lazy" decoding="async"></a><a href="/features/typeform.html" class="avx-int-tile"><img alt="Typeform" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/typeform-89ee0726225ec793c0816a3f142cb88d41d1a9f5e612cc5a21d1b46d5ec73ab1.png" loading="lazy" decoding="async"></a><a href="/features/voluum.html" class="avx-int-tile"><img alt="Voluum" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/voluum-e51ff4b11aa9073ef5c7d794225ef9bbd3c646beee0150204473fd0655a1db9d.png" loading="lazy" decoding="async"></a><a href="/features/zapier.html" class="avx-int-tile"><img alt="Zapier" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zapier-6d5fbe5560d457a00502b800c5cd3297037f01c5e681ab0d186382ad6d4bc03e.png" loading="lazy" decoding="async"></a><a href="/features/mailchimp.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/mailchimp-b3c74873bfb67129c787998f13f15a1e74d9ed47822d71ff2153913ef4807d2e.png" loading="lazy" decoding="async"></a><a href="/features/mailgun.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/mailgun-d6b5ee626060dc4d602e7f9cd6c854d10b010592cc5f0c4b5e0a1aaf923240c0.png" loading="lazy" decoding="async"></a><a href="/features/salesforce.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/salesforce-a21fa35fb18263007a227565fb1c11d7a8e7d3be29e8f774d608ca235952921e.png" loading="lazy" decoding="async"></a><a href="/features/sendgrid.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/sendgrid-5ed1a34ef10000dd16db972e9ee19c1cde2ea7dfb063759d2666c2af51367039.png" loading="lazy" decoding="async"></a><a href="/features/slack.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/slack-49c9905640dcb9becc91d5238eb7576c4495e4d3096d6582b48c528a89765251.png" loading="lazy" decoding="async"></a><a href="/features/typeform.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/typeform-89ee0726225ec793c0816a3f142cb88d41d1a9f5e612cc5a21d1b46d5ec73ab1.png" loading="lazy" decoding="async"></a><a href="/features/voluum.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/voluum-e51ff4b11aa9073ef5c7d794225ef9bbd3c646beee0150204473fd0655a1db9d.png" loading="lazy" decoding="async"></a><a href="/features/zapier.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zapier-6d5fbe5560d457a00502b800c5cd3297037f01c5e681ab0d186382ad6d4bc03e.png" loading="lazy" decoding="async"></a></div></div>
+      <div class="avx-int-row"><div class="avx-int-track"><a href="/features/voice_agents/elevenlabs.html" class="avx-int-tile"><img alt="ElevenLabs" src="/assets/avx-site/img/elevenlabs.png" loading="lazy" decoding="async"></a><a href="/features/zoho_crm.html" class="avx-int-tile"><img alt="Zoho CRM" src="/assets/avx-site/img/zoho_crm.png" loading="lazy" decoding="async"></a><a href="/features/aws_s3.html" class="avx-int-tile"><img alt="AWS S3" src="/assets/avx-site/img/aws_s3.png" loading="lazy" decoding="async"></a><a href="/features/cake.html" class="avx-int-tile"><img alt="Cake" src="/assets/avx-site/img/cake.png" loading="lazy" decoding="async"></a><a href="/features/adwords.html" class="avx-int-tile"><img alt="Google Ads" src="/assets/avx-site/img/ga.png" loading="lazy" decoding="async"></a><a href="/features/hasoffers.html" class="avx-int-tile"><img alt="HasOffers" src="/assets/avx-site/img/hasoffers.png" loading="lazy" decoding="async"></a><a href="/features/infusionsoft.html" class="avx-int-tile"><img alt="Infusionsoft" src="/assets/avx-site/img/infusionsoft-blue.png" loading="lazy" decoding="async"></a><a href="/features/linktrust.html" class="avx-int-tile"><img alt="Linktrust" src="/assets/avx-site/img/linktrust.png" loading="lazy" decoding="async"></a><a href="/features/voice_agents/elevenlabs.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/elevenlabs.png" loading="lazy" decoding="async"></a><a href="/features/zoho_crm.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/zoho_crm.png" loading="lazy" decoding="async"></a><a href="/features/aws_s3.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/aws_s3.png" loading="lazy" decoding="async"></a><a href="/features/cake.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/cake.png" loading="lazy" decoding="async"></a><a href="/features/adwords.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/ga.png" loading="lazy" decoding="async"></a><a href="/features/hasoffers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/hasoffers.png" loading="lazy" decoding="async"></a><a href="/features/infusionsoft.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/infusionsoft-blue.png" loading="lazy" decoding="async"></a><a href="/features/linktrust.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/linktrust.png" loading="lazy" decoding="async"></a></div></div>
+      <div class="avx-int-row avx-int-rev"><div class="avx-int-track"><a href="/features/mailchimp.html" class="avx-int-tile"><img alt="MailChimp" src="/assets/avx-site/img/mailchimp.png" loading="lazy" decoding="async"></a><a href="/features/mailgun.html" class="avx-int-tile"><img alt="Mailgun" src="/assets/avx-site/img/mailgun.png" loading="lazy" decoding="async"></a><a href="/features/salesforce.html" class="avx-int-tile"><img alt="Salesforce" src="/assets/avx-site/img/salesforce.png" loading="lazy" decoding="async"></a><a href="/features/sendgrid.html" class="avx-int-tile"><img alt="Sendgrid" src="/assets/avx-site/img/sendgrid.png" loading="lazy" decoding="async"></a><a href="/features/slack.html" class="avx-int-tile"><img alt="Slack" src="/assets/avx-site/img/slack.png" loading="lazy" decoding="async"></a><a href="/features/typeform.html" class="avx-int-tile"><img alt="Typeform" src="/assets/avx-site/img/typeform.png" loading="lazy" decoding="async"></a><a href="/features/voluum.html" class="avx-int-tile"><img alt="Voluum" src="/assets/avx-site/img/voluum.png" loading="lazy" decoding="async"></a><a href="/features/zapier.html" class="avx-int-tile"><img alt="Zapier" src="/assets/avx-site/img/zapier.png" loading="lazy" decoding="async"></a><a href="/features/mailchimp.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/mailchimp.png" loading="lazy" decoding="async"></a><a href="/features/mailgun.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/mailgun.png" loading="lazy" decoding="async"></a><a href="/features/salesforce.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/salesforce.png" loading="lazy" decoding="async"></a><a href="/features/sendgrid.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/sendgrid.png" loading="lazy" decoding="async"></a><a href="/features/slack.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/slack.png" loading="lazy" decoding="async"></a><a href="/features/typeform.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/typeform.png" loading="lazy" decoding="async"></a><a href="/features/voluum.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/voluum.png" loading="lazy" decoding="async"></a><a href="/features/zapier.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/zapier.png" loading="lazy" decoding="async"></a></div></div>
     </div>
     <a href="/features/integrations.html" class="btn avx-btn-ghost">View All Integrations</a>
   </div>
@@ -735,14 +879,61 @@
 </div>
 
         <div class="avx-int-rows avx-int-voip">
-      <div class="avx-int-row avx-int-rev"><div class="avx-int-track"><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Plivo" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/plivo-35fc37923e230463beea5008a723828975cca42ee2deefc37d3a466cf9665631.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Telnyx" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/telnyx-564b8722392f0bf1b119daa51a08488560582e43dd07c227b4fa70310fe21386.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Twilio" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/twilio-0b98cc930031db95706be9ca3dbb4d143b22c4416dfd1b0d33ce559bed5b312f.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Zadarma" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zadarma-217d211820c3d5c48fe3a94db4f2f76eca3c58aec47c64dce4dc9cbc26658516.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Sonetel" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/sonetel-e9621ef69e1edc2bf3c6a87ee7f0d1714a3e004c710f6f1900636b1f8a2961d7.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="OnSIP" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/onsip-16c77cbfae1e51eb79f9386a484ba346cebfc8720b51a230a5e24880f2410d42.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Avoxi" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/avoxi-5d3e44f6b5c92be53796d6f27664b0eb6f99ef8c63ff83a525e4ef5246237b24.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/plivo-35fc37923e230463beea5008a723828975cca42ee2deefc37d3a466cf9665631.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/telnyx-564b8722392f0bf1b119daa51a08488560582e43dd07c227b4fa70310fe21386.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/twilio-0b98cc930031db95706be9ca3dbb4d143b22c4416dfd1b0d33ce559bed5b312f.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zadarma-217d211820c3d5c48fe3a94db4f2f76eca3c58aec47c64dce4dc9cbc26658516.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/sonetel-e9621ef69e1edc2bf3c6a87ee7f0d1714a3e004c710f6f1900636b1f8a2961d7.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/onsip-16c77cbfae1e51eb79f9386a484ba346cebfc8720b51a230a5e24880f2410d42.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/avoxi-5d3e44f6b5c92be53796d6f27664b0eb6f99ef8c63ff83a525e4ef5246237b24.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/plivo-35fc37923e230463beea5008a723828975cca42ee2deefc37d3a466cf9665631.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/telnyx-564b8722392f0bf1b119daa51a08488560582e43dd07c227b4fa70310fe21386.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/twilio-0b98cc930031db95706be9ca3dbb4d143b22c4416dfd1b0d33ce559bed5b312f.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zadarma-217d211820c3d5c48fe3a94db4f2f76eca3c58aec47c64dce4dc9cbc26658516.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/sonetel-e9621ef69e1edc2bf3c6a87ee7f0d1714a3e004c710f6f1900636b1f8a2961d7.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/onsip-16c77cbfae1e51eb79f9386a484ba346cebfc8720b51a230a5e24880f2410d42.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/avoxi-5d3e44f6b5c92be53796d6f27664b0eb6f99ef8c63ff83a525e4ef5246237b24.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/plivo-35fc37923e230463beea5008a723828975cca42ee2deefc37d3a466cf9665631.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/telnyx-564b8722392f0bf1b119daa51a08488560582e43dd07c227b4fa70310fe21386.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/twilio-0b98cc930031db95706be9ca3dbb4d143b22c4416dfd1b0d33ce559bed5b312f.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/zadarma-217d211820c3d5c48fe3a94db4f2f76eca3c58aec47c64dce4dc9cbc26658516.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/sonetel-e9621ef69e1edc2bf3c6a87ee7f0d1714a3e004c710f6f1900636b1f8a2961d7.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/onsip-16c77cbfae1e51eb79f9386a484ba346cebfc8720b51a230a5e24880f2410d42.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/avoxi-5d3e44f6b5c92be53796d6f27664b0eb6f99ef8c63ff83a525e4ef5246237b24.png" loading="lazy" decoding="async"></a></div></div>
+      <div class="avx-int-row avx-int-rev"><div class="avx-int-track"><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Plivo" src="/assets/avx-site/img/plivo.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Telnyx" src="/assets/avx-site/img/telnyx.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Twilio" src="/assets/avx-site/img/twilio.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Zadarma" src="/assets/avx-site/img/zadarma.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Sonetel" src="/assets/avx-site/img/sonetel.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="OnSIP" src="/assets/avx-site/img/onsip.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile"><img alt="Avoxi" src="/assets/avx-site/img/avoxi.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/plivo.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/telnyx.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/twilio.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/zadarma.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/sonetel.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/onsip.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/avoxi.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/plivo.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/telnyx.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/twilio.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/zadarma.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/sonetel.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/onsip.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/avoxi.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/plivo.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/telnyx.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/twilio.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/zadarma.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/sonetel.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/onsip.png" loading="lazy" decoding="async"></a><a href="/features/multiple_telephone_providers.html" class="avx-int-tile" aria-hidden="true" tabindex="-1"><img alt="" src="/assets/avx-site/img/avoxi.png" loading="lazy" decoding="async"></a></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="mktg-section avx-proof" id="trust">
+  <div class="container">
+    <div class="mktg-section-header text-center">
+      <p class="avx-eyebrow">Built to be trusted</p>
+      <h2 class="fw-bold">Fast, reliable and compliant by default</h2>
+      <p class="text-muted">Screening and controls run on every call, before anyone is dialed.</p>
+    </div>
+    <div class="avx-proof-stats">
+      <div><b class="avx-proof-num">99.9%</b><span>Uptime</span></div>
+      <div><b class="avx-proof-num">85ms</b><span>Avg routing time</span></div>
+      <div><b class="avx-proof-num">10+</b><span>Buyer match rules</span></div>
+    </div>
+    <div class="avx-trust-grid">
+      <a href="/features/suppression_lists.html" class="avx-trust-item">
+        <i class="fa-solid fa-ban" aria-hidden="true"></i>
+        <b>TCPA, DNC and VOIP screening</b>
+        <span>DNC checks, suppression lists and blacklists run before any call routes or dials.</span>
+      </a>
+      <a href="/features/consent_opt_out.html" class="avx-trust-item">
+        <i class="fa-solid fa-file-signature" aria-hidden="true"></i>
+        <b>Consent and opt-out</b>
+        <span>A verifiable consent record for every lead, and opt-outs honored automatically.</span>
+      </a>
+      <a href="/features/pii_redaction.html" class="avx-trust-item">
+        <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+        <b>PII redaction</b>
+        <span>Clear or hash PII from aged data, restrict sensitive fields and redact transcriptions.</span>
+      </a>
+      <a href="/features/state_rules.html" class="avx-trust-item">
+        <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
+        <b>State rules</b>
+        <span>Calling-hour windows, holiday blackouts and contact limits, enforced state by state.</span>
+      </a>
+      <a href="/features/verified_identity.html" class="avx-trust-item">
+        <i class="fa-solid fa-id-card" aria-hidden="true"></i>
+        <b>Verified identity</b>
+        <span>KYC, KYB and STIR/SHAKEN keep your numbers trusted by carriers.</span>
+      </a>
+      <a href="/features/spam_tag_mitigation.html" class="avx-trust-item">
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        <b>Spam tag mitigation</b>
+        <span>Branded caller ID and spam-label removal, so more of your calls get answered.</span>
+      </a>
     </div>
   </div>
 </section>
 
 <section class="marketing-cta-band">
   <div class="marketing-cta-band__bg" aria-hidden="true">
-    <img alt="" loading="lazy" src="https://d15iqiuf0x41sc.cloudfront.net/assets/trackdrive_marketing/constellation-light-33dc8d522be07d051bde04620da8741af1d4aa6a922bac4fa2ed96e39c42215e.svg" />
+    <img alt="" loading="lazy" src="/assets/avx-site/img/constellation-light.svg" />
   </div>
   <div class="container">
     <h2 class="marketing-cta-band__title">Ready to get started?</h2>

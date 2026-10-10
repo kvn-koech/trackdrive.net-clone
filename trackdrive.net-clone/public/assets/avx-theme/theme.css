@@ -1,3 +1,13 @@
+/* a local face sized to Inter's metrics: text keeps its line breaks when Inter swaps in */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 107.06%;
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
@@ -906,8 +916,8 @@ a:hover > .avx-logo-mark .avx-mk-r3 { transform: rotate(-60deg); }
    Smoothing and regular-weight copy keep text crisp on the dark canvas. */
 
 :root {
-  --avx-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --avx-font-display: "Inter Tight", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --avx-font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --avx-font-display: "Inter Tight", "Inter", "Inter Fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --avx-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --bs-body-font-family: var(--avx-font-sans);
   --bs-font-sans-serif: var(--avx-font-sans);

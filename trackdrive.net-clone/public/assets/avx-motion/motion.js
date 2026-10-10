@@ -1208,7 +1208,7 @@
   // ---------- Count-up stats ----------
 
   function initCounters() {
-    document.querySelectorAll('.hero-proof-stats .fs-3').forEach(function (el) {
+    document.querySelectorAll('.hero-proof-stats .fs-3, .avx-proof-num').forEach(function (el) {
       var m = el.textContent.trim().match(/^([\d.,]+)(.*)$/);
       if (!m || reduced) return;
       var target = parseFloat(m[1].replace(/,/g, ''));
@@ -3534,6 +3534,686 @@
     });
   }
 
+  // ---------- Hero: a live decision, one call at a time ----------
+  // The card ships finished in the HTML (that is what shows without motion); this replays it:
+  // the call rings in, the AI scores it, three buyers bid and the winner gets the call.
+
+  var DECISIONS = [
+    { num: '(312) 555-0142', meta: 'Google Ads · Medicare · Chicago, IL', quote: 'Hi, I’m looking to switch my Medicare plan before the deadline.',
+      intent: .91, sent: ['Positive', 'pos'], tags: ['Plan switch', 'Deadline', 'Ready to enroll'],
+      bids: [['Apex Insurance', 64], ['Meridian Health', 58], ['Northwind Benefits', 52]], why: 'Highest bid · intent above 0.80 · licensed in IL', ms: 84 },
+    { num: '(720) 555-0187', meta: 'Meta · Home solar · Denver, CO', quote: 'We just closed on a house and want a quote for panels.',
+      intent: .87, sent: ['Positive', 'pos'], tags: ['Homeowner', 'Quote request'],
+      bids: [['Summit Solar', 48], ['Harbor Home', 41], ['Pinnacle Energy', 37]], why: 'Highest bid · homeowner verified · serves CO', ms: 79 },
+    { num: '(305) 555-0119', meta: 'Bing · Auto insurance · Miami, FL', quote: 'My policy renews Friday and the price just went up again.',
+      intent: .94, sent: ['Neutral', 'neutral'], tags: ['Renewal due', 'Price shopper'],
+      bids: [['Pinnacle Auto', 39], ['Apex Insurance', 36], ['Harbor Mutual', 31]], why: 'Highest bid · renewal window · open capacity', ms: 88 },
+    { num: '(617) 555-0164', meta: 'Organic · Legal · Boston, MA', quote: 'I was in an accident last week and need to talk to a lawyer.',
+      intent: .89, sent: ['Urgent', 'urgent'], tags: ['Recent incident', 'Seeks counsel'],
+      bids: [['Lakeside Legal', 112], ['Beacon Law', 104], ['Harbor Legal', 95]], why: 'Highest bid · practice area match · MA bar', ms: 91 }
+  ];
+
+  function initDecision() {
+    var card = document.querySelector('[data-avx-decide]');
+    if (!card || reduced) return;
+    var q = function (k) { return card.querySelector('[data-dc="' + k + '"]'); };
+    var steps = {};
+    card.querySelectorAll('.avx-dc-step').forEach(function (s) { steps[s.dataset.step] = s; });
+    var timers = [], idx = 0, callNo = 48213, running = false, waiting = false;
+    function later(ms, fn) { timers.push(setTimeout(fn, ms)); }
+    function clear() { timers.forEach(clearTimeout); timers = []; }
+    function stage(name) {
+      Object.keys(steps).forEach(function (k) { steps[k].classList.remove('avx-dc-now'); });
+      if (name) steps[name].classList.add('avx-dc-on', 'avx-dc-now');
+    }
+    function money(v) { return '$' + Math.round(v); }
+
+    function play() {
+      clear();
+      var d = DECISIONS[idx % DECISIONS.length];
+      idx++;
+      callNo += Math.floor(rnd(3, 19));
+      q('id').textContent = 'Call #' + fmtInt(callNo);
+      q('ms').textContent = '—';
+      Object.keys(steps).forEach(function (k) { steps[k].classList.remove('avx-dc-on'); });
+
+      // 01: the call arrives and its first words stream in
+      stage('call');
+      q('num').textContent = d.num;
+      q('meta').textContent = d.meta;
+      var quote = q('quote'), words = ('“' + d.quote + '”').split(' '), n = 0;
+      quote.textContent = '';
+      quote.classList.add('avx-dc-typing');
+      (function type() {
+        if (n >= words.length) { quote.classList.remove('avx-dc-typing'); return; }
+        quote.textContent += (n ? ' ' : '') + words[n++];
+        later(70 + Math.random() * 60, type);
+      })();
+
+      // 02: intent counts up, then sentiment and the signals behind it
+      var intent = q('intent'), bar = q('intent-bar'), tags = q('tags'), sent = q('sent');
+      intent.textContent = '0.00';
+      bar.style.setProperty('--v', 0);
+      tags.innerHTML = '';
+      sent.textContent = '…';
+      sent.removeAttribute('data-tone');
+      later(1500, function () {
+        stage('score');
+        bar.style.setProperty('--v', d.intent);
+        var t0 = performance.now();
+        (function count(now) {
+          var p = Math.min((now - t0) / 900, 1);
+          intent.textContent = (d.intent * (1 - Math.pow(1 - p, 3))).toFixed(2);
+          if (p < 1) requestAnimationFrame(count);
+        })(t0);
+      });
+      later(2300, function () { sent.textContent = d.sent[0]; sent.dataset.tone = d.sent[1]; });
+      d.tags.forEach(function (t, i) {
+        later(2550 + i * 180, function () { tags.appendChild(el('span', '', t)); });
+      });
+
+      // 04 waits for the auction
+      q('winner').textContent = 'Waiting for bids';
+      q('why').textContent = 'Ranks every eligible buyer in real time';
+      q('pay').textContent = '—';
+
+      // 03: three buyers bid; bars and amounts climb to their final bids
+      var list = q('bids');
+      list.innerHTML = '';
+      var rows = d.bids.map(function (b) {
+        var li = el('li', '', '<span></span><i></i><b>$0</b>');
+        li.querySelector('span').textContent = b[0];
+        list.appendChild(li);
+        return li;
+      });
+      later(3300, function () {
+        stage('bids');
+        var top = d.bids[0][1], t0 = performance.now();
+        rows.forEach(function (li, i) { li.querySelector('i').style.setProperty('--v', d.bids[i][1] / top); });
+        (function bid(now) {
+          var p = Math.min((now - t0) / 1100, 1), e = 1 - Math.pow(1 - p, 3);
+          rows.forEach(function (li, i) { li.querySelector('b').textContent = money(d.bids[i][1] * e); });
+          if (p < 1) requestAnimationFrame(bid);
+        })(t0);
+      });
+      later(4600, function () { rows[0].classList.add('avx-dc-win'); });
+
+      // 04: routed to the winner
+      later(5100, function () {
+        stage('route');
+        q('winner').textContent = d.bids[0][0];
+        q('why').textContent = d.why;
+        q('pay').textContent = '$' + d.bids[0][1].toFixed(2);
+        q('ms').textContent = d.ms + 'ms';
+      });
+      later(9200, next);
+    }
+
+    function next() {
+      if (!running) return;
+      if (motionPaused() || document.hidden) { waiting = true; return; }
+      play();
+    }
+
+    // runs while on screen; pausing motion holds the current decision
+    onVisible(card, function () {
+      if (running) return;
+      running = true;
+      play();
+    }, function () { running = false; clear(); stage(null); }, 0.25);
+    setInterval(function () { if (waiting && running && !motionPaused() && !document.hidden) { waiting = false; play(); } }, 600);
+  }
+
+  // ---------- AI at work: Ask Avortyx, a live transcript and a voice agent ----------
+
+  var ASK = {
+    margin: {
+      q: 'Which traffic source had the best margin last week?',
+      status: 'Reading 1,284 calls across 6 sources',
+      a: 'Google Ads led last week with a 31.4% margin on 512 calls, ahead of Bing at 27.9% and Meta at 24.1%. TikTok trailed at 9.8%: 41% of its calls ended in under 30 seconds.',
+      chart: { unit: '%', rows: [['Google Ads', 31.4], ['Bing', 27.9], ['Meta', 24.1], ['Affiliate', 18.6], ['TikTok', 9.8]] }
+    },
+    drop: {
+      q: 'Why did connect rate dip yesterday afternoon?',
+      status: 'Comparing hourly connect rate with buyer caps',
+      a: 'Connect rate fell from 71% to 57% between 2pm and 4pm. Meridian Health and Northwind Benefits both hit their daily caps at 1:52pm, so Medicare calls fell through to a smaller pool. Raising Meridian’s cap by 150 calls would have covered the gap.',
+      chart: { unit: '%', hours: true, flag: [4, 5], rows: [['10a', 72], ['11a', 70], ['12p', 73], ['1p', 71], ['2p', 59], ['3p', 57], ['4p', 66], ['5p', 72]] }
+    },
+    buyer: {
+      q: 'Which buyer should get more Medicare calls?',
+      status: 'Ranking Medicare buyers by conversion, RPC and open cap',
+      a: 'Apex Insurance. It converts Medicare calls at 34% with $61 revenue per call and still has 220 calls of daily cap open. Meridian Health converts higher, at 37%, but is capped out by early afternoon.',
+      table: [['Buyer', 'Conv.', 'RPC', 'Cap left'], ['Apex Insurance', '34%', '$61', '220'], ['Meridian Health', '37%', '$66', '0'], ['Northwind Benefits', '26%', '$48', '140']]
+    },
+    today: {
+      q: 'Summarize today’s calls',
+      status: 'Summarizing 3,918 calls since midnight',
+      a: '3,918 calls so far, 27.8% converted, $84,210 in revenue. Google Ads drove 38% of volume. Three spam bursts were blocked before routing. Worth a look: after-hours calls are up 22% and no buyer is open past 9pm ET.',
+      kpis: [['Calls', '3,918'], ['Converted', '27.8%'], ['Revenue', '$84,210'], ['Spam blocked', '3 bursts']]
+    }
+  };
+  var ASK_FALLBACK = 'This demo answers a few sample questions; try one of the suggestions. In your workspace, Ask Avortyx answers from your own calls, sources and buyers.';
+
+  function askMatch(text) {
+    var t = text.toLowerCase();
+    if (/margin|source|channel|roi|profit/.test(t)) return 'margin';
+    if (/dip|drop|connect|fell|down/.test(t)) return 'drop';
+    if (/buyer|medicare|who should|allocate/.test(t)) return 'buyer';
+    if (/summar|today|overview|how are we/.test(t)) return 'today';
+    return null;
+  }
+
+  function askVisual(d) {
+    if (d.chart) {
+      var max = Math.max.apply(null, d.chart.rows.map(function (r) { return r[1]; }));
+      var html = '<div class="avx-ask-chart' + (d.chart.hours ? ' avx-ask-cols' : '') + '">';
+      d.chart.rows.forEach(function (r, i) {
+        var flag = d.chart.flag && d.chart.flag.indexOf(i) !== -1 ? ' avx-flag' : '';
+        html += '<div class="avx-ask-bar' + flag + '" style="--v:' + (r[1] / max).toFixed(3) + ';--i:' + i + '"><span>' + r[0] + '</span><i></i><b>' + r[1] + d.chart.unit + '</b></div>';
+      });
+      return html + '</div>';
+    }
+    if (d.table) {
+      var t = '<table class="avx-ask-table"><thead><tr>' + d.table[0].map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead><tbody>';
+      d.table.slice(1).forEach(function (r, i) { t += '<tr' + (i === 0 ? ' class="avx-ask-pick"' : '') + '>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; });
+      return t + '</tbody></table>';
+    }
+    return '<div class="avx-ask-kpis">' + d.kpis.map(function (k) { return '<div><span>' + k[0] + '</span><b>' + k[1] + '</b></div>'; }).join('') + '</div>';
+  }
+
+  function initAsk(panel) {
+    var log = panel.querySelector('.avx-ask-log'), form = panel.querySelector('.avx-ask-form');
+    var input = form.querySelector('input'), busy = false, touched = false, demoTimer = null;
+    function scrollEnd() { log.scrollTop = log.scrollHeight; }
+    function ask(text, key) {
+      if (busy || !text.trim()) return;
+      busy = true;
+      panel.classList.add('avx-ask-busy');
+      // keep the log to the latest exchange
+      log.querySelectorAll('.avx-ask-q, .avx-ask-a').forEach(function (n) { n.parentNode.removeChild(n); });
+      var hello = log.querySelector('.avx-ask-hello');
+      if (hello) hello.parentNode.removeChild(hello);
+      var qn = el('p', 'avx-ask-q');
+      qn.textContent = text;
+      log.appendChild(qn);
+      var d = key ? ASK[key] : null;
+      var an = el('div', 'avx-ask-a', '<span class="avx-ask-av" aria-hidden="true"></span><div class="avx-ask-msg"><p class="avx-ask-status"><i></i><i></i><i></i> <span></span></p><p class="avx-ask-text"></p></div>');
+      an.querySelector('.avx-ask-status span').textContent = d ? d.status : 'Thinking';
+      log.appendChild(an);
+      scrollEnd();
+      var words = (d ? d.a : ASK_FALLBACK).split(' '), n = 0, out = an.querySelector('.avx-ask-text');
+      setTimeout(function () {
+        var st = an.querySelector('.avx-ask-status');
+        st.parentNode.removeChild(st);
+        (function stream() {
+          if (n < words.length) {
+            out.textContent += (n ? ' ' : '') + words[n++];
+            scrollEnd();
+            setTimeout(stream, reduced ? 0 : 26 + Math.random() * 30);
+            return;
+          }
+          if (d) {
+            var v = el('div', 'avx-ask-vis', askVisual(d));
+            an.querySelector('.avx-ask-msg').appendChild(v);
+            requestAnimationFrame(function () { v.classList.add('avx-on'); });
+          }
+          busy = false;
+          panel.classList.remove('avx-ask-busy');
+          scrollEnd();
+        })();
+      }, reduced ? 0 : 900);
+    }
+    panel.querySelectorAll('.avx-ask-chips button').forEach(function (b) {
+      b.addEventListener('click', function () { touched = true; clearTimeout(demoTimer); ask(ASK[b.dataset.q].q, b.dataset.q); });
+    });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      touched = true;
+      clearTimeout(demoTimer);
+      var text = input.value;
+      input.value = '';
+      ask(text, askMatch(text));
+    });
+    input.addEventListener('focus', function () { touched = true; clearTimeout(demoTimer); });
+    // the first time it is seen, it types and asks a question by itself
+    return function autoplay() {
+      if (touched || reduced || panel.dataset.played) return;
+      panel.dataset.played = '1';
+      var text = ASK.margin.q, i = 0;
+      demoTimer = setTimeout(function typeQ() {
+        if (touched) return;
+        input.value = text.slice(0, ++i);
+        if (i < text.length) { demoTimer = setTimeout(typeQ, 28); return; }
+        demoTimer = setTimeout(function () { if (!touched) { input.value = ''; ask(text, 'margin'); } }, 350);
+      }, 700);
+    };
+  }
+
+  var LISTEN = [
+    ['Agent', 'Thanks for calling Apex Insurance, this is Dana. How can I help?', .62],
+    ['Caller', 'Hi, I got a renewal notice and my premium went up almost forty dollars a month.', .32, ['Renewal', 'Price increase']],
+    ['Agent', 'I can help with that. What’s the ZIP code on the policy?', .5],
+    ['Caller', 'It’s 94110. I have two cars, a 2019 Civic and a 2021 RAV4.', .52, ['Multi-vehicle']],
+    ['Agent', 'With both cars and a clean record, I can bundle them and bring that down.', .66, ['Bundle offer']],
+    ['Caller', 'Okay, that would be great. What would the monthly be?', .76],
+    ['Agent', 'About $184 a month, which is $62 less than your renewal.', .84, ['Quote given']],
+    ['Caller', 'That works. Let’s go ahead and switch.', .93, ['Converted']]
+  ];
+  var LISTEN_SUM = 'Renewal premium rose about $40/mo. Agent bundled two vehicles and quoted $184/mo, $62 under renewal. Caller agreed to switch. Outcome: converted.';
+  var LISTEN_MARK = /(\bpremium\b|\brenewal\b|\bbundle\b|\bswitch\b|\$184|\$62)/gi;
+
+  function initListen(panel) {
+    var lines = panel.querySelector('[data-ls="lines"]'), spark = panel.querySelector('[data-ls="spark"]');
+    var topics = panel.querySelector('[data-ls="topics"]'), sum = panel.querySelector('[data-ls="sum"]'), clock = panel.querySelector('[data-ls="clock"]');
+    var timers = [], on = false, secs = 0, clockTimer = null;
+    function later(ms, fn) { timers.push(setTimeout(fn, ms)); }
+    function stop() { timers.forEach(clearTimeout); timers = []; clearInterval(clockTimer); on = false; }
+    function drawSpark(vals) {
+      var w = 200, step = w / (LISTEN.length - 1);
+      spark.setAttribute('d', vals.map(function (v, i) { return (i ? 'L' : 'M') + (i * step).toFixed(1) + ' ' + (44 - v * 40).toFixed(1); }).join(' '));
+    }
+    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    function run() {
+      stop();
+      on = true;
+      lines.innerHTML = '';
+      topics.innerHTML = '';
+      sum.textContent = 'Builds as the call goes on…';
+      sum.classList.remove('avx-on');
+      secs = 0;
+      clock.textContent = '0:00';
+      clockTimer = setInterval(function () { if (!motionPaused()) { secs++; clock.textContent = Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0'); } }, 1000);
+      var vals = [], t = 400;
+      LISTEN.forEach(function (ln) {
+        later(t, function () {
+          var li = el('li', 'avx-ls-' + ln[0].toLowerCase(), '<b>' + ln[0] + '</b><p></p>');
+          lines.appendChild(li);
+          var p = li.querySelector('p'), words = ln[1].split(' '), n = 0;
+          (function word() {
+            if (n >= words.length) { p.innerHTML = esc(ln[1]).replace(LISTEN_MARK, '<mark>$1</mark>'); return; }
+            p.textContent += (n ? ' ' : '') + words[n++];
+            timers.push(setTimeout(word, 90));
+          })();
+          lines.scrollTop = lines.scrollHeight;
+          vals.push(ln[2]);
+          drawSpark(vals);
+          (ln[3] || []).forEach(function (tp, i) { later(500 + i * 200, function () { topics.appendChild(el('span', '', tp)); }); });
+        });
+        t += 700 + ln[1].split(' ').length * 90;
+      });
+      later(t + 300, function () { sum.textContent = LISTEN_SUM; sum.classList.add('avx-on'); clearInterval(clockTimer); });
+      later(t + 7000, function () { if (on) run(); });
+    }
+    return { start: function () { if (!on && !reduced) run(); else if (reduced && !lines.children.length) { LISTEN.forEach(function (ln) { lines.appendChild(el('li', 'avx-ls-' + ln[0].toLowerCase(), '<b>' + ln[0] + '</b><p>' + esc(ln[1]).replace(LISTEN_MARK, '<mark>$1</mark>') + '</p>')); }); drawSpark(LISTEN.map(function (l) { return l[2]; })); sum.textContent = LISTEN_SUM; } }, stop: stop };
+  }
+
+  var VOICE = [
+    ['Agent', 'Hi, this is Ava with the Medicare help line. This call may be recorded. Is now a good time?', 0],
+    ['Caller', 'Yes, that’s fine.'],
+    ['Agent', 'Great. Are you sixty-five or older, and what’s your ZIP code?', 1],
+    ['Caller', 'I’m sixty-seven. ZIP is six oh six one four.'],
+    ['Agent', 'Thanks. Do you have a Medicare Advantage plan today?'],
+    ['Caller', 'I have original Medicare, but I want better drug coverage.', 2],
+    ['Agent', 'Got it. I’m connecting you now with a licensed agent at Apex Insurance who can compare plans with you.', 3]
+  ];
+  var VOICE_STATE = ['Greeting · consent captured', 'Qualifying caller', 'Intent 0.93 · eligible', 'Transferring to Apex Insurance'];
+
+  function initVoice(panel) {
+    var play = panel.querySelector('[data-vc="play"]'), lines = panel.querySelector('[data-vc="lines"]');
+    var state = panel.querySelector('[data-vc="state"]'), steps = panel.querySelectorAll('[data-vc="steps"] li');
+    var synth = window.speechSynthesis, playing = false, timer = null, token = 0;
+    function voices() {
+      var all = synth ? synth.getVoices().filter(function (v) { return /^en/i.test(v.lang); }) : [];
+      var female = all.filter(function (v) { return /female|samantha|ava|allison|aria|jenny|zira|susan|karen|moira|google us english/i.test(v.name); })[0];
+      var other = all.filter(function (v) { return v !== female && /male|daniel|alex|fred|guy|david|mark|google uk english male/i.test(v.name); })[0];
+      return { Agent: female || all[0], Caller: other || all[1] || all[0] };
+    }
+    function setPlaying(on) {
+      playing = on;
+      panel.classList.toggle('avx-voice-on', on);
+      play.querySelector('i').className = 'fa-solid ' + (on ? 'fa-stop' : 'fa-play');
+      play.querySelector('span').textContent = on ? 'Stop' : 'Play sample call';
+    }
+    function stop() {
+      token++;
+      clearTimeout(timer);
+      if (synth) synth.cancel();
+      setPlaying(false);
+      if (state.dataset.done !== '1') state.textContent = 'Ready · press play to hear a sample call';
+    }
+    function start() {
+      stop();
+      var my = token, v = voices();
+      lines.innerHTML = '';
+      steps.forEach(function (s) { s.classList.remove('avx-on', 'avx-done'); });
+      state.dataset.done = '';
+      setPlaying(true);
+      var i = 0;
+      (function say() {
+        if (my !== token) return;
+        if (i >= VOICE.length) { setPlaying(false); state.dataset.done = '1'; state.textContent = 'Transferred · qualified call delivered to Apex Insurance'; return; }
+        var ln = VOICE[i++];
+        if (ln[2] !== undefined) {
+          steps.forEach(function (s, k) { s.classList.toggle('avx-done', k < ln[2]); s.classList.toggle('avx-on', k === ln[2]); });
+          state.textContent = VOICE_STATE[ln[2]];
+        }
+        var li = el('li', 'avx-ls-' + ln[0].toLowerCase(), '<b>' + ln[0] + '</b><p></p>');
+        li.querySelector('p').textContent = ln[1];
+        lines.appendChild(li);
+        lines.scrollTop = lines.scrollHeight;
+        panel.dataset.speaker = ln[0].toLowerCase();
+        var fallback = 600 + ln[1].split(' ').length * 330;
+        if (synth && v[ln[0]]) {
+          var u = new SpeechSynthesisUtterance(ln[1]);
+          u.voice = v[ln[0]];
+          u.rate = 1.04;
+          u.pitch = ln[0] === 'Agent' ? 1.08 : .92;
+          var done = false;
+          var next = function () { if (done) return; done = true; clearTimeout(timer); timer = setTimeout(say, 260); };
+          u.onend = next;
+          u.onerror = next;
+          synth.speak(u);
+          timer = setTimeout(next, fallback + 4000); // some browsers never fire onend
+        } else {
+          timer = setTimeout(say, fallback);
+        }
+      })();
+    }
+    if (synth) synth.getVoices(); // starts loading the voice list
+    play.addEventListener('click', function () { if (playing) stop(); else start(); });
+    return { stop: stop };
+  }
+
+  function initAiAtWork() {
+    var sec = document.querySelector('[data-avx-ai]');
+    if (!sec) return;
+    var tabs = Array.prototype.slice.call(sec.querySelectorAll('.avx-ai-tabs [role="tab"]'));
+    var panels = {};
+    sec.querySelectorAll('.avx-ai-panel').forEach(function (p) { panels[p.dataset.panel] = p; });
+    var askAuto = initAsk(panels.ask), listen = initListen(panels.listen), voice = initVoice(panels.voice);
+    var current = 'ask', visible = false;
+    function activate() {
+      if (!visible) return;
+      if (current === 'ask') askAuto();
+      if (current === 'listen') listen.start();
+    }
+    function show(key, focus) {
+      current = key;
+      tabs.forEach(function (t) {
+        var on = t.dataset.ai === key;
+        t.classList.toggle('avx-on', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        if (on && focus) t.focus();
+      });
+      Object.keys(panels).forEach(function (k) { panels[k].hidden = k !== key; panels[k].classList.toggle('avx-on', k === key); });
+      if (key !== 'listen') listen.stop();
+      if (key !== 'voice') voice.stop();
+      activate();
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { show(t.dataset.ai); });
+      t.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        show(tabs[(i + d + tabs.length) % tabs.length].dataset.ai, true);
+      });
+    });
+    onVisible(sec, function () { visible = true; activate(); }, function () { visible = false; listen.stop(); voice.stop(); }, 0.3);
+  }
+
+  // ---------- More Capabilities: a small live view inside each bento card ----------
+
+  var BENTO = {
+    transcriptions: function (v) {
+      v.className += ' avx-viz-tr';
+      var foot = el('div', 'avx-viz-tr-foot', '<span>Sentiment</span><i></i><span data-s>—</span>');
+      var i = 0;
+      function line() {
+        var ln = LISTEN[i % LISTEN.length];
+        if (i % LISTEN.length === 0) v.querySelectorAll('p').forEach(function (p) { p.parentNode.removeChild(p); });
+        var p = el('p', 'avx-ls-' + ln[0].toLowerCase(), '<b>' + ln[0] + '</b><span></span>');
+        p.querySelector('span').textContent = ln[1];
+        v.insertBefore(p, foot);
+        var ps = v.querySelectorAll('p');
+        if (ps.length > 6) ps[0].parentNode.removeChild(ps[0]);
+        foot.style.setProperty('--s', ln[2]);
+        foot.querySelector('[data-s]').textContent = ln[2] >= .7 ? 'Positive' : ln[2] >= .45 ? 'Neutral' : 'Negative';
+        i++;
+      }
+      v.appendChild(foot);
+      for (var k = 0; k < 3; k++) line();
+      return [2200, line];
+    },
+    spam_tag_mitigation: function (v) {
+      v.className += ' avx-viz-sp';
+      v.innerHTML = '<div class="avx-sp-bad"><small>Incoming call</small><b>Scam Likely</b><span>(888) 555-0142</span></div>' +
+        '<div class="avx-sp-good"><small>Incoming call</small><b>Apex Insurance ✓</b><span>(888) 555-0142</span></div>';
+      return [2600, function () { v.classList.toggle('avx-flip'); }];
+    },
+    dynamic_number_insertion: function (v) {
+      v.className += ' avx-viz-dn';
+      var N = [['Google Ads', '(888) 555-0142'], ['Meta', '(888) 555-0177'], ['Bing', '(888) 555-0119'], ['Organic', '(888) 555-0164']], i = 0;
+      v.innerHTML = '<b></b><span></span>';
+      function show() { var n = N[i++ % N.length]; v.querySelector('b').textContent = n[1]; v.querySelector('span').textContent = 'visitor from ' + n[0]; }
+      show();
+      return [2000, function () { v.classList.add('avx-swap'); setTimeout(function () { show(); v.classList.remove('avx-swap'); }, 260); }];
+    },
+    custom_webhook: function (v) {
+      v.className += ' avx-viz-wh';
+      var id = 48213;
+      function draw() {
+        id += Math.floor(rnd(1, 9));
+        v.innerHTML = '{ <em>"event"</em>: <u>"call.completed"</u>,\n  <em>"call_id"</em>: ' + id + ',\n  <em>"buyer"</em>: <u>"' + pick(LIVE_BUYERS) + '"</u>,\n  <em>"revenue"</em>: ' + rnd(24, 96).toFixed(2) + ' }' +
+          '<span class="avx-wh-ok">200 OK · ' + Math.floor(rnd(28, 70)) + 'ms</span>';
+      }
+      draw();
+      return [2400, draw];
+    },
+    formulas: function (v) {
+      v.className += ' avx-viz-ex';
+      v.innerHTML = '<code><i>if</i>(intent &gt; 0.8, bid * 1.2, bid)</code><span>intent <b data-i>0.91</b> → bid <b data-b>$76.80</b></span>';
+      return [2400, function () {
+        var it = rnd(.55, .97), bid = 64;
+        v.querySelector('[data-i]').textContent = it.toFixed(2);
+        v.querySelector('[data-b]').textContent = '$' + (it > .8 ? bid * 1.2 : bid).toFixed(2);
+      }];
+    },
+    call_recordings: function (v) {
+      v.className += ' avx-viz-rc';
+      var bars = [];
+      for (var k = 0; k < 34; k++) { var b = el('i'); b.style.setProperty('--h', Math.round(20 + Math.abs(Math.sin(k * .7) * 55 + Math.sin(k * 1.9) * 20))); v.appendChild(b); bars.push(b); }
+      var at = 0;
+      return [120, function () { bars[at % bars.length].classList.add('avx-on'); at++; if (at % bars.length === 0) bars.forEach(function (b) { b.classList.remove('avx-on'); }); }];
+    },
+    data_export: function (v) {
+      v.className += ' avx-viz-de';
+      v.innerHTML = '<div><span>calls_this_week.csv</span><span data-p>0%</span></div><i></i>';
+      var p = 0;
+      return [300, function () { p = p >= 100 ? 0 : Math.min(100, p + rnd(4, 11)); v.style.setProperty('--p', p); v.querySelector('[data-p]').textContent = Math.round(p) + '%'; }];
+    },
+    compliance: function (v) {
+      v.className += ' avx-viz-sc';
+      var C = ['TCPA consent', 'DNC scrub', 'State hours', 'PII redacted'], i = 0;
+      v.innerHTML = C.map(function (c) { return '<p><span>' + c + '</span><b>✓</b></p>'; }).join('');
+      var rows = v.querySelectorAll('p');
+      return [500, function () { if (i % (C.length + 2) === 0) rows.forEach(function (r) { r.classList.remove('avx-on'); }); else if (rows[(i % (C.length + 2)) - 1]) rows[(i % (C.length + 2)) - 1].classList.add('avx-on'); i++; }];
+    }
+  };
+
+  function initBento() {
+    var grid = document.querySelector('[data-avx-bento]');
+    if (!grid) return;
+    grid.querySelectorAll('.avx-cap').forEach(function (card) {
+      var href = card.getAttribute('href') || '';
+      var key = /security-compliance/.test(href) ? 'compliance' : (href.match(/features\/([a-z_]+)\.html/) || [])[1];
+      if (!BENTO[key]) return;
+      var v = el('div', 'avx-cap-viz');
+      v.setAttribute('aria-hidden', 'true');
+      card.insertBefore(v, card.firstChild);
+      var tick = BENTO[key](v);
+      ticker(card, tick[0], tick[1]);
+    });
+  }
+
+  // "How it decides": the links between the steps carry a pulse once the flow is on screen
+  function initHowFlow() {
+    var flow = document.querySelector('[data-avx-how]');
+    if (!flow) return;
+    onVisible(flow, function () { flow.classList.add('avx-on'); }, null, 0.35);
+  }
+
+  // ---------- Command palette: ⌘K / Ctrl+K jumps to any page or feature ----------
+
+  var PALETTE = [
+    ['Home', '/', 'Page', 'fa-house'], ['All features', '/features.html', 'Page', 'fa-grip'], ['Pricing', '/pricing.html', 'Page', 'fa-tag'],
+    ['Integrations', '/features/integrations.html', 'Page', 'fa-plug'], ['Request a demo', '/p/request_demo.html', 'Page', 'fa-calendar-check'],
+    ['Contact', '/p/contact.html', 'Page', 'fa-envelope'], ['Sign up free', '/sign_up.html', 'Page', 'fa-user-plus'], ['Sign in', '/users/sign_in.html', 'Page', 'fa-right-to-bracket'],
+    ['Careers', '/careers.html', 'Page', 'fa-briefcase'], ['Brand assets', '/brand_assets.html', 'Page', 'fa-palette'],
+    ['Privacy policy', '/privacy_policy.html', 'Page', 'fa-file-shield'], ['Terms of service', '/terms_of_service.html', 'Page', 'fa-file-contract'],
+    ['AI at work: Ask Avortyx, live transcript, voice agent', '/#ai-at-work', 'Home', 'fa-wand-magic-sparkles'], ['How the AI decides', '/#how-it-decides', 'Home', 'fa-diagram-project'],
+    ['Product tour', '/#product-tour', 'Home', 'fa-display'], ['Trust and compliance', '/#trust', 'Home', 'fa-shield-halved'],
+    ['Ping/Post and real-time bidding', '/features/ping_post.html', 'Feature', 'fa-gavel'], ['Ping/Post integration guide', '/features/ping_post_integration.html', 'Feature', 'fa-book'],
+    ['Call tracking', '/features/call_tracking.html', 'Feature', 'fa-phone'], ['Inbound call routing', '/features/inbound_call_routing.html', 'Feature', 'fa-route'],
+    ['Agent control center and power dialer', '/features/agent_controls.html', 'Feature', 'fa-headset'], ['Lead automation', '/features/lead_automation.html', 'Feature', 'fa-bolt'],
+    ['AI call transcriptions', '/features/transcriptions.html', 'Feature', 'fa-closed-captioning'], ['AI voice agents', '/features/voice_agents.html', 'Feature', 'fa-robot'],
+    ['AI SMS bots', '/features/ai_sms_bots.html', 'Feature', 'fa-comment-sms'], ['Call recordings', '/features/call_recordings.html', 'Feature', 'fa-microphone-lines'],
+    ['Buyer management', '/features/buyer_management.html', 'Feature', 'fa-users'], ['Simultaneously dial buyers', '/features/simul_dial.html', 'Feature', 'fa-phone-volume'],
+    ['Hold queue and callback', '/features/hold_queue.html', 'Feature', 'fa-hourglass-half'], ['Dynamic number insertion', '/features/dynamic_number_insertion.html', 'Feature', 'fa-hashtag'],
+    ['Formulas', '/features/formulas.html', 'Feature', 'fa-square-root-variable'], ['Custom webhooks', '/features/custom_webhook.html', 'Feature', 'fa-link'],
+    ['REST API', '/features/api.html', 'Feature', 'fa-code'], ['API IP whitelist', '/features/api_whitelist.html', 'Feature', 'fa-network-wired'],
+    ['Data exports', '/features/data_export.html', 'Feature', 'fa-file-export'], ['Multiple telephone providers', '/features/multiple_telephone_providers.html', 'Feature', 'fa-tower-cell'],
+    ['SIP support', '/features/sip_support.html', 'Feature', 'fa-server'], ['Spam tag mitigation', '/features/spam_tag_mitigation.html', 'Compliance', 'fa-shield-halved'],
+    ['Verified identity and caller ID', '/features/verified_identity.html', 'Compliance', 'fa-id-card'], ['Consent and opt-out', '/features/consent_opt_out.html', 'Compliance', 'fa-file-signature'],
+    ['Suppression lists and DNC', '/features/suppression_lists.html', 'Compliance', 'fa-ban'], ['State rules', '/features/state_rules.html', 'Compliance', 'fa-map-location-dot'],
+    ['PII redaction', '/features/pii_redaction.html', 'Compliance', 'fa-user-shield'],
+    ['Google Ads', '/features/adwords.html', 'Integration', 'fa-plug'], ['Salesforce', '/features/salesforce.html', 'Integration', 'fa-plug'],
+    ['Zoho CRM', '/features/zoho_crm.html', 'Integration', 'fa-plug'], ['Zapier', '/features/zapier.html', 'Integration', 'fa-plug'], ['Slack', '/features/slack.html', 'Integration', 'fa-plug'],
+    ['ElevenLabs voice agents', '/features/voice_agents/elevenlabs.html', 'Integration', 'fa-plug'], ['AWS S3', '/features/aws_s3.html', 'Integration', 'fa-plug'],
+    ['Typeform', '/features/typeform.html', 'Integration', 'fa-plug'], ['MailChimp', '/features/mailchimp.html', 'Integration', 'fa-plug'],
+    ['Mailgun', '/features/mailgun.html', 'Integration', 'fa-plug'], ['SendGrid', '/features/sendgrid.html', 'Integration', 'fa-plug'],
+    ['Infusionsoft', '/features/infusionsoft.html', 'Integration', 'fa-plug'], ['Twilio', '/features/twilio.html', 'Integration', 'fa-plug'],
+    ['Telnyx', '/features/telnyx.html', 'Integration', 'fa-plug'], ['Plivo', '/features/plivo.html', 'Integration', 'fa-plug'],
+    ['Cake', '/features/cake.html', 'Integration', 'fa-plug'], ['HasOffers', '/features/hasoffers.html', 'Integration', 'fa-plug'],
+    ['Voluum', '/features/voluum.html', 'Integration', 'fa-plug'], ['LinkTrust', '/features/linktrust.html', 'Integration', 'fa-plug']
+  ];
+
+  function initPalette() {
+    var isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+    var box = null, input, list, items = [], sel = 0, last = null;
+
+    // a search button in the navbar, before Sign In
+    var nav = document.querySelector('.marketing-navbar .navbar-nav');
+    if (nav && !nav.querySelector('.avx-k-btn')) {
+      var li = el('li', 'nav-item avx-k-item', '<button type="button" class="avx-k-btn" aria-label="Search pages and features"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><span>Search</span><kbd>' + (isMac ? '⌘' : 'Ctrl') + ' K</kbd></button>');
+      var signIn = Array.prototype.filter.call(nav.children, function (n) { return /sign_in/.test(n.innerHTML); })[0];
+      nav.insertBefore(li, signIn || null);
+      li.querySelector('button').addEventListener('click', function () { open(); });
+    }
+
+    function build() {
+      box = el('div', 'avx-k',
+        '<div class="avx-k-panel" role="dialog" aria-modal="true" aria-label="Search">' +
+        '<div class="avx-k-head"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>' +
+        '<input type="text" placeholder="Search pages, features and integrations" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="avx-k-list" aria-autocomplete="list"><kbd>Esc</kbd></div>' +
+        '<ul class="avx-k-list" id="avx-k-list" role="listbox"></ul>' +
+        '<div class="avx-k-foot"><span><kbd>↑</kbd><kbd>↓</kbd> to move</span><span><kbd>↵</kbd> to open</span></div></div>');
+      input = box.querySelector('input');
+      list = box.querySelector('.avx-k-list');
+      box.addEventListener('mousedown', function (e) { if (e.target === box) close(); });
+      input.addEventListener('input', render);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % Math.max(items.length, 1);
+          mark();
+        } else if (e.key === 'Enter' && items[sel]) {
+          e.preventDefault();
+          go(items[sel]);
+        }
+      });
+      list.addEventListener('click', function (e) {
+        var li = e.target.closest('li[data-i]');
+        if (li) go(items[+li.dataset.i]);
+      });
+      list.addEventListener('mousemove', function (e) {
+        var li = e.target.closest('li[data-i]');
+        if (li && +li.dataset.i !== sel) { sel = +li.dataset.i; mark(); }
+      });
+      document.body.appendChild(box);
+    }
+    // ranks by where the query matches: start of the title, start of a word, anywhere, then loose letters in order
+    function score(item, q) {
+      var t = item[0].toLowerCase(), g = item[2].toLowerCase();
+      if (!q) return 1;
+      if (t.indexOf(q) === 0) return 100;
+      if (new RegExp('\\b' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(t)) return 80;
+      if (t.indexOf(q) > -1) return 60;
+      if (g.indexOf(q) === 0) return 40;
+      var i = 0;
+      for (var k = 0; k < t.length && i < q.length; k++) if (t[k] === q[i]) i++;
+      return i === q.length ? 20 : 0;
+    }
+    function render() {
+      var q = input.value.trim().toLowerCase();
+      items = PALETTE.map(function (p) { return [p, score(p, q)]; }).filter(function (x) { return x[1] > 0; })
+        .sort(function (a, b) { return b[1] - a[1]; }).map(function (x) { return x[0]; }).slice(0, q ? 30 : 16);
+      sel = 0;
+      list.innerHTML = items.length ? '' : '<li class="avx-k-empty">No matches. Try “routing”, “AI” or “Twilio”.</li>';
+      items.forEach(function (it, i) {
+        var li = el('li', '', '<i class="fa-solid ' + it[3] + '" aria-hidden="true"></i><span></span><em>' + it[2] + '</em>');
+        li.querySelector('span').textContent = it[0];
+        li.dataset.i = i;
+        li.id = 'avx-k-' + i;
+        li.setAttribute('role', 'option');
+        list.appendChild(li);
+      });
+      mark();
+    }
+    function mark() {
+      list.querySelectorAll('li[data-i]').forEach(function (li) {
+        var on = +li.dataset.i === sel;
+        li.classList.toggle('avx-on', on);
+        li.setAttribute('aria-selected', on ? 'true' : 'false');
+        if (on) { input.setAttribute('aria-activedescendant', li.id); li.scrollIntoView({ block: 'nearest' }); }
+      });
+    }
+    function go(it) {
+      close();
+      var url = new URL(it[1], location.href);
+      if (samePage(url) && url.hash) {
+        var t = document.getElementById(url.hash.slice(1));
+        if (t) { t.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); history.replaceState(null, '', url.hash); return; }
+      }
+      location.href = it[1];
+    }
+    function open() {
+      if (!box) build();
+      last = document.activeElement;
+      input.value = '';
+      render();
+      box.classList.add('avx-k-on');
+      document.documentElement.style.overflow = 'hidden';
+      setTimeout(function () { input.focus(); }, 0);
+    }
+    function close() {
+      if (!box || !box.classList.contains('avx-k-on')) return;
+      box.classList.remove('avx-k-on');
+      document.documentElement.style.overflow = '';
+      if (last && last.focus) last.focus({ preventScroll: true });
+    }
+    document.addEventListener('keydown', function (e) {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        if (box && box.classList.contains('avx-k-on')) close(); else open();
+      } else if (e.key === 'Escape' && box && box.classList.contains('avx-k-on')) {
+        e.stopImmediatePropagation();
+        close();
+      }
+    }, true);
+  }
+
   // ---------- Screenshot zoom: enlarge in place, in the same dark app window ----------
   // The links point at the original light captures on the CDN; opening those in a tab
   // would drop the dark rendering and the app.avortyx.com frame, so they open here instead.
@@ -3783,9 +4463,9 @@
   // is never stuck behind one long block of set-up work
   function init() {
     // calm set: product UI, data and gentle reveals; no game-like decoration
-    var steps = [initMotionToggle, initProgress, initRingbaHero, initLeadFlow, initPlatformFlow,
-      initBottomWaves, initHeroCharts, initPingPostDemos, initProductTour, initFeatureDemos, initMiniPreviews,
-      initBackLinks, initZoom, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
+    var steps = [initMotionToggle, initProgress, initRingbaHero, initDecision, initLeadFlow, initPlatformFlow,
+      initBottomWaves, initHeroCharts, initPingPostDemos, initProductTour, initAiAtWork, initHowFlow, initBento, initFeatureDemos, initMiniPreviews,
+      initBackLinks, initZoom, initPalette, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
       initPricingHorizon, initIntegrationWaves, initFlowSequences, initTables, initCounters,
       initOffscreenPause, initScrollHints];
     if (!reduced) steps.push(initReveal);
