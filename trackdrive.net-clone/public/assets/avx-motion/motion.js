@@ -2613,111 +2613,6 @@
     return { svg: svg, update: update, value: value, o: o };
   }
 
-  // glass card: mono title + live dot, display-font value with a delta pill, chart
-  function chartCard(o) {
-    var chart = makeChart(o);
-    var card = el('div', 'avx-chart-card',
-      '<div class="avx-cc-head"><span><i class="avx-live-dot"></i>' + o.title + '</span><em class="avx-cc-delta"></em></div>' +
-      '<div class="avx-cc-value"></div>');
-    card.setAttribute('aria-hidden', 'true');
-    card.appendChild(chart.svg);
-    var valueEl = card.querySelector('.avx-cc-value'), deltaEl = card.querySelector('.avx-cc-delta');
-    var last = chart.value();
-    function show() {
-      var v = chart.value();
-      valueEl.textContent = o.fmt(v);
-      var d = last ? (v - last) / last * 100 : 0;
-      deltaEl.textContent = (d >= 0 ? '▲ ' : '▼ ') + Math.abs(d).toFixed(1) + '%';
-      deltaEl.className = 'avx-cc-delta ' + (d >= 0 ? 'avx-up' : 'avx-down');
-      last = v;
-    }
-    show();
-    chart.onTick = show;
-    return { card: card, chart: chart };
-  }
-
-  // advance a chart while its host is on screen
-  function liveChart(host, chart, every) {
-    if (reduced) return;
-    var timer = null;
-    function tick() {
-      if (motionPaused()) { timer = setTimeout(tick, 800); return; }
-      chart.update();
-      if (chart.onTick) setTimeout(chart.onTick, 950);
-      timer = setTimeout(tick, every + Math.random() * 600);
-    }
-    onVisible(host, function () { if (!timer) timer = setTimeout(tick, 600 + Math.random() * 800); },
-      function () { clearTimeout(timer); timer = null; }, 0.05);
-  }
-
-  var money = function (d) { return function (v) { return '$' + v.toFixed(d); }; };
-  var int = function (v) { return Math.round(v).toLocaleString('en-US'); };
-  var pct = function (v) { return v.toFixed(1) + '%'; };
-
-  var HERO_CHARTS = {
-    'call management': [
-      { type: 'area', title: 'Calls / hour', min: 820, max: 1400, start: 1080, step: 90, fmt: int },
-      { type: 'donut', title: 'Call outcomes', labels: ['Connected', 'Transferred', 'Voicemail', 'Missed'], weights: [58, 21, 13, 8], fmt: function (v) { return v.toFixed(0) + '% live'; } }
-    ],
-    'tracking & attribution': [
-      { type: 'bars', title: 'Calls by source', labels: ['GOOG', 'META', 'BING', 'TTOK', 'MAIL', 'DIR'], min: 120, max: 980, step: 90, fmt: function (v) { return int(v) + ' calls'; } },
-      { type: 'area', title: 'Conversion rate', min: 8, max: 17, start: 12.4, step: 1.1, fmt: pct }
-    ],
-    'ping/post': [
-      { type: 'bars', title: 'Top bids · $/call', labels: ['APX', 'NWB', 'MRD', 'SMT', 'LKS', 'HBR'], min: 18, max: 72, step: 6, avg: true, fmt: money(2) },
-      { type: 'gauge', title: 'Bid win rate', sub: 'TARGET 75%', min: 40, max: 95, start: 71, step: 4, decimals: 1, fmt: pct }
-    ],
-    'ai': [
-      { type: 'area', title: 'AI minutes / hr', min: 300, max: 920, start: 610, step: 60, fmt: int },
-      { type: 'donut', title: 'Caller sentiment', labels: ['Positive', 'Neutral', 'Negative'], weights: [62, 27, 11], fmt: function (v) { return v.toFixed(0) + '% positive'; } }
-    ],
-    'automation': [
-      { type: 'bars', title: 'Touches by channel', labels: ['SMS', 'MAIL', 'CALL', 'HOOK', 'WAIT'], min: 80, max: 640, step: 60, fmt: function (v) { return int(v) + ' sent'; } },
-      { type: 'gauge', title: 'Contact rate', sub: 'LAST 24H', min: 30, max: 90, start: 64, step: 4, decimals: 1, fmt: pct }
-    ],
-    'phone numbers': [
-      { type: 'area', title: 'Active numbers', min: 3200, max: 4100, start: 3650, step: 80, fmt: int },
-      { type: 'donut', title: 'Number pool', labels: ['Local', 'Toll-free', 'Pooled'], weights: [54, 28, 18], fmt: function (v) { return v.toFixed(0) + '% local'; } }
-    ],
-    'security & compliance tools': [
-      { type: 'bars', title: 'Blocked by rule', labels: ['DNC', 'SPAM', 'TCPA', 'GEO', 'VEL'], min: 20, max: 380, step: 40, fmt: function (v) { return int(v) + ' blocked'; } },
-      { type: 'gauge', title: 'Clean traffic', sub: 'SCREENED', min: 90, max: 100, start: 97.6, step: .6, decimals: 1, fmt: pct }
-    ],
-    'integrations': [
-      { type: 'area', title: 'Webhook events / min', min: 1800, max: 4200, start: 2900, step: 260, fmt: int },
-      { type: 'gauge', title: 'Delivery success', sub: 'SLA 99.9%', min: 95, max: 100, start: 99.4, step: .3, decimals: 2, fmt: pct }
-    ],
-    'pricing': [
-      { type: 'area', title: 'Avg cost / call', min: .041, max: .061, start: .052, step: .003, fmt: money(4) },
-      { type: 'donut', title: 'Spend mix', labels: ['Inbound', 'Forwarding', 'SMS', 'AI'], weights: [46, 31, 13, 10], fmt: function (v) { return v.toFixed(0) + '% inbound'; } }
-    ]
-  };
-
-  function initHeroCharts() {
-    var hero = document.querySelector('main section.mktg-subpage-hero');
-    if (!hero) return;
-    // the cards are positioned inside the header itself
-    hero.classList.add('avx-fx-host');
-    var key = hero.classList.contains('pricing-hero') ? 'pricing' :
-      ((hero.querySelector('.mktg-subpage-hero-eyebrow') || {}).textContent || '').trim().toLowerCase();
-    // feature pages without a category label fall back on their address
-    if (!HERO_CHARTS[key] && /^\/features\//.test(location.pathname)) {
-      key = /ping_post/.test(location.pathname) ? 'ping/post' : 'call management';
-    }
-    var set = HERO_CHARTS[key];
-    if (!set) return;
-    hero.classList.add('avx-has-charts');
-    var wrap = el('div', 'avx-hero-charts');
-    wrap.setAttribute('aria-hidden', 'true');
-    set.forEach(function (o, i) {
-      var c = chartCard(o);
-      c.card.classList.add(i ? 'avx-cc-right' : 'avx-cc-left');
-      wrap.appendChild(c.card);
-      liveChart(hero, c.chart, 2000 + i * 400);
-    });
-    hero.appendChild(wrap);
-  }
-
   // ---------- Landing hero: the Signal Core, built from ringba art ----------
 
   // still: chips keep fixed values (the logo version, so nothing flickers around it)
@@ -4464,7 +4359,7 @@
   function init() {
     // calm set: product UI, data and gentle reveals; no game-like decoration
     var steps = [initMotionToggle, initProgress, initRingbaHero, initDecision, initLeadFlow, initPlatformFlow,
-      initBottomWaves, initHeroCharts, initPingPostDemos, initProductTour, initAiAtWork, initHowFlow, initBento, initFeatureDemos, initMiniPreviews,
+      initBottomWaves, initPingPostDemos, initProductTour, initAiAtWork, initHowFlow, initBento, initFeatureDemos, initMiniPreviews,
       initBackLinks, initZoom, initPalette, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
       initPricingHorizon, initIntegrationWaves, initFlowSequences, initTables, initCounters,
       initOffscreenPause, initScrollHints];

@@ -2840,83 +2840,6 @@ img.avx-tint {
   fill: #8a93a3;
 }
 
-/* chart cards floating beside page-hero titles (wide screens) */
-.avx-hero-charts {
-  display: none;
-}
-
-@media (min-width: 1280px) {
-  .avx-has-charts .avx-fx { display: none; }
-
-  .avx-hero-charts {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: block;
-    pointer-events: none;
-  }
-
-  .avx-chart-card {
-    position: absolute;
-    top: 50%;
-    width: 248px;
-    padding: 12px 14px 10px;
-    border: 1px solid var(--avx-glass-border, rgba(148, 163, 184, .16));
-    border-radius: 14px;
-    background: var(--avx-glass, rgba(17, 19, 24, .62));
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, .85), inset 0 1px 0 rgba(255, 255, 255, .03);
-    color: #bbc2cf;
-    text-align: left;
-    transform: translateY(-50%) perspective(900px) rotateY(var(--avx-tilt, 0deg));
-  }
-
-  .avx-cc-left {
-    left: calc(var(--avx-rail-l, 40px) + 8px);
-    --avx-tilt: 10deg;
-  }
-
-  .avx-cc-right {
-    right: calc(var(--avx-rail-r, 40px) + 8px);
-    --avx-tilt: -10deg;
-    animation-delay: -4s;
-  }
-}
-
-@keyframes avxCardFloat {
-  from { transform: translateY(calc(-50% + 10px)) perspective(900px) rotateY(var(--avx-tilt, 0deg)); }
-  to { transform: translateY(calc(-50% - 2px)) perspective(900px) rotateY(calc(var(--avx-tilt, 0deg) * .6)); }
-}
-
-.avx-cc-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font: 600 9.5px/1 var(--avx-font-mono, monospace);
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: #8a93a3;
-}
-
-.avx-cc-delta {
-  padding: 2px 6px;
-  border-radius: 999px;
-  font-style: normal;
-  letter-spacing: .02em;
-}
-
-.avx-cc-delta.avx-up { color: #6ee7b7; background: rgba(16, 185, 129, .14); }
-.avx-cc-delta.avx-down { color: #fda4af; background: rgba(244, 63, 94, .14); }
-
-.avx-cc-value {
-  margin: 6px 0 6px;
-  font: 700 22px/1 var(--avx-font-display, sans-serif);
-  letter-spacing: -.02em;
-  color: #f3f5f8;
-  font-variant-numeric: tabular-nums;
-}
-
 /* live sparkline in the landing hero panel */
 .avx-live-spark {
   margin: 8px 6px 2px;
@@ -3214,7 +3137,6 @@ img.avx-tint {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .avx-chart-card,
   .avx-c-portal,
   .avx-c-dots,
   .avx-c-beam,
@@ -3802,7 +3724,6 @@ html.avx-booted main {
 /* performance: panels floating over moving scenes would re-blur every frame;
    a near-solid glass reads the same and costs nothing while scrolling */
 .avx-live,
-.avx-chart-card,
 .avx-c-chip {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
