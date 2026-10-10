@@ -9740,3 +9740,311 @@ body.home main section .mktg-section-header {
   .avx-ask-log { height: 300px; }
   .avx-bento .avx-cap:nth-child(5) .avx-cap-viz { min-height: 170px; }
 }
+
+/* ---------- Navbar: a floating glass bar with rounded, lit edges (every page) ---------- */
+
+:root[data-bs-theme="dark"] .marketing-navbar {
+  padding: 12px 0 0;
+  border-bottom: 0;
+  background: transparent !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+.marketing-navbar > .container {
+  position: relative;
+  padding: 8px 10px 8px 18px;
+  border: 1px solid rgba(148, 163, 184, .14);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(20, 23, 31, .78), rgba(11, 13, 18, .74));
+  -webkit-backdrop-filter: saturate(160%) blur(16px);
+  backdrop-filter: saturate(160%) blur(16px);
+  box-shadow: 0 18px 50px -24px rgba(0, 0, 0, .9), 0 0 0 1px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .05);
+  pointer-events: auto;
+  transition: background-color .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+
+/* a thin blue light along the top edge, fading out towards the corners */
+.marketing-navbar > .container::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: 18%;
+  left: 18%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, .7), transparent);
+  pointer-events: none;
+}
+
+.marketing-navbar.avx-nav-scrolled > .container {
+  border-color: rgba(148, 163, 184, .2);
+  background: linear-gradient(180deg, rgba(17, 20, 27, .92), rgba(10, 12, 16, .9));
+  box-shadow: 0 22px 60px -20px rgba(0, 0, 0, .95), 0 0 0 1px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+.marketing-navbar .avx-wordmark {
+  font-size: 26px !important;
+  letter-spacing: -1.2px !important;
+}
+
+.marketing-navbar .avx-logo-mark svg {
+  width: 30px;
+  height: 30px;
+}
+
+.marketing-navbar .navbar-brand {
+  padding: 0;
+}
+
+.marketing-navbar .navbar-nav .nav-link {
+  border-radius: 10px;
+  transition: color .2s ease, background-color .2s ease;
+}
+
+@media (min-width: 992px) {
+  .marketing-navbar.navbar .navbar-nav .nav-link {
+    padding: 8px 12px !important;
+  }
+
+  .marketing-navbar.navbar .navbar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, .05);
+  }
+
+  .marketing-navbar .btn-td-green {
+    padding: 8px 16px !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .marketing-navbar {
+    padding: 10px 12px 0 !important;
+  }
+
+  .marketing-navbar > .container {
+    max-width: none;
+    padding: 8px 8px 8px 14px;
+    border-radius: 16px;
+  }
+
+  .marketing-navbar .navbar-toggler {
+    padding: 6px 9px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 11px;
+    box-shadow: none !important;
+  }
+
+  .marketing-navbar .navbar-collapse .navbar-nav {
+    padding: 10px 0 6px;
+  }
+
+  .marketing-navbar .navbar-collapse .nav-link {
+    padding: 10px 8px;
+  }
+
+  .marketing-navbar .avx-wordmark {
+    font-size: 23px !important;
+  }
+
+  .marketing-navbar .avx-logo-mark svg {
+    width: 27px;
+    height: 27px;
+  }
+}
+
+/* the page progress line stays above the floating bar */
+.avx-progress {
+  z-index: 2147482000;
+}
+
+/* feature pages opened on their own: the "View full page" strip floats the same way */
+body > #injected-modal-header {
+  top: 12px !important;
+  width: max-content;
+  margin: 12px 12px 0 auto;
+  padding: 8px 10px 8px 16px !important;
+  border: 1px solid rgba(148, 163, 184, .14) !important;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(20, 23, 31, .82), rgba(11, 13, 18, .78)) !important;
+  box-shadow: 0 18px 50px -24px rgba(0, 0, 0, .9), inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+/* phones: a long menu scrolls inside the bar instead of running off the screen */
+@media (max-width: 991.98px) {
+  .marketing-navbar .navbar-collapse {
+    max-height: calc(100vh - 96px);
+    max-height: calc(100dvh - 96px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* ---------- Landing hero: two columns, copy left and the live decision right ---------- */
+
+.avx-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr);
+  gap: 56px;
+  align-items: center;
+  text-align: left;
+}
+
+.avx-hero-copy {
+  min-width: 0;
+}
+
+.avx-hero-copy .avx-ribbon {
+  margin-bottom: 22px;
+}
+
+.avx-hero-copy h1 {
+  margin: 0 0 20px !important;
+  font-size: clamp(2.5rem, 1.5rem + 2.5vw, 4rem) !important;
+  line-height: 1.04 !important;
+  text-align: left;
+}
+
+.avx-hero-copy .hero-lead {
+  max-width: 470px;
+  margin: 0 0 30px !important;
+  font-size: clamp(16px, .95rem + .3vw, 19px);
+  line-height: 1.55;
+  text-align: left;
+}
+
+.avx-hero-copy .avx-hero-ctas {
+  justify-content: flex-start;
+}
+
+/* the card sits in the right column as a compact 2 x 2 panel */
+.avx-hero-grid .avx-decide {
+  max-width: none;
+  margin: 0 !important;
+}
+
+.avx-hero-grid .avx-dc-steps {
+  grid-template-columns: 1fr 1fr;
+}
+
+.avx-hero-grid .avx-dc-step {
+  padding: 16px 18px 18px;
+}
+
+.avx-hero-grid .avx-dc-step:nth-child(2n) { border-right: 0; }
+.avx-hero-grid .avx-dc-step:nth-child(-n+2) { border-bottom: 1px solid rgba(255, 255, 255, .06); }
+.avx-hero-grid .avx-dc-step::after { display: none; }
+
+.avx-hero-grid .avx-dc-quote {
+  display: -webkit-box;
+  min-height: 0;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.avx-hero-grid .avx-dc-intent b {
+  font-size: 30px;
+}
+
+@media (min-width: 992px) {
+  .avx-hero-calm.marketing-hero-simple {
+    padding-top: 56px !important;
+    padding-bottom: 96px !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .avx-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    text-align: center;
+  }
+
+  .avx-hero-copy h1,
+  .avx-hero-copy .hero-lead {
+    margin-right: auto !important;
+    margin-left: auto !important;
+    text-align: center;
+  }
+
+  .avx-hero-copy .avx-hero-ctas {
+    justify-content: center;
+  }
+
+  .avx-hero-grid .avx-decide {
+    max-width: 640px;
+    margin: 0 auto !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .avx-hero-grid .avx-dc-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .avx-hero-grid .avx-dc-step {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+  }
+
+  .avx-hero-grid .avx-dc-step:last-child {
+    border-bottom: 0;
+  }
+}
+
+/* the horizon arc rises from the bottom edge, clear of the copy and buttons */
+.avx-hero-calm .avx-pbg-eclipse {
+  top: calc(100% - 64px);
+}
+
+/* tablets and small laptops: one centered column, the card below the copy */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .avx-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px;
+    text-align: center;
+  }
+
+  .avx-hero-copy h1,
+  .avx-hero-copy .hero-lead {
+    margin-right: auto !important;
+    margin-left: auto !important;
+    text-align: center;
+  }
+
+  .avx-hero-copy .avx-hero-ctas {
+    justify-content: center;
+  }
+
+  .avx-hero-grid .avx-decide {
+    max-width: 760px;
+    margin: 0 auto !important;
+  }
+}
+
+/* navbar between 992 and 1199px: tighter links, the search shortcut shrinks to an icon */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .marketing-navbar.navbar .navbar-nav .nav-link {
+    padding: 8px 9px !important;
+    letter-spacing: .1em;
+  }
+
+  .avx-k-btn {
+    margin: 0 4px;
+    padding: 7px 10px;
+  }
+
+  .avx-k-btn kbd {
+    display: none;
+  }
+
+  .marketing-navbar .btn-td-green {
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .avx-hero-copy h1 {
+    font-size: 48px !important;
+  }
+}

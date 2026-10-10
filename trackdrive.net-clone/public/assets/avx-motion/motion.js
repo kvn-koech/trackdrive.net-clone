@@ -1514,50 +1514,6 @@
 
     // a quiet 3D floor: a perspective grid reaching back to a soft horizon
     hero.insertBefore(el('div', 'avx-pbg', '<div class="avx-pbg-spot"></div><div class="avx-pbg-dots"></div><div class="avx-pbg-eclipse"></div><div class="avx-pbg-fade"></div>'), hero.firstChild);
-
-    // two distant holographic scenes (ringba style), each telling part of the call-tracking story
-    var R = '/assets/avx-ringba/', B = '/assets/avx-baked/';
-    function im(src, cls, style) {
-      return '<img src="' + src + '" class="' + cls + '" alt="" decoding="async"' + (style ? ' style="' + style + '"' : '') + '>';
-    }
-
-    // left: call sources orbiting a platform; a beam carries each call up to its tracking number
-    var orbs = [[B + 'icon-sphere--green-b.webp', '0s'], [R + 'purple-sphere-312.webp', '-6s'], [R + 'icon-sphere--blue.webp', '-12s']];
-    var left = el('div', 'avx-side avx-side-l avx-rbs',
-      '<div class="avx-rbs-stage">' +
-      '<div class="avx-rbs-floor">' + im(R + 'pt-hero-rings-blue.webp', 'avx-rbs-rings') + im(R + 'platform-ring-blue.webp', 'avx-rbs-dots') +
-      '<i class="avx-rbs-ripple"></i><i class="avx-rbs-ripple"></i></div>' +
-      '<div class="avx-rbs-orbit">' + orbs.map(function (o) {
-        return '<div class="avx-rbs-slot" style="animation-delay:' + o[1] + '">' + im(o[0], 'avx-rbs-sat', 'animation-delay:' + o[1]) + '</div>';
-      }).join('') + '</div>' +
-      '<div class="avx-rbs-beam"></div>' +
-      '<div class="avx-rbs-tag"><span>Tracking number</span><b>(888) 571-0429</b><em class="avx-rbs-src">Google Ads · Medicare</em></div>' +
-      '</div>' +
-      '<p class="avx-side-cap"><b>Every call source, tracked</b><span>Ad, campaign and keyword on every call</span></p>');
-    hero.appendChild(left);
-    var SRC = [['(888) 571-0429', 'Google Ads · Medicare'], ['(855) 204-7731', 'Meta · Solar'], ['(866) 742-0915', 'Organic · Legal'], ['(877) 390-1158', 'Bing Ads · Auto']];
-    var si = 0;
-    ticker(left, 5000, function () {
-      si = (si + 1) % SRC.length;
-      left.querySelector('.avx-rbs-tag b').textContent = SRC[si][0];
-      left.querySelector('.avx-rbs-src').textContent = SRC[si][1];
-    });
-
-    // right: a hologram ring with the Avortyx mark; calls run out along floor lanes to buyers
-    var lanes = [[155, '0s'], [90, '-0.8s'], [25, '-1.6s']].map(function (l) {
-      return '<span class="avx-rbs-lane" style="transform:rotateZ(' + l[0] + 'deg)">' +
-        '<i class="avx-rbs-pk" style="animation-delay:' + l[1] + '"></i>' +
-        '<b class="avx-rbs-buyer" style="transform:rotateZ(' + (-l[0]) + 'deg) rotateX(-72deg)"><em style="animation-delay:' + l[1] + '"></em></b></span>';
-    }).join('');
-    var right = el('div', 'avx-side avx-side-r avx-rbs',
-      '<div class="avx-rbs-stage">' +
-      '<div class="avx-rbs-floor">' + im(R + 'platform-ring-blue.webp', 'avx-rbs-dots') + lanes + '</div>' +
-      '<div class="avx-rbs-holo">' + im(R + 'neon-ring-blue.webp', 'avx-rbs-neon') + '<span class="avx-rbs-mark"></span></div>' +
-      '</div>' +
-      '<p class="avx-side-cap"><b>Routed to the right buyer</b><span>In milliseconds, by your rules</span></p>');
-    right.querySelector('.avx-rbs-mark').appendChild(vortexSvg('avx-vx-rbs', ''));
-    hero.appendChild(right);
-    hero.querySelectorAll('.avx-side').forEach(function (n) { n.setAttribute('aria-hidden', 'true'); });
   }
 
 
@@ -3994,6 +3950,20 @@
     ['Voluum', '/features/voluum.html', 'Integration', 'fa-plug'], ['LinkTrust', '/features/linktrust.html', 'Integration', 'fa-plug']
   ];
 
+  // ---------- Navbar: the floating bar firms up once the page scrolls ----------
+
+  function initNavScroll() {
+    var nav = document.querySelector('.marketing-navbar');
+    if (!nav) return;
+    var ticking = false;
+    function update() {
+      nav.classList.toggle('avx-nav-scrolled', (window.scrollY || document.documentElement.scrollTop) > 8);
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
+  }
+
   function initPalette() {
     var isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     var box = null, input, list, items = [], sel = 0, last = null;
@@ -4360,7 +4330,7 @@
     // calm set: product UI, data and gentle reveals; no game-like decoration
     var steps = [initMotionToggle, initProgress, initRingbaHero, initDecision, initLeadFlow, initPlatformFlow,
       initBottomWaves, initPingPostDemos, initProductTour, initAiAtWork, initHowFlow, initBento, initFeatureDemos, initMiniPreviews,
-      initBackLinks, initZoom, initPalette, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
+      initBackLinks, initZoom, initNavScroll, initPalette, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
       initPricingHorizon, initIntegrationWaves, initFlowSequences, initTables, initCounters,
       initOffscreenPause, initScrollHints];
     if (!reduced) steps.push(initReveal);
