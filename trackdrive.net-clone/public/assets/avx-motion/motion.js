@@ -1259,19 +1259,22 @@
     if (!ctx) return wrap;
     var W = 0, H = 0, dpr = 1, raf = 0, visible = false, clock = 0, last = 0, lastDraw = 0, state = {};
 
+    // resizing a canvas wipes it, so only resize when the size really changed
     function size() {
       var r = wrap.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      W = Math.max(1, Math.round(r.width));
-      H = Math.max(1, Math.round(r.height));
+      var d = Math.min(window.devicePixelRatio || 1, 1.5);
+      var w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+      if (w === W && h === H && d === dpr) return false;
+      dpr = d; W = w; H = h;
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       state.sized = false;
+      return true;
     }
 
-    function frame(now) {
+    function frame(now, force) {
       raf = 0;
-      if (!reduced && (now - lastDraw < 32 || (lastDraw && scrolling()))) { schedule(); return; }
+      if (!force && !reduced && (now - lastDraw < 32 || (lastDraw && scrolling()))) { schedule(); return; }
       lastDraw = now;
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
@@ -1293,13 +1296,16 @@
     var resizeT = 0;
     window.addEventListener('resize', function () {
       clearTimeout(resizeT);
-      resizeT = setTimeout(function () { size(); if (reduced) frame(performance.now()); }, 150);
+      // a resized canvas is blank: repaint at once, even mid-scroll
+      resizeT = setTimeout(function () { if (size() || reduced) frame(performance.now(), true); }, 150);
     });
     setTimeout(function () {
+      // start 300px early, so the scene is drawn before it scrolls into view
       onVisible(wrap, function () {
-        visible = true; last = 0; size();
-        if (reduced) frame(performance.now()); else schedule();
-      }, function () { visible = false; }, 0);
+        visible = true; last = 0;
+        if (size() || !lastDraw || reduced) frame(performance.now(), true);
+        else schedule();
+      }, function () { visible = false; }, 0, '300px 0px');
     }, 0);
     return wrap;
   }
