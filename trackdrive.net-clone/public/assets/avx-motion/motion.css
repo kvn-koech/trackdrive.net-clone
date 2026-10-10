@@ -199,13 +199,9 @@ img.avx-tint {
   opacity: 1;
 }
 
+/* the flow shows as soon as the section does; its canvas is drawn before it scrolls in */
 .avx-flow3d .hero-simple-flow {
-  opacity: 0;
-}
-
-.avx-flow3d.avx-seen .hero-simple-flow {
   opacity: 1;
-  transition: opacity .9s ease;
 }
 
 /* spheres replace the original glass tiles */
@@ -10128,8 +10124,8 @@ body ::-webkit-scrollbar-thumb:hover {
    The landing page is long and every section is busy; content-visibility lets the browser skip
    style, layout and paint for sections well outside the viewport. "auto" remembers each
    section's real height once it has been seen, so the scrollbar settles quickly.
-   The hero and the logo strip (always near the top, and drawing outside their boxes) are left alone. */
-body.home main > section:nth-child(n+3) {
+   The hero, the logo strip and the leads-to-calls scene (all within the first screens) are left alone. */
+body.home main > section:nth-child(n+4) {
   content-visibility: auto;
   contain-intrinsic-size: auto 900px;
 }

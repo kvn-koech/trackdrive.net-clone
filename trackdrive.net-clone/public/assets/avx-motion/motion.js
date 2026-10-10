@@ -48,14 +48,15 @@
     return el;
   }
 
-  function onVisible(el, enter, leave, threshold) {
+  // margin widens the viewport for the test, so work can start before something arrives
+  function onVisible(el, enter, leave, threshold, margin) {
     if (!('IntersectionObserver' in window)) { enter(); return; }
     new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) enter();
         else if (leave) leave();
       });
-    }, { threshold: threshold || 0.15 }).observe(el);
+    }, { threshold: threshold || 0.15, rootMargin: margin || '0px' }).observe(el);
   }
 
   // ---------- Scroll progress ----------
@@ -348,11 +349,12 @@
         setVar(tilt, '--avx-hx', hx.toFixed(3));
         setVar(tilt, '--avx-hy', hy.toFixed(3));
       }, true);
+      // revealed just before it scrolls in, so it is already showing when it arrives
       onVisible(flowWrap, function () {
         if (flowWrap.classList.contains('avx-seen')) return;
         flowWrap.classList.add('avx-seen');
         setTimeout(function () { flowWrap.classList.add('avx-settled'); }, 1500);
-      }, null, 0.2);
+      }, null, 0.01, '0px 0px 200px 0px');
     });
   }
 
@@ -689,8 +691,9 @@
 
     function frame(now) {
       raf = 0;
-      // the calls move slowly: 30 fps reads the same and halves the work while scrolling
-      if (!reduced && (now - lastDraw < 32 || (lastDraw && scrolling()))) { schedule(); return; }
+      // the calls move slowly: 30 fps reads the same and halves the work. This scene is small,
+      // so unlike the big backgrounds it keeps moving while the page scrolls.
+      if (!reduced && now - lastDraw < 32) { schedule(); return; }
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
       lastDraw = now;
@@ -708,10 +711,12 @@
       clearTimeout(resizeT);
       resizeT = setTimeout(function () { measure(); draw(clock + 1); }, 150);
     });
+    // start 400px early: the sphere sprites are built and the first frame drawn off screen
     onVisible(tilt, function () {
       visible = true; last = 0; measure();
-      if (reduced) draw(1); else schedule();
-    }, function () { visible = false; }, 0);
+      draw(clock + 1);
+      if (!reduced) schedule();
+    }, function () { visible = false; }, 0, '400px 0px');
     // web fonts can shift the layout after the first measure
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (visible) measure(); });
   }
