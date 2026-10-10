@@ -8309,7 +8309,6 @@ button:focus-visible,
   height: 340px;
   padding: 22px 22px 8px;
   overflow-y: auto;
-  scrollbar-width: thin;
 }
 
 .avx-ask-hello,
@@ -8640,7 +8639,6 @@ button:focus-visible,
   padding: 18px 20px;
   overflow-y: auto;
   list-style: none;
-  scrollbar-width: thin;
 }
 
 .avx-listen-lines {
@@ -9645,7 +9643,6 @@ body.home main section .mktg-section-header {
   padding: 6px;
   overflow-y: auto;
   list-style: none;
-  scrollbar-width: thin;
 }
 
 .avx-k-list li[data-i] {
@@ -10046,5 +10043,83 @@ body > #injected-modal-header {
 @media (min-width: 1200px) and (max-width: 1399.98px) {
   .avx-hero-copy h1 {
     font-size: 48px !important;
+  }
+}
+
+/* ---------- Scrollbars: slim, dark, rounded; the thumb lights up blue on hover ---------- */
+
+/* Chromium and Safari: a floating pill thumb inset from the window edge */
+html::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-track {
+  background: #07080b;
+}
+
+html::-webkit-scrollbar-thumb {
+  min-height: 48px;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(96, 165, 250, .55), rgba(59, 130, 246, .42)) padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #60a5fa, #3b82f6) padding-box;
+}
+
+html::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #93c5fd, #2563eb) padding-box;
+}
+
+html::-webkit-scrollbar-corner {
+  background: #07080b;
+}
+
+/* no arrow buttons at the ends of any scrollbar */
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* the site stylesheet colors every scrollbar with the standard property, which makes
+   Chromium skip the styles below; hand those elements back to them */
+@supports selector(::-webkit-scrollbar) {
+  [data-bs-theme="dark"] * {
+    scrollbar-color: auto;
+  }
+}
+
+/* inner scroll areas (menus, palette, demos, tables): thinner, no track */
+body ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body ::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, .28) padding-box;
+}
+
+body ::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, .7) padding-box;
+}
+
+/* Firefox (no pseudo-elements): the standard properties give the same colors */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+      scrollbar-color: rgba(96, 165, 250, .45) #07080b;
+  }
+
+  body * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, .35) transparent;
   }
 }
