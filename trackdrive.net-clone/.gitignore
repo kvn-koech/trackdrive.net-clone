@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# server build of the pages (deleted after prerendering)
+.ssr

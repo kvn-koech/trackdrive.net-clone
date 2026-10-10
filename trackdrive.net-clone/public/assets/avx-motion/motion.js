@@ -4148,6 +4148,15 @@
   }
 
   function initBackLinks() {
+    // the close button on a feature page goes back to the page that opened it; opened from
+    // elsewhere (or in a new tab) it follows its href to the Features page
+    document.addEventListener('click', function (e) {
+      var back = e.target.closest && e.target.closest('[data-avx-back]');
+      var fromSite = document.referrer && document.referrer.indexOf(location.origin + '/') === 0;
+      if (!back || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || !fromSite) return;
+      e.preventDefault();
+      history.back();
+    });
     document.addEventListener('click', function (e) {
       var a = e.target.closest && e.target.closest('.modal a.mktg-subpage-back');
       if (!a || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;

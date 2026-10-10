@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/:page(brand_assets|careers|features|pricing|privacy_policy|terms_of_service)/",
