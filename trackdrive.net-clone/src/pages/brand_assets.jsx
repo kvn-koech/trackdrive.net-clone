@@ -6,6 +6,16 @@ export const meta = {
   layout: "site",
 }
 
+// the downloadable logo set in public/assets/brand: [file, name, where to use it]
+const LOGOS = [
+  ["horizontal-gradient", "Primary Logotype", "Use on a white background."],
+  ["horizontal-white", "Primary Logotype", "Use on a gradient background."],
+  ["vertical-gradient", "Vertical Logotype", "Use in marketing with plenty of space on white."],
+  ["vertical-white", "Vertical Logotype", "Use in marketing with plenty of space."],
+  ["icon-gradient", "Icon", "Use in UI with limited space on white."],
+  ["icon-white", "Icon", "Use in UI with limited space."],
+]
+
 export default function BrandAssets() {
   return (
     <main>
@@ -28,102 +38,26 @@ export default function BrandAssets() {
             <p className="text-muted">The logo should never be placed vertically, outlined or modified in shape or form.</p>
           </div>
           <div className="row g-4 mb-5">
-            <div className="col-md-6 col-lg-4">
-              <div className="mktg-brand-card">
-                <div className="mktg-brand-preview">
-                  <div className="image horizontal-logo-gradient" title="horizontal gradient logo" />
-                </div>
-                <div className="mktg-brand-card-body">
-                  <h5 className="fw-semibold mb-1">Primary Logotype</h5>
-                  <p className="text-muted small mb-3">Use on a white background.</p>
-                  <div className="d-flex gap-2">
-                    <a className="btn btn-sm btn-outline-td-green" href="/assets/trackdrive_marketing/brand-assets/download/eps/horizontal-gradient-logo.eps">EPS</a>
-                    {" "}
-                    <a className="btn btn-sm btn-outline-td-green" download="horizontal-gradient-logo.png" href="/assets/trackdrive_marketing/brand-assets/download/png/horizontal-gradient-logo.png">PNG</a>
+            {LOGOS.map(([file, title, use]) => {
+              const dark = file.endsWith('-white')
+              return (
+                <div key={file} className="col-md-6 col-lg-4">
+                  <div className={'mktg-brand-card' + (dark ? ' mktg-brand-card--dark' : '')}>
+                    <div className={'mktg-brand-preview' + (dark ? ' mktg-brand-preview--dark' : '')}>
+                      <img className={'avx-brand-logo avx-brand-logo--' + file.split('-')[0]} src={`/assets/brand/avortyx-${file}.png`} alt={`Avortyx ${title.toLowerCase()}`} />
+                    </div>
+                    <div className="mktg-brand-card-body">
+                      <h5 className="fw-semibold mb-1">{title}</h5>
+                      <p className="text-muted small mb-3">{use}</p>
+                      <div className="d-flex gap-2">
+                        <a className="btn btn-sm btn-outline-td-green" download href={`/assets/brand/avortyx-${file}.svg`}>SVG</a>
+                        <a className="btn btn-sm btn-outline-td-green" download href={`/assets/brand/avortyx-${file}.png`}>PNG</a>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="mktg-brand-card mktg-brand-card--dark">
-                <div className="mktg-brand-preview mktg-brand-preview--dark">
-                  <div className="image horizontal-logo-white" title="horizontal white logo" />
-                </div>
-                <div className="mktg-brand-card-body">
-                  <h5 className="fw-semibold mb-1">Primary Logotype</h5>
-                  <p className="text-muted small mb-3">Use on a gradient background.</p>
-                  <div className="d-flex gap-2">
-                    <a className="btn btn-sm btn-outline-td-green" href="/assets/trackdrive_marketing/brand-assets/download/eps/horizontal-white-logo.eps">EPS</a>
-                    {" "}
-                    <a className="btn btn-sm btn-outline-td-green" download="horizontal-white-logo.png" href="/assets/trackdrive_marketing/brand-assets/download/png/horizontal-white-logo.png">PNG</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="mktg-brand-card">
-                <div className="mktg-brand-preview">
-                  <div className="image vertical-logo-gradient" title="vertical gradient logo" />
-                </div>
-                <div className="mktg-brand-card-body">
-                  <h5 className="fw-semibold mb-1">Vertical Logotype</h5>
-                  <p className="text-muted small mb-3">Use in marketing with plenty of space on white.</p>
-                  <div className="d-flex gap-2">
-                    <a className="btn btn-sm btn-outline-td-green" href="/assets/trackdrive_marketing/brand-assets/download/eps/vertical-gradient-logo.eps">EPS</a>
-                    {" "}
-                    <a className="btn btn-sm btn-outline-td-green" download="vertical-gradient-logo.png" href="/assets/trackdrive_marketing/brand-assets/download/png/vertical-gradient-logo.png">PNG</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="mktg-brand-card mktg-brand-card--dark">
-                <div className="mktg-brand-preview mktg-brand-preview--dark">
-                  <div className="image vertical-logo-white" title="vertical white logo" />
-                </div>
-                <div className="mktg-brand-card-body">
-                  <h5 className="fw-semibold mb-1">Vertical Logotype</h5>
-                  <p className="text-muted small mb-3">Use in marketing with plenty of space.</p>
-                  <div className="d-flex gap-2">
-                    <a className="btn btn-sm btn-outline-td-green" href="/assets/trackdrive_marketing/brand-assets/download/eps/vertical-white-logo.eps">EPS</a>
-                    {" "}
-                    <a className="btn btn-sm btn-outline-td-green" download="vertical-white-logo.png" href="/assets/trackdrive_marketing/brand-assets/download/png/vertical-white-logo.png">PNG</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="mktg-brand-card">
-                <div className="mktg-brand-preview">
-                  <div className="image icon-logo-gradient" title="icon gradient logo" />
-                </div>
-                <div className="mktg-brand-card-body">
-                  <h5 className="fw-semibold mb-1">Icon</h5>
-                  <p className="text-muted small mb-3">Use in UI with limited space on white.</p>
-                  <div className="d-flex gap-2">
-                    <a className="btn btn-sm btn-outline-td-green" href="/assets/trackdrive_marketing/brand-assets/download/eps/icon-gradient-logo.eps">EPS</a>
-                    {" "}
-                    <a className="btn btn-sm btn-outline-td-green" download="icon-gradient-logo.png" href="/assets/trackdrive_marketing/brand-assets/download/png/icon-gradient-logo.png">PNG</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="mktg-brand-card mktg-brand-card--dark">
-                <div className="mktg-brand-preview mktg-brand-preview--dark">
-                  <div className="image icon-logo-white" title="icon white logo" />
-                </div>
-                <div className="mktg-brand-card-body">
-                  <h5 className="fw-semibold mb-1">Icon</h5>
-                  <p className="text-muted small mb-3">Use in UI with limited space.</p>
-                  <div className="d-flex gap-2">
-                    <a className="btn btn-sm btn-outline-td-green" href="/assets/trackdrive_marketing/brand-assets/download/eps/icon-white-logo.eps">EPS</a>
-                    {" "}
-                    <a className="btn btn-sm btn-outline-td-green" download="icon-white-logo.png" href="/assets/trackdrive_marketing/brand-assets/download/png/icon-white-logo.png">PNG</a>
-                  </div>
-                </div>
-              </div>
-            </div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -131,8 +65,7 @@ export default function BrandAssets() {
         <div className="container">
           <div className="text-center mb-4">
             <h2 className="fw-bold mb-2">Color Palette</h2>
-            <p className="text-muted">Start with a white canvas, accompanied by a dominance of Avortyx green. Filled with cool grey copy and splashed accents of CTA orange.</p>
-            <a href="/assets/trackdrive_marketing/brand-assets/Avortyx.ase" className="btn btn-outline-td-green mt-2">Download Color Palette (.ASE)</a>
+            <p className="text-muted">Start with a white canvas, accompanied by a dominance of Avortyx blue. Filled with cool grey copy and splashed accents of CTA orange.</p>
           </div>
           <div className="row g-3 justify-content-center">
             <div className="col-6 col-md-4 col-lg-2">

@@ -21,8 +21,13 @@ src/
 public/                    Copied to the build as-is
   assets/avx-motion/       motion.css + motion.js: animations, live demos, search, zoom
   assets/avx-theme/        theme.css: colors and type
-  assets/avx-site/         Base stylesheet and script (Bootstrap, menus, feature pop-ups, cookie notice)
-  assets/avx-shots/        Product screenshots
+  assets/avx-site/         Base stylesheet and script (Bootstrap, menus, feature pop-ups, cookie notice);
+                           img/ holds partner logos and page illustrations
+  assets/avx-shots/        Product screenshots (dark, Avortyx-branded)
+  assets/avx-baked/        Pre-rendered background art used by motion.js
+  assets/avx-ringba/       Sphere art used by the integrations hub
+  assets/brand/            Avortyx logo set (SVG + PNG) offered on the brand kit page
+  favicon*, og-image.png   Icons and the social share image
 scripts/prerender.js       Writes every page to dist/
 vercel.json                Build settings, URL rewrites, cache headers
 ```

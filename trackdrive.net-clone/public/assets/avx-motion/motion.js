@@ -5,7 +5,6 @@
 (function () {
   'use strict';
 
-  var ASSETS = '/assets/trackdrive_marketing/brand-assets/ringba%20assets/';
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
@@ -16,31 +15,10 @@
   function scrolling() { return performance.now() < scrollQuietAt; }
 
   var BAKED = '/assets/avx-baked/';
-  var DARK = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-  // colored spheres that have a pre-tinted blue twin in /assets/avx-baked
-  var BLUE_TWIN = /^(green-sphere-120|orange_sphere-120|pink-sphere-120|purple-sphere-120|icon-sphere--green|icon-sphere--pink|icon-sphere--orange)\.png$/;
-
+  // decorative art from /assets/avx-ringba
   function img(name, className) {
     var el = document.createElement('img');
-    var twin = BLUE_TWIN.test(name) && !/avx-keep/.test(className || '');
-    el.src = twin ? BAKED + name.replace('.png', '-b.webp') : ASSETS + name;
-    el.alt = '';
-    el.decoding = 'async';
-    el.loading = 'lazy';
-    if (className) el.className = className;
-    // colored spheres are tinted to the hero blue, unless marked avx-keep
-    return el;
-  }
-
-  // theme-matched pre-rendered art: <base>-l.png (light) or <base>-d.png (dark)
-  function baked(base, className) {
-    return bakedFile(base + (DARK ? '-d' : '-l') + '.png', className);
-  }
-
-  // dark art ships as WebP; the light-theme PNGs are kept only as a fallback
-  function bakedFile(file, className) {
-    var el = document.createElement('img');
-    el.src = BAKED + (/-l\.png$/.test(file) ? file : file.replace(/\.png$/, '.webp'));
+    el.src = RB + name;
     el.alt = '';
     el.decoding = 'async';
     el.loading = 'lazy';
@@ -137,72 +115,7 @@
 
   // ---------- Pointer tilt ----------
 
-  function initTilt() {
-    if (!finePointer) return;
-    document.querySelectorAll('main .card, main .integration-logo-card, main .mktg-spotlight-visual, main .marketing-subpage-content .bg-light.rounded-3').forEach(function (el) {
-      if (el.closest('.modal')) return;
-      el.classList.add('avx-tilt');
-      el.addEventListener('pointermove', function (e) {
-        var r = el.getBoundingClientRect();
-        var x = (e.clientX - r.left) / r.width - 0.5;
-        var y = (e.clientY - r.top) / r.height - 0.5;
-        el.style.setProperty('--avx-ry', (x * 10).toFixed(2) + 'deg');
-        el.style.setProperty('--avx-rx', (y * -10).toFixed(2) + 'deg');
-        el.classList.add('avx-tilting');
-      });
-      el.addEventListener('pointerleave', function () {
-        el.classList.remove('avx-tilting');
-      });
-    });
-  }
-
   // ---------- Floating spheres (heroes, CTA bands, convert section) ----------
-
-  function addFloats(host, spheres, extraClass) {
-    host.classList.add('avx-fx-host');
-    var fx = document.createElement('div');
-    fx.className = 'avx-fx' + (extraClass ? ' ' + extraClass : '');
-    fx.setAttribute('aria-hidden', 'true');
-    spheres.forEach(function (s) {
-      var wrap = document.createElement('div');
-      wrap.className = 'avx-float' + (s.soft ? ' avx-soft' : '') + (s.hideSm ? ' avx-hide-sm' : '');
-      ['top', 'right', 'bottom', 'left'].forEach(function (k) { if (s[k]) wrap.style[k] = s[k]; });
-      wrap.style.setProperty('--size', s.size + 'px');
-      wrap.style.setProperty('--depth', s.depth);
-      wrap.style.setProperty('--bob', s.bob || '9s');
-      wrap.style.setProperty('--spin', s.spin || '40s');
-      wrap.style.setProperty('--delay', s.delay || '0s');
-      if (s.alpha) wrap.style.setProperty('--alpha', s.alpha);
-      wrap.appendChild(s.baked ? bakedFile(s.baked) : img(s.src));
-      fx.appendChild(wrap);
-    });
-    host.insertBefore(fx, host.firstChild);
-    if (!reduced) parallax(host, fx);
-    dimOverText(host, fx);
-    return fx;
-  }
-
-  // fade any sphere whose resting position overlaps copy (positions are tuned for
-  // centered layouts; left-aligned heroes and narrow screens wrap text beneath them)
-  function dimOverText(host, fx) {
-    function check() {
-      var text = Array.prototype.map.call(
-        host.querySelectorAll('h1, h2, h3, p, .lead, .btn, .flow-item'),
-        function (t) { return t.getBoundingClientRect(); });
-      Array.prototype.forEach.call(fx.children, function (f) {
-        var r = f.getBoundingClientRect(), inset = r.width * 0.15;
-        var hit = r.width > 0 && text.some(function (t) {
-          return t.width > 0 && r.left + inset < t.right && r.right - inset > t.left &&
-            r.top + inset < t.bottom && r.bottom - inset > t.top;
-        });
-        f.classList.toggle('avx-over-text', hit);
-      });
-    }
-    requestAnimationFrame(check);
-    window.addEventListener('load', check);
-    var t = 0;
-    window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(check, 200); });
-  }
 
   // Writes a custom property only when its value changes (avoids needless style recalcs).
   function setVar(el, name, value) {
@@ -281,35 +194,6 @@
     }
     onVisible(host, function () { measureDriver(d); d.visible = true; d.dirty = true; scheduleDrivers(); },
       function () { d.visible = false; }, 0);
-  }
-
-  function parallax(host, target) {
-    driver(host, 0.08, function (px, py, r) {
-      setVar(target, '--avx-px', (px * 24).toFixed(2));
-      setVar(target, '--avx-py', (py * 24).toFixed(2));
-    });
-  }
-
-  function initHeroFx() {
-    var hero = document.querySelector('main > section');
-    if (!hero || hero.closest('.modal')) return;
-    addFloats(hero, [
-      { src: 'blue-sphere-120.png', top: '14%', left: '5%', size: 84, depth: 1.6, bob: '8s', spin: '38s' },
-      { src: 'icon-sphere--green.png', top: '20%', right: '6%', size: 96, depth: 2.2, bob: '10s', spin: '55s', delay: '-3s' },
-      { src: 'orange_sphere-120.png', bottom: '10%', left: '14%', size: 46, depth: 0.9, bob: '7s', delay: '-2s', hideSm: true },
-      { src: 'purple-sphere-120.png', bottom: '14%', right: '16%', size: 58, depth: 1.2, bob: '11s', delay: '-5s', hideSm: true },
-      { src: 'icon-sphere--pink.png', top: '6%', left: '38%', size: 30, depth: 0.6, bob: '6s', delay: '-1s', hideSm: true }
-    ]);
-  }
-
-  function initCtaFx() {
-    document.querySelectorAll('.marketing-cta-band').forEach(function (band) {
-      var fx = addFloats(band, [
-        { src: 'blue-sphere-120.png', top: '18%', left: '8%', size: 70, depth: 1.4, alpha: .8 },
-        { src: 'icon-sphere--green.png', bottom: '12%', right: '9%', size: 90, depth: 2, delay: '-4s', alpha: .85 }
-      ]);
-      fx.insertBefore(bakedFile('cta-glow.png', 'avx-waves'), fx.firstChild);
-    });
   }
 
   // ---------- "Everything you need to convert" 3D lead-flow scene ----------
@@ -721,149 +605,7 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (visible) measure(); });
   }
 
-  // scroll-driven story: as the section scrolls up, a lead lights up, flows into the hub,
-  // and comes out as revenue
-  function storyline(wrap, flow) {
-    var nodes = [
-      [flow.querySelector('.hero-simple-node-leads'), 0.12],
-      [flow.querySelector('.hero-simple-hub'), 0.45],
-      [flow.querySelector('.hero-simple-node-revenue'), 0.8]
-    ];
-    var tracks = flow.querySelectorAll('.hero-simple-arrow-track');
-    wrap.classList.add('avx-story');
-    var ticking = false, last = -1;
-    function update() {
-      ticking = false;
-      var r = wrap.getBoundingClientRect(), vh = window.innerHeight;
-      // 0 when the flow enters the bottom of the screen, 1 once it reaches the upper third
-      var p = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.62 + r.height * 0.4)));
-      if (reduced) p = 1;
-      if (Math.abs(p - last) < 0.004) return;
-      last = p;
-      nodes.forEach(function (n) { if (n[0]) n[0].classList.toggle('avx-lit', p >= n[1]); });
-      if (tracks[0]) tracks[0].style.setProperty('--fill', Math.max(0, Math.min(1, (p - 0.14) / 0.3)).toFixed(3));
-      if (tracks[1]) tracks[1].style.setProperty('--fill', Math.max(0, Math.min(1, (p - 0.48) / 0.3)).toFixed(3));
-    }
-    window.addEventListener('scroll', function () {
-      if (!ticking) { ticking = true; requestAnimationFrame(update); }
-    }, { passive: true });
-    update();
-  }
-
   // ---------- Spotlight headings: unique 3D scene behind each heading ----------
-
-  var HEADING_FX = [
-    { re: /^ping\s*\/\s*post$/i, type: 'ping', w: 340, h: 340 },
-    { re: /^power dialer$/i, type: 'dialer', w: 360, h: 360 },
-    { re: /^call tracking$/i, type: 'tracking', w: 460, h: 260 },
-    { re: /^lead automation$/i, type: 'automation', w: 360, h: 360 },
-    { re: /^agent control center$/i, type: 'gyro', w: 320, h: 320 }
-  ];
-
-  function buildHeadingFx(type) {
-    var anim = document.createElement('div');
-    anim.className = 'avx-hfx-anim';
-    function add(el) { anim.appendChild(el); return el; }
-    function div(cls) { var d = document.createElement('div'); d.className = cls; return d; }
-
-    if (type === 'ping') {
-      add(baked('shine', 'avx-core'));
-      for (var i = 0; i < 3; i++) add(div('avx-echo'));
-    } else if (type === 'dialer') {
-      add(baked('dial', 'avx-core'));
-      add(div('avx-dial-face'));
-      var holes = add(div('avx-dial-holes'));
-      for (var k = 0; k < 10; k++) {
-        var hole = div('avx-dial-hole');
-        hole.style.setProperty('--a', (k * 30 + 60) + 'deg');
-        holes.appendChild(hole);
-      }
-      add(img('green-sphere-120.png', 'avx-dial-stop'));
-      add(div('avx-dial-ring'));
-    } else if (type === 'tracking') {
-      // attribution map: calls land as pins, each traced to its source and number
-      var floor = add(div('avx-trk-floor'));
-      // the masked grid is its own layer: a mask on the floor itself would flatten the pins
-      var grid = div('avx-trk-grid');
-      grid.appendChild(div('avx-trk-scan'));
-      floor.appendChild(grid);
-      setTimeout(function () { trackingPins(floor); }, 0);
-    } else if (type === 'automation') {
-      var loop = add(div('avx-loop'));
-      ['blue-sphere-120.png', 'green-sphere-120.png', 'orange_sphere-120.png', 'pink-sphere-120.png', 'purple-sphere-120.png']
-        .forEach(function (name, n, all) {
-          var slot = div('avx-slot');
-          slot.style.setProperty('--a', (360 / all.length * n) + 'deg');
-          slot.style.setProperty('--r', '180px');
-          slot.appendChild(img(name));
-          loop.appendChild(slot);
-        });
-    } else if (type === 'gyro') {
-      [1, 2, 3].forEach(function (n) {
-        var g = add(div('avx-gyro avx-gyro-' + n));
-        g.appendChild(baked('gyro'));
-      });
-      add(img('blue-sphere-120.png', 'avx-gyro-core'));
-    }
-    return anim;
-  }
-
-  var TRK_SOURCES = ['Google Ads', 'Meta', 'Bing', 'TikTok', 'Email', 'Direct', 'Affiliate'];
-
-  function trackingPins(floor) {
-    if (reduced) return;
-    var timer = null, side = 0;
-    function drop() {
-      timer = setTimeout(drop, 1300 + Math.random() * 700);
-      if (motionPaused() || floor.querySelectorAll('.avx-pin').length > 3) return;
-      // alternate sides and keep clear of the heading in the middle
-      side = 1 - side;
-      var x = side ? 58 + Math.random() * 28 : 14 + Math.random() * 28;
-      var y = 22 + Math.random() * 56;
-      var pin = document.createElement('div');
-      pin.className = 'avx-pin';
-      pin.style.left = x.toFixed(1) + '%';
-      pin.style.top = y.toFixed(1) + '%';
-      var num = '(888) 5' + (10 + Math.floor(Math.random() * 89)) + '-0' + (100 + Math.floor(Math.random() * 899));
-      pin.innerHTML = '<i class="avx-pin-ring"></i><i class="avx-pin-ring avx-pin-ring-2"></i>' +
-        '<div class="avx-pin-stand"><b class="avx-pin-stem"></b><span class="avx-pin-tag"><em>' +
-        TRK_SOURCES[Math.floor(Math.random() * TRK_SOURCES.length)] + '</em>' + num + '</span></div>';
-      floor.appendChild(pin);
-      setTimeout(function () { if (pin.parentNode) pin.parentNode.removeChild(pin); }, 3600);
-    }
-    onVisible(floor, function () { if (!timer) timer = setTimeout(drop, 300); },
-      function () { clearTimeout(timer); timer = null; }, 0.05);
-  }
-
-  function initHeadingFx() {
-    document.querySelectorAll('main .mktg-section-header > h2').forEach(function (h2) {
-      var text = h2.textContent.trim();
-      var cfg = HEADING_FX.filter(function (c) { return c.re.test(text); })[0];
-      if (!cfg) return;
-      var host = h2.parentElement;
-      var section = host.closest('section') || host;
-      host.classList.add('avx-hfx-host');
-      section.classList.add('avx-clip');
-
-      var fx = document.createElement('div');
-      fx.className = 'avx-hfx avx-hfx-' + cfg.type;
-      fx.setAttribute('aria-hidden', 'true');
-      fx.style.setProperty('--w', cfg.w + 'px');
-      fx.style.setProperty('--h', cfg.h + 'px');
-      var stage = document.createElement('div');
-      stage.className = 'avx-hfx-stage';
-      stage.appendChild(buildHeadingFx(cfg.type));
-      fx.appendChild(stage);
-      host.insertBefore(fx, h2);
-      if (reduced) return;
-
-      // pointer + scroll make the scene react in 3D while it is on screen
-      driver(section, 0.07, function (hx, hy, r) {
-        setVar(fx, '--avx-hx', hx.toFixed(3));
-        setVar(fx, '--avx-hy', hy.toFixed(3));
-      });
-    });
-  }
 
   // ---------- Bottom-of-page 3D wave floors (one style per page) ----------
 
@@ -940,7 +682,7 @@
       if (o.z) layer.style.setProperty('--z', o.z);
       var im = document.createElement('div');
       im.className = 'avx-bw-img avx-bw-' + l[1] + ' ' + l[2];
-      if (l[0]) im.style.setProperty('--src', 'url("' + BAKED + l[0] + (DARK ? '-d.webp' : '-l.png') + '")');
+      if (l[0]) im.style.setProperty('--src', 'url("' + BAKED + l[0] + '-d.webp")');
       if (o.alpha) im.style.setProperty('--alpha', o.alpha);
       if (o.speed) im.style.setProperty('--speed', o.speed);
       if (o.pos) im.style.setProperty('--pos', o.pos);
@@ -1072,7 +814,7 @@
     });
 
     orbit.appendChild(spin);
-    stage.appendChild(img('icon-sphere--blue.png', 'avx-ihub-core'));
+    stage.appendChild(img('icon-sphere--blue.webp', 'avx-ihub-core'));
     stage.appendChild(orbit);
     hub.appendChild(stage);
     container.appendChild(hub);
@@ -1103,74 +845,7 @@
 
   // ---------- Section backgrounds ----------
 
-  function sbg(cls) {
-    var el = document.createElement('div');
-    el.className = 'avx-sbg ' + cls;
-    el.setAttribute('aria-hidden', 'true');
-    return el;
-  }
-
-  function initSectionBackgrounds() {
-    // page-hero titles get tilted portal rings, like the landing page hero
-    document.querySelectorAll('main section.mktg-subpage-hero h1').forEach(function (h1) {
-      var wrap = document.createElement('div');
-      wrap.className = 'avx-h1wrap';
-      h1.parentNode.insertBefore(wrap, h1);
-      var rings = sbg('avx-sbg-rings');
-      var tilt = document.createElement('div');
-      tilt.className = 'avx-sbg-rings-tilt';
-      tilt.appendChild(baked('rings'));
-      rings.appendChild(tilt);
-      wrap.appendChild(rings);
-      wrap.appendChild(h1);
-      var section = wrap.closest('section');
-      if (section) section.classList.add('avx-fx-host');
-    });
-
-    // integration logo sections get a slowly turning glow orb
-    topSections().forEach(function (section) {
-      if (section.querySelectorAll('.integration-logo-card').length < 3) return;
-      var h2 = section.querySelector('h2');
-      if (h2 && /bring your own voip/i.test(h2.textContent)) return;
-      section.classList.add('avx-fx-host');
-      var orb = sbg('avx-sbg-orb');
-      orb.appendChild(baked('orb'));
-      section.insertBefore(orb, section.firstChild);
-    });
-
-    // card grids and pricing get a dot-matrix floor
-    topSections().forEach(function (section) {
-      var cards = section.querySelectorAll('.card').length;
-      if (!(cards >= 3 || section.classList.contains('pricing-body'))) return;
-      if (section.classList.contains('avx-bwaves-host')) return; // keep the bottom waves clear
-      section.classList.add('avx-fx-host');
-      var dots = sbg('avx-sbg-dots');
-      var plane = document.createElement('div');
-      plane.className = 'avx-sbg-dots-plane';
-      dots.appendChild(plane);
-      section.insertBefore(dots, section.firstChild);
-    });
-
-    // "How It Works" boxes get a grid floor moving forward
-    document.querySelectorAll('main .bg-light.rounded-3').forEach(function (box) {
-      if (!box.querySelector('.flow-diagram, .flow-diagram-vertical')) return;
-      box.classList.add('avx-sbg-host');
-      var floor = sbg('avx-sbg-floor');
-      buildWaveLayers(WAVE_STYLES.mesh, floor);
-      box.insertBefore(floor, box.firstChild);
-    });
-
-  }
-
   // ---------- Step-by-step highlight for flow diagrams ----------
-
-  var ORB_BY_BG = [
-    ['bg-primary', 'blue-sphere-120.png'],
-    ['bg-info', 'icon-sphere--blue.png'],
-    ['bg-warning', 'orange_sphere-120.png'],
-    ['bg-success', 'green-sphere-120.png'],
-    ['bg-danger', 'pink-sphere-120.png']
-  ];
 
   function initFlowSequences() {
     if (reduced) return;
@@ -1408,20 +1083,7 @@
 
   // ---------- Aurora: drifting light behind sections that have no scene of their own ----------
 
-  function initAurora() {
-    topSections().forEach(function (section) {
-      if (section.matches('.marketing-cta-band, .marketing-hero-simple, .hero-constellation-bg')) return;
-      if (section.querySelector('.avx-sbg, .avx-fx, .avx-bwaves, .avx-ibg, .avx-flow3d, .avx-plat3d, .avx-hfx')) return;
-      section.classList.add('avx-fx-host');
-      var aurora = document.createElement('div');
-      aurora.className = 'avx-aurora';
-      aurora.setAttribute('aria-hidden', 'true');
-      aurora.innerHTML = '<i></i><i></i><i></i>';
-      section.insertBefore(aurora, section.firstChild);
-    });
-  }
-
-  // ---------- Ringba art (optimized copies of /ringba assets) ----------
+  // ---------- Ringba art (optimized WebP in /assets/avx-ringba) ----------
 
   var RB = '/assets/avx-ringba/';
 
@@ -1448,19 +1110,6 @@
     '.flow-item, .spotlight-flow-step, .mktg-brand-card, .mktg-careers-card, .mktg-auth-card, ' +
     '.pricing-highlight-card, .pricing-table-wrap, .pricing-accordion .accordion-item, .pricing-calculator-breakdown';
 
-  function initSpotlight() {
-    if (!finePointer) return;
-    document.querySelectorAll(SPOT).forEach(function (card) {
-      if (card.closest('.modal')) return;
-      card.classList.add('avx-spot');
-      card.addEventListener('pointermove', function (e) {
-        var r = card.getBoundingClientRect();
-        card.style.setProperty('--mx', (e.clientX - r.left).toFixed(0) + 'px');
-        card.style.setProperty('--my', (e.clientY - r.top).toFixed(0) + 'px');
-      });
-    });
-  }
-
   // ---------- Headings: words rise out of a blur as they scroll in ----------
 
   function splitWords(node, counter) {
@@ -1484,39 +1133,9 @@
     });
   }
 
-  function initHeadingWords() {
-    if (reduced || !('IntersectionObserver' in window)) return;
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        io.unobserve(e.target);
-        e.target.classList.add('avx-words-in');
-      });
-    }, { threshold: 0.3 });
-    document.querySelectorAll('main h1, main h2, .marketing-cta-band h2').forEach(function (h) {
-      // accordion headers wrap a flex button: split words would lose their spaces
-      if (h.closest('.modal') || h.querySelector('button') || h.textContent.trim().length > 90) return;
-      splitWords(h, { n: 0 });
-      h.classList.add('avx-words');
-      io.observe(h);
-    });
-  }
-
   // ---------- Landing hero: synthwave floor, hologram, and a live routing panel ----------
 
   var LIVE_BUYERS = ['Apex Insurance', 'Northwind Benefits', 'Meridian Health', 'Summit Solar', 'Lakeside Legal', 'Harbor Home', 'Pinnacle Auto'];
-  var LIVE_STATES = [['Connected', 'ok'], ['Ringing', 'ring'], ['Bidding', 'bid'], ['Connected', 'ok']];
-
-  function liveRow() {
-    var st = LIVE_STATES[Math.floor(Math.random() * LIVE_STATES.length)];
-    var area = 200 + Math.floor(Math.random() * 700);
-    var row = el('div', 'avx-live-row',
-      '<span class="avx-live-num">(' + area + ') ··' + (10 + Math.floor(Math.random() * 89)) + '</span>' +
-      '<span class="avx-live-buyer">' + LIVE_BUYERS[Math.floor(Math.random() * LIVE_BUYERS.length)] + '</span>' +
-      '<span class="avx-live-pay">$' + (28 + Math.floor(Math.random() * 45)) + '.00</span>' +
-      '<span class="avx-live-pill avx-pill-' + st[1] + '">' + st[0] + '</span>');
-    return row;
-  }
 
   function initRingbaHero() {
     var hero = document.querySelector('.marketing-hero-simple.hero-constellation-bg');
@@ -1526,7 +1145,6 @@
     // a quiet 3D floor: a perspective grid reaching back to a soft horizon
     hero.insertBefore(el('div', 'avx-pbg', '<div class="avx-pbg-spot"></div><div class="avx-pbg-dots"></div><div class="avx-pbg-eclipse"></div><div class="avx-pbg-fade"></div>'), hero.firstChild);
   }
-
 
   // ---------- Homepage: 3D waves floating behind the integration sections (no edges) ----------
 
@@ -1590,46 +1208,9 @@
 
   // ---------- Hero: a call attribution card (source, campaign, keyword, buyer, revenue) ----------
 
-  var ATTR_CALLS = [
-    { caller: '(312) 555-0142', number: '(888) 571-0429', source: 'Google Ads', campaign: 'Medicare · Brand', keyword: 'medicare plans near me', buyer: 'Apex Insurance', dur: '6:42', rev: '$64.00' },
-    { caller: '(646) 555-0188', number: '(855) 204-7731', source: 'Meta', campaign: 'Solar · Lookalike', keyword: 'Lead form · solar quote', buyer: 'Summit Solar', dur: '4:18', rev: '$48.00' },
-    { caller: '(213) 555-0117', number: '(877) 390-1158', source: 'Bing Ads', campaign: 'Auto Ins. · Generic', keyword: 'cheap car insurance quote', buyer: 'Pinnacle Auto', dur: '8:05', rev: '$72.00' },
-    { caller: '(404) 555-0163', number: '(866) 742-0915', source: 'Organic', campaign: 'Legal · SEO', keyword: 'injury lawyer free consult', buyer: 'Lakeside Legal', dur: '11:27', rev: '$95.00' }
-  ];
-
-  function attributionCard() {
-    var card = el('div', 'avx-attr');
-    card.setAttribute('aria-hidden', 'true');
-    function fill(c) {
-      card.innerHTML =
-        '<div class="avx-attr-head"><span><i class="avx-live-dot"></i>Call attributed</span><em>just now</em></div>' +
-        '<div class="avx-attr-num"><b>' + c.caller + '</b><span>called tracking number ' + c.number + '</span></div>' +
-        '<dl class="avx-attr-rows">' +
-        '<div><dt>Source</dt><dd>' + c.source + '</dd></div>' +
-        '<div><dt>Campaign</dt><dd>' + c.campaign + '</dd></div>' +
-        '<div><dt>Keyword</dt><dd>' + c.keyword + '</dd></div>' +
-        '<div><dt>Buyer</dt><dd>' + c.buyer + '</dd></div></dl>' +
-        '<div class="avx-attr-path"><span>Ad click</span><i></i><span>Call</span><i></i><span>Routed</span><i></i><span>Converted</span></div>' +
-        '<div class="avx-attr-foot"><span>Duration <b>' + c.dur + '</b></span><span>Revenue <b>' + c.rev + '</b></span></div>';
-    }
-    var i = 0;
-    fill(ATTR_CALLS[0]);
-    // a new attributed call every few seconds, swapped with a quiet fade
-    ticker(card, 7000, function () {
-      card.classList.add('avx-attr-out');
-      setTimeout(function () {
-        i = (i + 1) % ATTR_CALLS.length;
-        fill(ATTR_CALLS[i]);
-        card.classList.remove('avx-attr-out');
-      }, 300);
-    });
-    return card;
-  }
-
   // ---------- Motion toggle: one button pauses every 3D scene and live feed ----------
 
   var MOTION_KEY = 'avx-motion';
-
 
   function motionPaused() {
     return document.documentElement.classList.contains('avx-paused');
@@ -1664,141 +1245,6 @@
   // ---------- Landing intro: "Signal Sea" — a 3D field of light that ripples with each call ----------
   // A perspective-projected grid of points rolls like a voice waveform; every few
   // seconds a call lands somewhere in the field and a ripple spreads out from it.
-
-  function buildSignalSea(hero) {
-    var wrap = el('div', 'avx-intro');
-    wrap.setAttribute('aria-hidden', 'true');
-    wrap.appendChild(el('div', 'avx-intro-glow'));
-    var canvas = el('canvas', 'avx-sea');
-    wrap.appendChild(canvas);
-    var ctx = canvas.getContext('2d');
-    if (!ctx) return wrap;
-
-    var COLS = 72, ROWS = 34, X0 = -2100, X1 = 2100, Z0 = 380, Z1 = 2900;
-    var W = 0, H = 0, dpr = 1, f = 1, horizon = 0, camY = 170, ZC = (Z0 + Z1) / 2;
-    var pings = [], nextPing = 0.6, raf = 0, visible = false, clock = 0, last = 0;
-    // ten pre-built colours from deep blue to near-white, picked by brightness
-    var SHADES = [];
-    for (var i = 0; i < 10; i++) {
-      var k = i / 9;
-      SHADES.push('rgb(' + Math.round(37 + k * 182) + ',' + Math.round(99 + k * 135) + ',' + Math.round(235 + k * 19) + ')');
-    }
-
-    function size() {
-      var r = hero.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 1.25);
-      W = Math.max(1, Math.round(r.width));
-      H = Math.max(1, Math.round(r.height));
-      canvas.width = Math.round(W * dpr);
-      canvas.height = Math.round(H * dpr);
-      canvas.style.width = W + 'px';
-      canvas.style.height = H + 'px';
-      f = W * 0.7;
-      horizon = H * 0.52;
-    }
-
-    function height(x, z, t) {
-      // two slow swells crossing each other, like a sustained voice waveform
-      var h = 52 * Math.sin(x * 0.0019 + t * 0.5) * Math.cos(z * 0.0016 - t * 0.34) +
-              24 * Math.sin((x + z) * 0.0031 - t * 0.75);
-      var glow = 0;
-      for (var p = 0; p < pings.length; p++) {
-        var g = pings[p], age = t - g.t;
-        var d = Math.sqrt((x - g.x) * (x - g.x) + (z - g.z) * (z - g.z));
-        var front = d - age * 560, fade = Math.max(0, 1 - age / 3.2);
-        var wave = Math.exp(-(front * front) / 12000) * fade;
-        h += 95 * wave;
-        glow += wave;
-      }
-      return [h, glow];
-    }
-
-    var lastDraw = 0;
-    function frame(now) {
-      raf = 0;
-      // the swell is slow, so 30 fps reads the same and halves the work
-      if (!reduced && (now - lastDraw < 32 || (lastDraw && scrolling()))) { schedule(); return; }
-      lastDraw = now;
-      // scene time only advances while running, so a pause resumes without a jump
-      clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
-      last = now;
-      var t = clock;
-      if (t > nextPing && !reduced) {
-        pings.push({ x: (Math.random() - 0.5) * 2600, z: Z0 + 500 + Math.random() * 1500, t: t });
-        nextPing = t + 2.6 + Math.random() * 2.2;
-      }
-      pings = pings.filter(function (g) { return t - g.t < 3.4; });
-
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, W, H);
-      var cx = W / 2, rows = [];
-      // the camera drifts slowly from side to side so the field reads in depth
-      var yaw = 0.07 * Math.sin(t * 0.12), cy = Math.cos(yaw), sy0 = Math.sin(yaw);
-      for (var r = 0; r < ROWS; r++) {
-        var z = Z1 - (Z1 - Z0) * (r / (ROWS - 1)), row = [];
-        for (var c = 0; c < COLS; c++) {
-          var x = X0 + (X1 - X0) * (c / (COLS - 1));
-          var hv = height(x, z, t);
-          var xr = x * cy - (z - ZC) * sy0, zr = (z - ZC) * cy + x * sy0 + ZC;
-          var sx = cx + xr * f / zr, sy = horizon + (camY - hv[0]) * f / zr;
-          row.push([sx, sy, hv[0], hv[1], z]);
-        }
-        rows.push(row);
-      }
-
-      // faint contour lines along each row give the field its surface
-      ctx.lineWidth = 1;
-      for (r = 0; r < ROWS; r++) {
-        var depth = r / (ROWS - 1);
-        ctx.strokeStyle = 'rgba(96,165,250,' + (0.03 + depth * 0.1).toFixed(3) + ')';
-        ctx.beginPath();
-        for (c = 0; c < COLS; c++) {
-          var pt = rows[r][c];
-          if (c) ctx.lineTo(pt[0], pt[1]); else ctx.moveTo(pt[0], pt[1]);
-        }
-        ctx.stroke();
-      }
-
-      // points: nearer and higher points are larger and brighter; ripples flare white
-      for (r = 0; r < ROWS; r++) {
-        depth = r / (ROWS - 1);
-        for (c = 0; c < COLS; c++) {
-          pt = rows[r][c];
-          if (pt[0] < -4 || pt[0] > W + 4 || pt[1] < H * 0.36 || pt[1] > H) continue;
-          var lift = Math.max(0, Math.min(1, (pt[2] + 50) / 150));
-          var bright = Math.min(1, 0.3 + lift * 0.5 + pt[3] * 1.2);
-          // fade in from the horizon and out towards the bottom edge
-          var a = Math.min(1, (0.15 + depth * 1.6)) * Math.min(1, (H - pt[1]) / 60) *
-            Math.min(1, (pt[1] - H * 0.36) / (H * 0.14)) * (0.45 + bright * 0.55);
-          if (a < 0.03) continue;
-          var sz = (0.9 + depth * 2.4) * (1 + pt[3] * 1.1);
-          ctx.globalAlpha = a;
-          ctx.fillStyle = SHADES[Math.min(9, Math.round(bright * 9))];
-          ctx.fillRect(pt[0] - sz / 2, pt[1] - sz / 2, sz, sz);
-        }
-      }
-      ctx.globalAlpha = 1;
-      schedule();
-    }
-
-    function schedule() {
-      if (raf || !visible || reduced) return;
-      // paused: hold still, but only after the first frame is on screen
-      if (motionPaused() && lastDraw) { last = 0; setTimeout(schedule, 400); return; }
-      raf = requestAnimationFrame(frame);
-    }
-
-    function start() {
-      size();
-      if (reduced) { frame(performance.now()); return; }
-      schedule();
-    }
-
-    var resizeT = 0;
-    window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(function () { size(); if (reduced) frame(performance.now()); }, 150); });
-    onVisible(hero, function () { visible = true; last = 0; start(); }, function () { visible = false; }, 0);
-    return wrap;
-  }
 
   // ---------- Canvas scenes: procedural backdrops drawn edge-free (no image tiles or seams) ----------
 
@@ -2055,63 +1501,6 @@
     });
   }
 
-  // pricing header: an eclipse horizon, a light sweeping slowly along its rim
-  function horizonScene(cls) {
-    return canvasScene(cls, function (ctx, W, H, t, s) {
-      if (!s.stars) {
-        s.stars = [];
-        for (var i = 0; i < 90; i++) s.stars.push([Math.random(), Math.random() * 0.8, Math.random() * Math.PI * 2, 0.4 + Math.random() * 0.9]);
-      }
-      var R = Math.max(W * 0.72, 640), cx = W / 2, cy = H * 0.8 + R;
-      function rimY(x) { return cy - Math.sqrt(Math.max(0, R * R - (x - cx) * (x - cx))); }
-      ctx.fillStyle = '#c7dcff';
-      s.stars.forEach(function (st) {
-        var x = st[0] * W, y = st[1] * H;
-        if (y > rimY(x) - 6) return;
-        ctx.globalAlpha = (0.18 + 0.32 * Math.abs(Math.sin(t * 0.6 + st[2]))) * Math.min(1, Math.abs(x - cx) / (W * 0.18));
-        ctx.fillRect(x, y, st[3], st[3]);
-      });
-      ctx.globalAlpha = 1;
-
-      // the atmosphere: layered faint arcs above the rim (clipped to the sky, the planet stays see-through)
-      ctx.save();
-      ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(cx, cy, R, 0, Math.PI * 2);
-      ctx.clip('evenodd');
-      for (var k = 6; k >= 1; k--) {
-        ctx.strokeStyle = 'rgba(59,130,246,' + (0.09 / k + 0.02).toFixed(3) + ')';
-        ctx.lineWidth = k * 9;
-        ctx.beginPath(); ctx.arc(cx, cy, R + k * 4, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
-      }
-      ctx.restore();
-      // just under the rim, a faint lit surface
-      var surf = ctx.createRadialGradient(cx, cy, R - 70, cx, cy, R);
-      surf.addColorStop(0, 'rgba(59,130,246,0)');
-      surf.addColorStop(1, 'rgba(59,130,246,.16)');
-      ctx.fillStyle = surf;
-      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
-
-      // the rim, lit by a highlight that drifts back and forth across the top
-      var sweep = 0.5 + 0.32 * Math.sin(t * 0.18);
-      var g = ctx.createLinearGradient(0, 0, W, 0);
-      g.addColorStop(0, 'rgba(96,165,250,0)');
-      g.addColorStop(Math.max(0.01, sweep - 0.3), 'rgba(96,165,250,.35)');
-      g.addColorStop(sweep, 'rgba(239,246,255,.95)');
-      g.addColorStop(Math.min(0.99, sweep + 0.3), 'rgba(96,165,250,.35)');
-      g.addColorStop(1, 'rgba(96,165,250,0)');
-      ctx.strokeStyle = g;
-      ctx.lineWidth = 1.6;
-      ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI * 1.02, Math.PI * 1.98); ctx.stroke();
-
-      // a faint light column where the highlight sits
-      var hx = sweep * W, top = rimY(hx);
-      var col = ctx.createRadialGradient(hx, top, 0, hx, top, H * 0.9);
-      col.addColorStop(0, 'rgba(147,197,253,.16)');
-      col.addColorStop(1, 'rgba(59,130,246,0)');
-      ctx.fillStyle = col;
-      ctx.fillRect(0, 0, W, top);
-    });
-  }
-
   // integrations header: data streams curving in from the edges and feeding the hub
   function streamsScene(cls, host) {
     return canvasScene(cls, function (ctx, W, H, t, s, wrap) {
@@ -2266,206 +1655,6 @@
     '}'
   ].join('\n');
 
-  var VX_VERT = 'attribute vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }';
-
-  var VX_PRESETS = {
-    // landing hero: three-quarter view, rings slightly apart, calls flowing in
-    hero: { pitch: -0.22, yaw: 0.42, roll: 0.0, sep: 0.16, cam: 4.2, zoom: 0.5, alpha: 1, calls: 34, drift: 0.22, spin: [0.30, -0.45, 0.70] },
-    // page headers: the vortex lies back like a portal behind the title
-    portal: { pitch: 1.28, yaw: 0.0, roll: 0.35, sep: 0.06, cam: 4.0, zoom: 0.36, alpha: 0.5, calls: 18, drift: 0.12, spin: [0.18, -0.26, 0.40] },
-    // footer signature: facing the viewer, gently turning
-    footer: { pitch: -0.18, yaw: 0.35, roll: 0.0, sep: 0.14, cam: 4.0, zoom: 0.4, alpha: 1, calls: 24, drift: 0.18, spin: [0.22, -0.34, 0.55] }
-  };
-
-  function rotMat(pitch, yaw, roll) {
-    // object -> world rotation R = Ry(yaw) * Rx(pitch) * Rz(roll), row-major 3x3
-    var cx = Math.cos(pitch), sx = Math.sin(pitch), cy = Math.cos(yaw), sy = Math.sin(yaw), cz = Math.cos(roll), sz = Math.sin(roll);
-    var rz = [cz, -sz, 0, sz, cz, 0, 0, 0, 1];
-    var rx = [1, 0, 0, 0, cx, -sx, 0, sx, cx];
-    var ry = [cy, 0, sy, 0, 1, 0, -sy, 0, cy];
-    function mul(a, b) {
-      var o = [];
-      for (var r = 0; r < 3; r++) for (var c = 0; c < 3; c++) o.push(a[r * 3] * b[c] + a[r * 3 + 1] * b[3 + c] + a[r * 3 + 2] * b[6 + c]);
-      return o;
-    }
-    return mul(ry, mul(rx, rz));
-  }
-
-  function vortex3d(kind, host, onFail) {
-    var P = VX_PRESETS[kind];
-    var wrap = el('div', 'avx-vx3d avx-vx3d-' + kind);
-    wrap.setAttribute('aria-hidden', 'true');
-    var canvas = el('canvas', 'avx-vx3d-gl');
-    var overlay = el('canvas', 'avx-vx3d-calls');
-    wrap.appendChild(canvas);
-    wrap.appendChild(overlay);
-    var gl = canvas.getContext('webgl', { premultipliedAlpha: true, alpha: true, antialias: false }) ||
-      canvas.getContext('experimental-webgl');
-    if (!gl) { wrap.classList.add('avx-vx3d-off'); return wrap; }
-    // ray-marching on a CPU renderer (no GPU acceleration) would stall scrolling: use the light fallback
-    var dbg = gl.getExtension('WEBGL_debug_renderer_info');
-    var renderer = String(gl.getParameter(dbg ? dbg.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
-    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer) && !/[?&]avxgl=1/.test(location.search)) {
-      wrap.classList.add('avx-vx3d-off');
-      return wrap;
-    }
-
-    // the shader is compiled only when the sculpture first comes into view: compiling a
-    // ray-marcher can take a noticeable moment, and the footer copy may never be reached
-    var prog = null, U = {};
-    function setup() {
-      function shader(type, src) {
-        var s = gl.createShader(type);
-        gl.shaderSource(s, src);
-        gl.compileShader(s);
-        return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
-      }
-      var vs = shader(gl.VERTEX_SHADER, VX_VERT), fs = shader(gl.FRAGMENT_SHADER, VX_FRAG);
-      if (!vs || !fs) return false;
-      var p = gl.createProgram();
-      gl.attachShader(p, vs);
-      gl.attachShader(p, fs);
-      gl.linkProgram(p);
-      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) return false;
-      gl.useProgram(p);
-      var buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-      var aPos = gl.getAttribLocation(p, 'aPos');
-      gl.enableVertexAttribArray(aPos);
-      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-      ['uRes', 'uTime', 'uRotT', 'uSpin', 'uCam', 'uSep', 'uAlpha', 'uZoom'].forEach(function (k) { U[k] = gl.getUniformLocation(p, k); });
-      gl.uniform1f(U.uCam, P.cam);
-      gl.uniform1f(U.uSep, P.sep);
-      gl.uniform1f(U.uAlpha, P.alpha);
-      gl.uniform1f(U.uZoom, P.zoom);
-      prog = p;
-      return true;
-    }
-
-    var ctx2 = overlay.getContext('2d');
-    var W = 0, H = 0, dpr = 1, raf = 0, visible = false, clock = 0, last = 0, lastDraw = 0;
-    var px = 0, py = 0, tx = 0, ty = 0;
-    var calls = [];
-    for (var i = 0; i < P.calls; i++) calls.push({ a: Math.random() * Math.PI * 2, r: 0.4 + Math.random() * 1.3, v: 0.12 + Math.random() * 0.16, z: (Math.random() - 0.5) * 0.3 });
-
-    function size() {
-      var r = wrap.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      W = Math.max(1, Math.round(r.width));
-      H = Math.max(1, Math.round(r.height));
-      // the sculpture renders supersampled on standard screens (smoother rims), within a pixel budget
-      var ss = Math.max(dpr, 1.6);
-      if (W * H * ss * ss > 1.6e6) ss = Math.max(1, Math.sqrt(1.6e6 / (W * H)));
-      canvas.width = Math.round(W * ss);
-      canvas.height = Math.round(H * ss);
-      overlay.width = Math.round(W * dpr);
-      overlay.height = Math.round(H * dpr);
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.uniform2f(U.uRes, canvas.width, canvas.height);
-    }
-
-    function draw(t) {
-      px += (tx - px) * 0.06;
-      py += (ty - py) * 0.06;
-      var yaw = P.yaw + Math.sin(t * 0.21) * P.drift + px * 0.5;
-      var pitch = P.pitch + Math.sin(t * 0.17 + 1.3) * P.drift * 0.5 + py * 0.35;
-      var R = rotMat(pitch, yaw, P.roll);
-      // uniformMatrix3fv reads column-major, so R (row-major) arrives as its transpose: world -> object
-      gl.uniformMatrix3fv(U.uRotT, false, new Float32Array(R));
-      gl.uniform1f(U.uTime, t);
-      gl.uniform3f(U.uSpin, t * P.spin[0], t * P.spin[1], t * P.spin[2]);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-      // incoming calls: points spiralling into the core, projected with the shader's camera
-      ctx2.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx2.clearRect(0, 0, W, H);
-      if (!P.calls) return;
-      ctx2.globalCompositeOperation = 'lighter';
-      calls.forEach(function (c) {
-        c.r -= c.v * 0.033 * (0.4 + c.r * 0.6);
-        c.a += 0.033 * (0.9 / Math.max(0.25, c.r));
-        if (c.r < 0.08) { c.r = 1.5 + Math.random() * 0.3; c.a = Math.random() * Math.PI * 2; }
-        var ox = Math.cos(c.a) * c.r, oy = Math.sin(c.a) * c.r, oz = c.z * c.r;
-        var wx = R[0] * ox + R[1] * oy + R[2] * oz, wy = R[3] * ox + R[4] * oy + R[5] * oz, wz = R[6] * ox + R[7] * oy + R[8] * oz;
-        var k = 1 / ((P.cam - wz) * P.zoom);
-        var sx = (wx * k * H + W) / 2, sy = (H - wy * k * H) / 2;
-        var fade = Math.min(1, (1.6 - c.r) * 2) * Math.min(1, c.r * 4);
-        ctx2.globalAlpha = 0.85 * fade * P.alpha;
-        ctx2.fillStyle = c.r < 0.5 ? '#eff6ff' : '#93c5fd';
-        var s = 1.2 + (1.6 - c.r) * 1.1;
-        ctx2.beginPath();
-        ctx2.arc(sx, sy, s, 0, Math.PI * 2);
-        ctx2.fill();
-      });
-      ctx2.globalAlpha = 1;
-      ctx2.globalCompositeOperation = 'source-over';
-    }
-
-    function frame(now) {
-      raf = 0;
-      if (now - lastDraw < 32 || (lastDraw && scrolling())) { schedule(); return; }
-      lastDraw = now;
-      clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
-      last = now;
-      draw(clock + 3);
-      schedule();
-    }
-
-    function schedule() {
-      if (raf || !visible || reduced) return;
-      // paused: hold still, but only after the first frame is on screen
-      if (motionPaused() && lastDraw) { last = 0; setTimeout(schedule, 400); return; }
-      raf = requestAnimationFrame(frame);
-    }
-
-    if (finePointer && host) {
-      host.addEventListener('pointermove', function (e) {
-        var r = host.getBoundingClientRect();
-        tx = (e.clientX - r.left) / r.width - 0.5;
-        ty = (e.clientY - r.top) / r.height - 0.5;
-      });
-      host.addEventListener('pointerleave', function () { tx = 0; ty = 0; });
-    }
-    var resizeT = 0;
-    window.addEventListener('resize', function () {
-      clearTimeout(resizeT);
-      resizeT = setTimeout(function () { if (prog) { size(); draw(clock + 3); } }, 150);
-    });
-    // a driver can compile the shader yet draw nothing: look at the first frame, and if it
-    // came out empty, step aside for the fallback art
-    var checked = false;
-    function selfCheck() {
-      if (checked) return true;
-      checked = true;
-      draw(clock + 3);
-      var w = canvas.width, rows = [0.5, 0.42, 0.58], px = new Uint8Array(w * 4);
-      for (var r = 0; r < rows.length; r++) {
-        gl.readPixels(0, Math.floor(canvas.height * rows[r]), w, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
-        for (var i = 3; i < px.length; i += 4) if (px[i] > 10) return true;
-      }
-      wrap.classList.add('avx-vx3d-off');
-      visible = false;
-      if (onFail) onFail();
-      return false;
-    }
-
-    setTimeout(function () {
-      onVisible(wrap, function () {
-        if (wrap.classList.contains('avx-vx3d-off')) return;
-        if (!prog && !setup()) {
-          wrap.classList.add('avx-vx3d-off');
-          if (onFail) onFail();
-          return;
-        }
-        visible = true; last = 0; size();
-        if (!selfCheck()) return;
-        if (reduced) draw(3); else schedule();
-      }, function () { visible = false; }, 0);
-    }, 0);
-    return wrap;
-  }
-
   // ---------- Live charts: a tiny SVG chart engine in the site's glass style ----------
 
   var chartId = 0;
@@ -2544,7 +1733,7 @@
       value = function () { return vals.reduce(function (a, b) { return a + b; }, 0) / (o.avg ? vals.length : 1); };
     } else if (o.type === 'donut') {
       var segs = o.labels.map(function (lb, k) { return { lb: lb, v: o.weights[k] }; });
-      var R = 30, C = 2 * Math.PI * R, colors = ['#60a5fa', '#2563eb', '#93c5fd', '#475569', '#34d399'];
+      var R = 30, C = 2 * Math.PI * R, colors = ['#60a5fa', '#2563eb', '#93c5fd', '#475569', '#3471d3'];
       svg = svgEl('svg', { viewBox: '0 0 240 76', class: 'avx-ch avx-ch-donut' });
       var dh = '<circle class="avx-ch-ring" cx="38" cy="38" r="' + R + '"/>';
       segs.forEach(function (sg, k) {
@@ -2589,79 +1778,11 @@
 
   // ---------- Landing hero: the Signal Core, built from ringba art ----------
 
-  // still: chips keep fixed values (the logo version, so nothing flickers around it)
-  function buildSignalCore(still) {
-    var core = el('div', 'avx-core3d');
-    core.setAttribute('aria-hidden', 'true');
-    var stage = el('div', 'avx-c-stage');
-    core.appendChild(stage);
-
-    var floor = el('div', 'avx-c-floor');
-    floor.appendChild(rb('pt-hero-rings-blue.webp', 'avx-c-portal'));
-    floor.appendChild(rb('platform-ring-blue.webp', 'avx-c-dots'));
-    stage.appendChild(floor);
-    stage.appendChild(el('div', 'avx-c-beam'));
-
-    // radial bar radar: 24 spokes whose lengths stream live data, with a sweep
-    var radar = svgEl('svg', { viewBox: '-100 -100 200 200', class: 'avx-radar' });
-    var rh = '<defs><radialGradient id="avx-rd-bg"><stop offset="0%" stop-color="#0f1d3d" stop-opacity=".9"/><stop offset="100%" stop-color="#0b0c10" stop-opacity="0"/></radialGradient>' +
-      '<linearGradient id="avx-rd-bar" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#bfdbfe"/></linearGradient>' +
-      '<linearGradient id="avx-rd-sw" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#60a5fa" stop-opacity="0"/><stop offset="100%" stop-color="#60a5fa" stop-opacity=".45"/></linearGradient></defs>' +
-      '<circle r="86" fill="url(#avx-rd-bg)"/><circle class="avx-rd-ring" r="30"/><circle class="avx-rd-ring" r="56"/><circle class="avx-rd-ring" r="82"/>' +
-      '<g class="avx-rd-sweep"><path d="M0 0 L82 0 A82 82 0 0 0 58 -58 Z" fill="url(#avx-rd-sw)"/></g><g class="avx-rd-bars">';
-    for (var i = 0; i < 24; i++) rh += '<g transform="rotate(' + (i * 15) + ')"><rect class="avx-rd-bar" x="-1.8" y="-80" width="3.6" height="48" rx="1.8" fill="url(#avx-rd-bar)"/></g>';
-    rh += '</g><text class="avx-rd-val" y="8" text-anchor="middle">92</text><text class="avx-rd-lbl" y="22" text-anchor="middle">INTENT</text>';
-    radar.innerHTML = rh;
-
-    var heart = el('div', 'avx-c-core');
-    heart.appendChild(radar);
-    heart.appendChild(rb('neon-ring-blue.webp', 'avx-c-neon'));
-    var gyro = el('div', 'avx-c-gyro');
-    gyro.appendChild(rb('icon-sphere--blue.webp'));
-    heart.appendChild(gyro);
-    stage.appendChild(heart);
-
-    var orbit = el('div', 'avx-c-orbit');
-    [['purple-sphere-312.webp', 0], ['icon-sphere--blue.webp', 120], ['purple-sphere-312.webp', 240]].forEach(function (s) {
-      var slot = el('div', 'avx-c-slot');
-      slot.style.setProperty('--a', s[1] + 'deg');
-      slot.appendChild(rb(s[0], 'avx-c-sat'));
-      orbit.appendChild(slot);
-    });
-    stage.appendChild(orbit);
-
-
-    var chipA = el('div', 'avx-c-chip avx-c-chip-a', '<span>Routed today</span><b>1,283</b>');
-    var chipB = el('div', 'avx-c-chip avx-c-chip-b', '<span>Buyer payout</span><b>$65.00</b>');
-    core.appendChild(chipA);
-    core.appendChild(chipB);
-
-    if (!reduced && !still) {
-      var bars = radar.querySelectorAll('.avx-rd-bar'), lvl = [], score = 92, routed = 1283, timer = null;
-      for (var b = 0; b < 24; b++) lvl.push(.35 + Math.random() * .6);
-      function pulse() {
-        if (motionPaused()) { timer = setTimeout(pulse, 800); return; }
-        lvl = lvl.map(function (v, j) { return Math.max(.2, Math.min(1, v + (Math.random() - .5) * .35 + (j % 6 === 0 ? .05 : 0))); });
-        Array.prototype.forEach.call(bars, function (bar, j) { bar.style.transform = 'scaleY(' + lvl[j].toFixed(3) + ')'; });
-        score = Math.max(71, Math.min(99, score + Math.round((Math.random() - .45) * 4)));
-        radar.querySelector('.avx-rd-val').textContent = score;
-        routed += 1 + Math.floor(Math.random() * 4);
-        chipA.querySelector('b').textContent = routed.toLocaleString('en-US');
-        chipB.querySelector('b').textContent = '$' + (38 + Math.floor(Math.random() * 40)) + '.00';
-        timer = setTimeout(pulse, 1400);
-      }
-      onVisible(core, function () { if (!timer) timer = setTimeout(pulse, 400); },
-        function () { clearTimeout(timer); timer = null; }, 0.05);
-    }
-    return core;
-  }
-
   // ---------- Ping/Post: live consoles replace the static dashboard screenshots ----------
   // Each console mirrors what its screenshot showed, with demo data that keeps moving.
 
   var PP_OFFERS = ['Medicare', 'Auto Ins.', 'Solar', 'Home Svc', 'Legal', 'Debt'];
   var PP_SOURCES = ['Google Ads', 'Meta', 'Bing', 'Native', 'Email', 'Affiliates'];
-  var PP_BUYERS = ['Apex Insurance', 'Northwind', 'Meridian Health', 'Summit Solar', 'Lakeside Legal', 'Harbor Home'];
   var rnd = function (a, b) { return a + Math.random() * (b - a); };
   var pick = function (arr) { return arr[Math.floor(Math.random() * arr.length)]; };
   var fmtInt = function (v) { return Math.round(v).toLocaleString('en-US'); };
@@ -2829,47 +1950,6 @@
   }
 
   // ---------- Landing hero: the vortex sculpture with its live chips ----------
-
-  var vxcId = 0;
-
-  // the logo's three rings, each spinning in its own plane while that plane rocks on its
-  // own axis (a gyroscope); stacked copies behind each ring give it real thickness
-  function vortexGyro() {
-    var g = el('div', 'avx-vxc');
-    var ARCS = [['M52 32a20 20 0 1 1-13.2-18.8', 3.4], ['M44.5 32a12.5 12.5 0 1 1-8.9-11.9', 3.0], ['M38 32a6 6 0 1 1-4.2-5.7', 2.6]];
-    var SIDES = ['#1d4ed8', '#1e3a8a', '#172554'];
-    g.appendChild(el('div', 'avx-vxc-halo'));
-    ARCS.forEach(function (a, i) {
-      var ring = el('div', 'avx-vxc-ring avx-vxc-r' + (i + 1));
-      var spin = el('div', 'avx-vxc-spin');
-      var id = 'avx-vxc-g' + (++vxcId);
-      // back layer: the ring's darker edge; front layer: the gradient face with a soft glow
-      var html = '<svg viewBox="0 0 64 64" fill="none" style="--k:1"><path d="' + a[0] + '" stroke="' + SIDES[1] +
-        '" stroke-width="' + a[1] + '" stroke-linecap="round"/></svg>' +
-        '<svg viewBox="0 0 64 64" fill="none" style="--k:0"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1">' +
-        '<stop offset="0" stop-color="#eff6ff"/><stop offset=".45" stop-color="#60a5fa"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient>' +
-        '<filter id="' + id + 'f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.1" result="b"/>' +
-        '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' +
-        '<path d="' + a[0] + '" stroke="url(#' + id + ')" stroke-width="' + a[1] + '" stroke-linecap="round" filter="url(#' + id + 'f)"/></svg>';
-      spin.innerHTML = html;
-      ring.appendChild(spin);
-      g.appendChild(ring);
-    });
-    g.appendChild(el('div', 'avx-vxc-dot'));
-    return g;
-  }
-
-  function buildVortexCore() {
-    var core = buildSignalCore(true);
-    var heart = core.querySelector('.avx-c-core');
-    ['.avx-radar', '.avx-c-gyro'].forEach(function (sel) {
-      var n = heart.querySelector(sel);
-      if (n) n.parentNode.removeChild(n);
-    });
-    heart.appendChild(vortexGyro());
-    core.classList.add('avx-core-logo');
-    return core;
-  }
 
   // ---------- Footer signature: a monumental wordmark whose "o" is the live vortex ----------
 
@@ -4208,44 +3288,9 @@
 
   // ---------- Buttons: primary calls to action lean towards the cursor ----------
 
-  function initMagnetic() {
-    if (!finePointer || reduced) return;
-    document.querySelectorAll('main .btn-td-green, .marketing-cta-band .btn').forEach(function (b) {
-      b.addEventListener('pointermove', function (e) {
-        var r = b.getBoundingClientRect();
-        var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-        b.style.translate = (x * 8).toFixed(1) + 'px ' + (y * 6).toFixed(1) + 'px';
-      });
-      b.addEventListener('pointerleave', function () { b.style.translate = ''; });
-    });
-  }
-
   // ---------- Page heroes: ringba portal rings with a counter-rotating shine ----------
 
-  function initPortals() {
-    document.querySelectorAll('.avx-sbg-rings-tilt').forEach(function (tilt) {
-      tilt.innerHTML = '';
-      tilt.appendChild(rb('pt-hero-rings-blue.webp', 'avx-portal-rings'));
-      tilt.appendChild(rb('pt-hero-shine-blue.webp', 'avx-portal-shine'));
-    });
-  }
-
   // ---------- CTA band: neon trading waves flowing across ----------
-
-  function initCtaWaves() {
-    document.querySelectorAll('.marketing-cta-band').forEach(function (band) {
-      var fx = band.querySelector('.avx-fx');
-      if (!fx) return;
-      var waves = el('div', 'avx-cta-waves');
-      ['trading-waves--top-1900.webp', 'trading-waves--bottom-1700.webp'].forEach(function (f, i) {
-        var lane = el('div', 'avx-wave-lane avx-wave-lane-' + (i + 1));
-        lane.appendChild(rb(f));
-        lane.appendChild(rb(f));
-        waves.appendChild(lane);
-      });
-      fx.insertBefore(waves, fx.firstChild);
-    });
-  }
 
   // ---------- Tables: staggered rows, live header sheen, count-up prices, row + column focus ----------
 
