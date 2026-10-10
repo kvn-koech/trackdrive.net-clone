@@ -4223,6 +4223,88 @@ html.avx-booted main {
   filter: invert(1) hue-rotate(180deg) saturate(1.15) contrast(1.06) brightness(.84);
 }
 
+/* ---------- Screenshot zoom: the enlarged view keeps the dark app window ---------- */
+
+.zoomable-marketing-image {
+  cursor: zoom-in;
+}
+
+.avx-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000; /* above pop-ups and the cookie notice */
+  display: none;
+  overflow: auto;
+  padding: 56px 16px 32px;
+  background: rgba(5, 7, 11, .86);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: zoom-out;
+}
+
+.avx-zoom.avx-zoom-on {
+  display: block;
+  animation: avxZoomFade .2s ease both;
+}
+
+.avx-zoom:focus {
+  outline: none;
+}
+
+.avx-zoom-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.avx-zoom-window {
+  cursor: default;
+  animation: avxZoomIn .25s var(--avx-ease, ease) both;
+}
+
+.avx-zoom-window .avx-window-bar span {
+  translate: 0 0;
+}
+
+.avx-zoom-close {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #8b95a8;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.avx-zoom-close:hover,
+.avx-zoom-close:focus-visible {
+  background: rgba(255, 255, 255, .08);
+  color: #e6ebf4;
+}
+
+/* same dark rendering of the light captures as on the page */
+.avx-zoom-window img {
+  filter: invert(1) hue-rotate(180deg) saturate(1.15) contrast(1.06) brightness(.84);
+}
+
+.avx-zoom-cap {
+  max-width: 820px;
+  margin: 14px auto 0;
+  color: #8b95a8;
+  font-size: 14px;
+  text-align: center;
+}
+
+@keyframes avxZoomFade { from { opacity: 0; } }
+@keyframes avxZoomIn { from { opacity: 0; transform: scale(.97); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .avx-zoom.avx-zoom-on, .avx-zoom-window { animation: none; }
+}
+
 /* ---------- Page transitions (cross-document view transitions) ---------- */
 
 @view-transition {

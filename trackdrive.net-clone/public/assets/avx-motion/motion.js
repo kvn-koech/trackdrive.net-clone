@@ -3534,6 +3534,65 @@
     });
   }
 
+  // ---------- Screenshot zoom: enlarge in place, in the same dark app window ----------
+  // The links point at the original light captures on the CDN; opening those in a tab
+  // would drop the dark rendering and the app.avortyx.com frame, so they open here instead.
+
+  function initZoom() {
+    var box = null, last = null, prevOverflow = '';
+    function close() {
+      if (!box || !box.classList.contains('avx-zoom-on')) return;
+      box.classList.remove('avx-zoom-on');
+      document.documentElement.style.overflow = prevOverflow;
+      if (last) last.focus({ preventScroll: true });
+    }
+    function build() {
+      box = el('div', 'avx-zoom',
+        '<div class="avx-zoom-inner"><div class="avx-window avx-zoom-window">' +
+        '<div class="avx-window-bar"><i></i><i></i><i></i><span>app.avortyx.com</span>' +
+        '<button type="button" class="avx-zoom-close" aria-label="Close">&times;</button></div>' +
+        '<img alt="" decoding="async"></div><p class="avx-zoom-cap"></p></div>');
+      box.setAttribute('role', 'dialog');
+      box.setAttribute('aria-modal', 'true');
+      box.setAttribute('aria-label', 'Enlarged screenshot');
+      box.tabIndex = -1;
+      box.addEventListener('click', function (e) {
+        if (e.target.closest('.avx-zoom-close') || !e.target.closest('.avx-zoom-window')) close();
+      });
+    }
+    function open(a) {
+      var im = a.querySelector('img');
+      if (!box) build();
+      // inside a feature pop-up, live in it so its focus trap treats the zoom view as its own
+      (a.closest('.modal') || document.body).appendChild(box);
+      last = a;
+      var big = box.querySelector('img');
+      big.src = a.getAttribute('href') || (im && im.src) || '';
+      big.alt = (im && im.alt) || '';
+      box.querySelector('.avx-zoom-cap').textContent = big.alt;
+      prevOverflow = document.documentElement.style.overflow;
+      document.documentElement.style.overflow = 'hidden';
+      box.scrollTop = 0;
+      box.classList.add('avx-zoom-on');
+      box.focus({ preventScroll: true });
+    }
+    function onClick(e) {
+      var a = e.target.closest && e.target.closest('a.zoomable-marketing-image');
+      if (!a || a.classList.contains('avx-replaced')) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (e.type === 'click') open(a);
+    }
+    // capture phase, so the site's own link handling never sees these clicks
+    document.addEventListener('click', onClick, true);
+    document.addEventListener('auxclick', onClick, true);
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || !box || !box.classList.contains('avx-zoom-on')) return;
+      e.stopImmediatePropagation(); // leave a feature pop-up underneath open
+      close();
+    }, true);
+  }
+
   // ---------- Feature pop-ups: "Back to …" closes the pop-up and lands on the parent section ----------
   // A feature opened from the page it belongs to shows inside a modal; its back link points at
   // that same page, so the browser would only change the hash and leave the modal open.
@@ -3726,7 +3785,7 @@
     // calm set: product UI, data and gentle reveals; no game-like decoration
     var steps = [initMotionToggle, initProgress, initRingbaHero, initLeadFlow, initPlatformFlow,
       initBottomWaves, initHeroCharts, initPingPostDemos, initProductTour, initFeatureDemos, initMiniPreviews,
-      initBackLinks, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
+      initBackLinks, initZoom, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
       initPricingHorizon, initIntegrationWaves, initFlowSequences, initTables, initCounters,
       initOffscreenPause, initScrollHints];
     if (!reduced) steps.push(initReveal);
