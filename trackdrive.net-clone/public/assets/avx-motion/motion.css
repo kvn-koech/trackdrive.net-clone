@@ -10123,3 +10123,13 @@ body ::-webkit-scrollbar-thumb:hover {
     scrollbar-color: rgba(148, 163, 184, .35) transparent;
   }
 }
+
+/* ---------- Scrolling: skip rendering home sections that are far off screen ----------
+   The landing page is long and every section is busy; content-visibility lets the browser skip
+   style, layout and paint for sections well outside the viewport. "auto" remembers each
+   section's real height once it has been seen, so the scrollbar settles quickly.
+   The hero and the logo strip (always near the top, and drawing outside their boxes) are left alone. */
+body.home main > section:nth-child(n+3) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}

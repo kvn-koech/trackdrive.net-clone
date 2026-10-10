@@ -12,7 +12,7 @@ export default function AiSmsBots() {
       <section className="mktg-subpage-hero">
         <div className="container">
           <div className="mktg-subpage-hero-nav">
-            <a href="/features.html#ai" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" /> Back to AI </a>
+            <a href="/features.html#ai" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Back to AI </a>
           </div>
           <p className="mktg-subpage-hero-eyebrow">AI</p>
           <h1 className="fw-bold mb-2">AI SMS Bots</h1>
@@ -29,25 +29,25 @@ export default function AiSmsBots() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-comment-sms" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-comment-sms" aria-hidden="true" /></div>
                   <div className="flow-node-label">Incoming SMS</div>
                   <div className="flow-node-desc">A lead texts your number</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-robot" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-robot" aria-hidden="true" /></div>
                   <div className="flow-node-label">AI Reads It</div>
                   <div className="flow-node-desc">Matches a keyword, menu choice, or filter</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-bolt" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-bolt" aria-hidden="true" /></div>
                   <div className="flow-node-label">Auto-Reply or Act</div>
                   <div className="flow-node-desc">Reply, collect a field, or fire a webhook</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-volume" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-volume" aria-hidden="true" /></div>
                   <div className="flow-node-label">Qualify & Call</div>
                   <div className="flow-node-desc">Place an outbound call once qualified</div>
                 </div>

@@ -12,7 +12,7 @@ export default function PrivacyPolicy() {
       <section className="mktg-subpage-hero">
         <div className="container">
           <div className="mktg-subpage-hero-nav">
-            <a href="/features.html" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" /> Back to Features </a>
+            <a href="/features.html" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Back to Features </a>
           </div>
           <h1 className="fw-bold mb-2">Privacy Policy</h1>
           <p className="lead mktg-subpage-hero-subtitle">How we collect, use, and protect your information.</p>

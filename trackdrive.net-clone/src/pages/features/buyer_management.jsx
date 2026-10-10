@@ -14,7 +14,7 @@ export default function BuyerManagement() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#call-management" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Call Management{" "}
             </a>
           </div>
@@ -33,31 +33,31 @@ export default function BuyerManagement() {
               <h5 className="fw-bold text-center mb-3">Buyer Routing Pipeline</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-phone-volume" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-phone-volume" aria-hidden="true" /></div>
                   <div className="flow-node-label">Incoming Call</div>
                   <div className="flow-node-desc">All buyers on the call router</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-filter" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-filter" aria-hidden="true" /></div>
                   <div className="flow-node-label">Filter</div>
                   <div className="flow-node-desc">Tokens, hours, caps, suppression</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-layer-group" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-layer-group" aria-hidden="true" /></div>
                   <div className="flow-node-label">Prioritize</div>
                   <div className="flow-node-desc">Tier, weight, revenue, or EPC</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" aria-hidden="true" /></div>
                   <div className="flow-node-label">Connect</div>
                   <div className="flow-node-desc">Best buyer receives the call</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-dollar-sign" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-dollar-sign" aria-hidden="true" /></div>
                   <div className="flow-node-label">Convert</div>
                   <div className="flow-node-desc">Duration threshold triggers revenue</div>
                 </div>
@@ -67,19 +67,19 @@ export default function BuyerManagement() {
             <div className="row g-4 mb-4">
               <div className="col-md-4">
                 <div className="card p-4 h-100 border-success border-opacity-50">
-                  <h5 className="fw-bold text-success"><i className="fa-solid fa-layer-group me-2" />Tier Routing</h5>
+                  <h5 className="fw-bold text-success"><i className="fa-solid fa-layer-group me-2" aria-hidden="true" />Tier Routing</h5>
                   <p className="text-muted small mb-0">Manual priority ordering. Lower tier values receive calls first. Buyers within the same tier are distributed by weight.</p>
                 </div>
               </div>
               <div className="col-md-4">
                 <div className="card p-4 h-100 border-primary border-opacity-50">
-                  <h5 className="fw-bold text-primary"><i className="fa-solid fa-dollar-sign me-2" />Revenue Routing</h5>
+                  <h5 className="fw-bold text-primary"><i className="fa-solid fa-dollar-sign me-2" aria-hidden="true" />Revenue Routing</h5>
                   <p className="text-muted small mb-0">Highest-bid-wins. Buyers offering the most per-call revenue are prioritized automatically.</p>
                 </div>
               </div>
               <div className="col-md-4">
                 <div className="card p-4 h-100 border-warning border-opacity-50">
-                  <h5 className="fw-bold text-warning"><i className="fa-solid fa-chart-line me-2" />EPC Routing</h5>
+                  <h5 className="fw-bold text-warning"><i className="fa-solid fa-chart-line me-2" aria-hidden="true" />EPC Routing</h5>
                   <p className="text-muted small mb-0">Earnings-per-call routing. Buyers with the highest historical EPC are prioritized for maximum return.</p>
                 </div>
               </div>

@@ -14,7 +14,7 @@ export default function Plivo() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#phone-numbers" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Phone Numbers{" "}
             </a>
           </div>
@@ -33,25 +33,25 @@ export default function Plivo() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-link" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-link" aria-hidden="true" /></div>
                   <div className="flow-node-label">Link Account</div>
                   <div className="flow-node-desc">Connect Plivo, Twilio, or Telnyx</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-file-import" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-file-import" aria-hidden="true" /></div>
                   <div className="flow-node-label">Import Numbers</div>
                   <div className="flow-node-desc">Bring existing numbers in one click</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-cart-shopping" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-cart-shopping" aria-hidden="true" /></div>
                   <div className="flow-node-label">Purchase Numbers</div>
                   <div className="flow-node-desc">Provision new numbers from any provider</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-volume" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-volume" aria-hidden="true" /></div>
                   <div className="flow-node-label">Calls & Texts</div>
                   <div className="flow-node-desc">Make and receive on every number</div>
                 </div>

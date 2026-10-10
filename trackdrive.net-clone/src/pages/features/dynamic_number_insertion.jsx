@@ -14,7 +14,7 @@ export default function DynamicNumberInsertion() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#tracking-attribution" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Tracking & Attribution{" "}
             </a>
           </div>
@@ -33,25 +33,25 @@ export default function DynamicNumberInsertion() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-user" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-user" aria-hidden="true" /></div>
                   <div className="flow-node-label">Visitor Lands</div>
                   <div className="flow-node-desc">Arrives from a specific source</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-arrows-rotate" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-arrows-rotate" aria-hidden="true" /></div>
                   <div className="flow-node-label">Number Swapped</div>
                   <div className="flow-node-desc">A snippet shows a tracking number</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-phone-volume" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-phone-volume" aria-hidden="true" /></div>
                   <div className="flow-node-label">Visitor Calls</div>
                   <div className="flow-node-desc">Dials the number they were shown</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-bullseye" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-bullseye" aria-hidden="true" /></div>
                   <div className="flow-node-label">Call Attributed</div>
                   <div className="flow-node-desc">Mapped back to the visitor's source</div>
                 </div>

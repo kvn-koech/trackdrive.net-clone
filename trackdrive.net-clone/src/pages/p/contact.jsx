@@ -19,7 +19,7 @@ export default function Contact() {
             <div className="d-flex flex-wrap justify-content-center gap-4 mb-4 pb-3 border-bottom mktg-contact-links">
               <a href="mailto:support@avortyx.com" className="d-flex align-items-center text-decoration-none text-body">
                 {" "}
-                <i className="fa-solid fa-envelope text-success me-2" />
+                <i className="fa-solid fa-envelope text-success me-2" aria-hidden="true" />
                 {" "}
                 <span className="fw-semibold small">support@avortyx.com</span>
                 {" "}
@@ -27,7 +27,7 @@ export default function Contact() {
               {" "}
               <a href="/p/request_demo.html" className="d-flex align-items-center text-decoration-none text-body">
                 {" "}
-                <i className="fa-solid fa-desktop text-success me-2" />
+                <i className="fa-solid fa-desktop text-success me-2" aria-hidden="true" />
                 {" "}
                 <span className="fw-semibold small">Request a Demo</span>
                 {" "}

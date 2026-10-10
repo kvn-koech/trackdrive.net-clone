@@ -14,7 +14,7 @@ export default function Cake() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#tracking-attribution" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Tracking & Attribution{" "}
             </a>
           </div>
@@ -33,19 +33,19 @@ export default function Cake() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-bolt" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-bolt" aria-hidden="true" /></div>
                   <div className="flow-node-label">Event Fires</div>
                   <div className="flow-node-desc">A call converts, a lead arrives, etc.</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-paper-plane" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-paper-plane" aria-hidden="true" /></div>
                   <div className="flow-node-label">Request Sent</div>
                   <div className="flow-node-desc">HTTP POST to your URL in real time</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-server" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-server" aria-hidden="true" /></div>
                   <div className="flow-node-label">Your System</div>
                   <div className="flow-node-desc">Receives the data immediately</div>
                 </div>

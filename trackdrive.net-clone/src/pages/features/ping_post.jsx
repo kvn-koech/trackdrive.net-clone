@@ -12,7 +12,7 @@ export default function PingPost() {
       <section className="mktg-subpage-hero">
         <div className="container">
           <div className="mktg-subpage-hero-nav">
-            <a href="/features.html#ping-post" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" /> Back to Features </a>
+            <a href="/features.html#ping-post" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Back to Features </a>
           </div>
           <h1 className="fw-bold mb-2">Ping/Post</h1>
           <p className="lead mktg-subpage-hero-subtitle">Real-time bidding (RTB) for inbound leads and calls. Publishers PING to find available buyers and collect live bids, then POST to get a tracking number and connect the call.</p>
@@ -28,31 +28,31 @@ export default function PingPost() {
               <h5 className="fw-bold text-center mb-3">How Ping/Post Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-building" /></div>
+                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-building" aria-hidden="true" /></div>
                   <div className="flow-node-label">Publisher</div>
                   <div className="flow-node-desc">Sends lead data</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-satellite-dish" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-satellite-dish" aria-hidden="true" /></div>
                   <div className="flow-node-label">PING</div>
                   <div className="flow-node-desc">Check available buyers, get bids</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-filter" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-filter" aria-hidden="true" /></div>
                   <div className="flow-node-label">Buyer Matching</div>
                   <div className="flow-node-desc">Hours, caps, geo, filters, duplicates</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-phone-flip" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-phone-flip" aria-hidden="true" /></div>
                   <div className="flow-node-label">POST</div>
                   <div className="flow-node-desc">Get tracking number for the call</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-circle-check" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-circle-check" aria-hidden="true" /></div>
                   <div className="flow-node-label">Connected</div>
                   <div className="flow-node-desc">Caller routes to selected buyer</div>
                 </div>

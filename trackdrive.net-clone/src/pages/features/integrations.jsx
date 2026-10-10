@@ -13,7 +13,7 @@ export default function Integrations() {
         <div className="container">
           <div className="mktg-section-header">
             <div className="mktg-subpage-hero-nav mb-3">
-              <a href="/features.html" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" /> Back to Features </a>
+              <a href="/features.html" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Back to Features </a>
             </div>
             <h1 className="fw-bold">Integrations</h1>
             <p className="text-muted lead">Connect Avortyx with the tools you already use.</p>

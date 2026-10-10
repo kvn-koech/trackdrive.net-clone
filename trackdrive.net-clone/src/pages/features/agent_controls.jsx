@@ -14,7 +14,7 @@ export default function AgentControls() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#call-management" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Call Management{" "}
             </a>
           </div>
@@ -70,31 +70,31 @@ export default function AgentControls() {
               <h5 className="fw-bold text-center mb-3">How the Power Dialer Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-users" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-users" aria-hidden="true" /></div>
                   <div className="flow-node-label">Leads Queue</div>
                   <div className="flow-node-desc">Leads enter via API, import, actions, and more</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-headset" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-headset" aria-hidden="true" /></div>
                   <div className="flow-node-label">Agent Available</div>
                   <div className="flow-node-desc">Agent on the line, ready for the next call</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-phone-volume" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-phone-volume" aria-hidden="true" /></div>
                   <div className="flow-node-label">Place Call</div>
                   <div className="flow-node-desc">Dials the next lead when an agent is free</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" aria-hidden="true" /></div>
                   <div className="flow-node-label">Connected</div>
                   <div className="flow-node-desc">Live answer bridged to agent</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-clipboard-check" /></div>
+                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-clipboard-check" aria-hidden="true" /></div>
                   <div className="flow-node-label">Disposition</div>
                   <div className="flow-node-desc">Agent selects outcome, next lead</div>
                 </div>

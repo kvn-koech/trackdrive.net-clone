@@ -14,7 +14,7 @@ export default function AwsS3() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features/integrations.html" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Integrations{" "}
             </a>
           </div>

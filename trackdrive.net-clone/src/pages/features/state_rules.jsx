@@ -14,7 +14,7 @@ export default function StateRules() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#security-compliance-tools" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Security & Compliance Tools{" "}
             </a>
           </div>
@@ -33,19 +33,19 @@ export default function StateRules() {
             <div className="row g-4 mb-4">
               <div className="col-md-4">
                 <div className="card p-3 h-100">
-                  <h5 className="fw-bold"><i className="fa-solid fa-clock me-2 text-muted" />State Business Hours</h5>
+                  <h5 className="fw-bold"><i className="fa-solid fa-clock me-2 text-muted" aria-hidden="true" />State Business Hours</h5>
                   <p className="text-muted small mb-0">Per-day calling windows for each state, evaluated in the lead's local time zone.</p>
                 </div>
               </div>
               <div className="col-md-4">
                 <div className="card p-3 h-100">
-                  <h5 className="fw-bold"><i className="fa-solid fa-gauge-high me-2 text-muted" />State Call Limits</h5>
+                  <h5 className="fw-bold"><i className="fa-solid fa-gauge-high me-2 text-muted" aria-hidden="true" />State Call Limits</h5>
                   <p className="text-muted small mb-0">Cap how many outbound contacts — calls and texts combined — a single number can receive within a rolling window.</p>
                 </div>
               </div>
               <div className="col-md-4">
                 <div className="card p-3 h-100">
-                  <h5 className="fw-bold"><i className="fa-solid fa-calendar-xmark me-2 text-muted" />State Holidays</h5>
+                  <h5 className="fw-bold"><i className="fa-solid fa-calendar-xmark me-2 text-muted" aria-hidden="true" />State Holidays</h5>
                   <p className="text-muted small mb-0">Block outbound calls to leads in specified states on the dates you designate.</p>
                 </div>
               </div>

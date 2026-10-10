@@ -9,6 +9,12 @@
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
+  // Canvas and WebGL scenes hold their current frame while the page is scrolling and pick up
+  // again just after: redrawing them on top of every scroll frame was the main cause of jank.
+  var scrollQuietAt = 0;
+  window.addEventListener('scroll', function () { scrollQuietAt = performance.now() + 150; }, { passive: true });
+  function scrolling() { return performance.now() < scrollQuietAt; }
+
   var BAKED = '/assets/avx-baked/';
   var DARK = document.documentElement.getAttribute('data-bs-theme') === 'dark';
   // colored spheres that have a pre-tinted blue twin in /assets/avx-baked
@@ -684,7 +690,7 @@
     function frame(now) {
       raf = 0;
       // the calls move slowly: 30 fps reads the same and halves the work while scrolling
-      if (!reduced && now - lastDraw < 32) { schedule(); return; }
+      if (!reduced && (now - lastDraw < 32 || (lastDraw && scrolling()))) { schedule(); return; }
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
       lastDraw = now;
@@ -1568,6 +1574,13 @@
     main.insertBefore(wrap, main.firstChild);
     place();
     window.addEventListener('load', place);
+    // sections above can change height as they are first drawn (content-visibility): follow them
+    if ('ResizeObserver' in window) {
+      var placeRaf = 0;
+      new ResizeObserver(function () {
+        if (!placeRaf) placeRaf = requestAnimationFrame(function () { placeRaf = 0; place(); });
+      }).observe(main);
+    }
   }
 
   // ---------- Hero: a call attribution card (source, campaign, keyword, buyer, revenue) ----------
@@ -1699,7 +1712,7 @@
     function frame(now) {
       raf = 0;
       // the swell is slow, so 30 fps reads the same and halves the work
-      if (!reduced && now - lastDraw < 32) { schedule(); return; }
+      if (!reduced && (now - lastDraw < 32 || (lastDraw && scrolling()))) { schedule(); return; }
       lastDraw = now;
       // scene time only advances while running, so a pause resumes without a jump
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
@@ -1806,7 +1819,7 @@
 
     function frame(now) {
       raf = 0;
-      if (!reduced && now - lastDraw < 32) { schedule(); return; }
+      if (!reduced && (now - lastDraw < 32 || (lastDraw && scrolling()))) { schedule(); return; }
       lastDraw = now;
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
@@ -2386,7 +2399,7 @@
 
     function frame(now) {
       raf = 0;
-      if (now - lastDraw < 32) { schedule(); return; }
+      if (now - lastDraw < 32 || (lastDraw && scrolling())) { schedule(); return; }
       lastDraw = now;
       clock += last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
@@ -2964,8 +2977,8 @@
         '<div class="avx-dl-phone">' +
           '<div class="avx-dl-agent"><i class="avx-av">JM</i><div><b>Jordan M.</b><span class="avx-dl-status"></span></div></div>' +
           '<div class="avx-dl-call"><span class="avx-dl-who"></span><b class="avx-dl-time">00:00</b></div>' +
-          '<div class="avx-dl-keys"><i class="fa-solid fa-microphone-slash"></i><i class="fa-solid fa-pause"></i>' +
-            '<i class="fa-solid fa-right-left"></i><i class="avx-dl-end fa-solid fa-phone-slash"></i></div>' +
+          '<div class="avx-dl-keys"><i class="fa-solid fa-microphone-slash" aria-hidden="true"></i><i class="fa-solid fa-pause" aria-hidden="true"></i>' +
+            '<i class="fa-solid fa-right-left" aria-hidden="true"></i><i class="avx-dl-end fa-solid fa-phone-slash" aria-hidden="true"></i></div>' +
         '</div>' +
         '<div class="avx-dl-queue"><h6>Lead queue</h6><div class="avx-dl-rows"></div></div>' +
       '</div>' +
@@ -3015,11 +3028,11 @@
     body.innerHTML =
       '<div class="avx-ct">' +
         '<svg class="avx-ct-wires" aria-hidden="true"></svg>' +
-        '<div class="avx-ct-node" data-n="num"><i class="fa-solid fa-hashtag"></i><b>Tracking number</b><span class="avx-ct-sub">+1 (888) 555-0142</span></div>' +
-        '<div class="avx-ct-node" data-n="ivr"><i class="fa-solid fa-list-ol"></i><b>IVR menu</b><span class="avx-ct-sub"></span></div>' +
-        '<div class="avx-ct-node" data-n="route"><i class="fa-solid fa-diagram-project"></i><b>Router</b><span class="avx-ct-sub"></span></div>' +
+        '<div class="avx-ct-node" data-n="num"><i class="fa-solid fa-hashtag" aria-hidden="true"></i><b>Tracking number</b><span class="avx-ct-sub">+1 (888) 555-0142</span></div>' +
+        '<div class="avx-ct-node" data-n="ivr"><i class="fa-solid fa-list-ol" aria-hidden="true"></i><b>IVR menu</b><span class="avx-ct-sub"></span></div>' +
+        '<div class="avx-ct-node" data-n="route"><i class="fa-solid fa-diagram-project" aria-hidden="true"></i><b>Router</b><span class="avx-ct-sub"></span></div>' +
         buyers.map(function (b, i) {
-          return '<div class="avx-ct-node avx-ct-buyer" data-n="b' + i + '"><i class="fa-solid fa-building"></i><b>' + b[0] + '</b><span class="avx-ct-sub">$' + b[1] + ' / call</span></div>';
+          return '<div class="avx-ct-node avx-ct-buyer" data-n="b' + i + '"><i class="fa-solid fa-building" aria-hidden="true"></i><b>' + b[0] + '</b><span class="avx-ct-sub">$' + b[1] + ' / call</span></div>';
         }).join('') +
         '<i class="avx-ct-dot"></i>' +
       '</div>' +
@@ -3089,7 +3102,7 @@
     body.innerHTML =
       '<div class="avx-la-lead"><i class="avx-av"></i><div><b class="avx-la-name"></b><span class="avx-la-what"></span></div><span class="avx-la-state"></span></div>' +
       '<div class="avx-la-track"><div class="avx-la-line"><b></b></div>' +
-        STEPS.map(function (s) { return '<div class="avx-la-step"><i class="fa-solid fa-' + s[0] + '"></i><span>' + s[1] + '</span><em></em></div>'; }).join('') +
+        STEPS.map(function (s) { return '<div class="avx-la-step"><i class="fa-solid fa-' + s[0] + '" aria-hidden="true"></i><span>' + s[1] + '</span><em></em></div>'; }).join('') +
       '</div>' +
       '<div class="avx-la-log"></div>';
     var steps = body.querySelectorAll('.avx-la-step'), fill = body.querySelector('.avx-la-line b'), log = body.querySelector('.avx-la-log'),
@@ -3159,7 +3172,7 @@
       time.textContent = '00:00';
       qs.forEach(function (q) { q.className = 'avx-ag-q'; q.querySelector('b').textContent = ''; });
       xfer.className = 'avx-ag-xfer';
-      xfer.innerHTML = '<i class="fa-solid fa-right-left"></i>Transfer to buyer';
+      xfer.innerHTML = '<i class="fa-solid fa-right-left" aria-hidden="true"></i>Transfer to buyer';
       chips.forEach(function (ch) { ch.className = ''; });
       var A = ['Yes', String(1 + Math.floor(Math.random() * 3)), pick(['State Farm', 'GEICO', 'Progressive', 'Allstate']), '787' + Math.floor(rnd(10, 99))];
       for (var s = 1; s <= 7; s++) (function (s) { at(s * 1000, function () { time.textContent = clock(s); }); })(s);
@@ -3167,8 +3180,8 @@
         at(800 + i * 800, function () { q.className = 'avx-ag-q avx-done'; q.querySelector('b').textContent = A[i]; });
       });
       var buyer = pick(DEMO_BUYERS);
-      at(4100, function () { xfer.className = 'avx-ag-xfer avx-busy'; xfer.innerHTML = '<i class="fa-solid fa-right-left"></i>Transferring to ' + buyer + '…'; });
-      at(5300, function () { xfer.className = 'avx-ag-xfer avx-done'; xfer.innerHTML = '<i class="fa-solid fa-check"></i>Transferred · ' + buyer; });
+      at(4100, function () { xfer.className = 'avx-ag-xfer avx-busy'; xfer.innerHTML = '<i class="fa-solid fa-right-left" aria-hidden="true"></i>Transferring to ' + buyer + '…'; });
+      at(5300, function () { xfer.className = 'avx-ag-xfer avx-done'; xfer.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>Transferred · ' + buyer; });
       at(6000, function () { chips[0].className = 'avx-on'; });
     });
   }
@@ -3216,7 +3229,7 @@
       var s = VOICE_SCRIPT[n++ % VOICE_SCRIPT.length];
       ai.querySelector('span').textContent = s[0];
       caller.querySelector('span').textContent = s[1];
-      tag.innerHTML = '<i class="fa-solid fa-right-left"></i>Warm transfer → ' + s[2];
+      tag.innerHTML = '<i class="fa-solid fa-right-left" aria-hidden="true"></i>Warm transfer → ' + s[2];
       [ai, caller, tag].forEach(function (x) { x.classList.remove('avx-on', 'avx-talk'); });
       at(200, function () { ai.classList.add('avx-on', 'avx-talk'); });
       at(1800, function () { ai.classList.remove('avx-talk'); caller.classList.add('avx-on'); });
@@ -3575,7 +3588,13 @@
   function initAsk(panel) {
     var log = panel.querySelector('.avx-ask-log'), form = panel.querySelector('.avx-ask-form');
     var input = form.querySelector('input'), busy = false, touched = false, demoTimer = null;
-    function scrollEnd() { log.scrollTop = log.scrollHeight; }
+    // keep the newest words in view; batched to one layout read per frame, since the answer
+    // streams in word by word while the visitor may be scrolling the page
+    var stick = 0;
+    function scrollEnd() {
+      if (stick) return;
+      stick = requestAnimationFrame(function () { stick = 0; log.scrollTop = log.scrollHeight; });
+    }
     function ask(text, key) {
       if (busy || !text.trim()) return;
       busy = true;
@@ -4049,7 +4068,7 @@
       var url = new URL(it[1], location.href);
       if (samePage(url) && url.hash) {
         var t = document.getElementById(url.hash.slice(1));
-        if (t) { t.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); history.replaceState(null, '', url.hash); return; }
+        if (t) { jumpTo(t); history.replaceState(null, '', url.hash); return; }
       }
       location.href = it[1];
     }
@@ -4172,7 +4191,7 @@
         if (done) return;
         done = true;
         history.replaceState(null, '', url.pathname + url.hash);
-        if (target) target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        if (target) jumpTo(target);
         else window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
       }
       modal.addEventListener('hidden.bs.modal', land, { once: true });
@@ -4335,13 +4354,50 @@
 
   // start-up runs in short slices (same order), yielding between them so a tap or click
   // is never stuck behind one long block of set-up work
+  // ---------- Anchors: land on the target once the sections around it have drawn ----------
+  // Off-screen home sections are skipped by content-visibility until they come close, so a jump
+  // to #trust is first made against estimated heights. Re-align on the target a few times while
+  // the real heights arrive; the visitor scrolling by hand ends it at once.
+
+  function settleOn(target) {
+    var tries = 0, handScrolled = false;
+    function stop() { handScrolled = true; }
+    ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (ev) { window.addEventListener(ev, stop, { once: true, passive: true }); });
+    var pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    (function fix() {
+      if (handScrolled) return;
+      if (Math.abs(target.getBoundingClientRect().top - pad) > 2) target.scrollIntoView({ block: 'start', behavior: 'instant' });
+      if (++tries < 8) setTimeout(fix, 120);
+    })();
+  }
+
+  // smooth-scroll to a section, then correct for sections that drew on the way
+  function jumpTo(target) {
+    target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    var done = false;
+    function settle() { if (done) return; done = true; settleOn(target); }
+    if ('onscrollend' in window) window.addEventListener('scrollend', settle, { once: true });
+    setTimeout(settle, reduced ? 50 : 1200);
+  }
+
+  function initAnchors() {
+    function current() {
+      var id = decodeURIComponent(location.hash.slice(1));
+      var t = id && document.getElementById(id);
+      if (t) settleOn(t);
+    }
+    window.addEventListener('hashchange', current);
+    window.addEventListener('load', current);
+    if (document.readyState === 'complete') current();
+  }
+
   function init() {
     // calm set: product UI, data and gentle reveals; no game-like decoration
     var steps = [initMotionToggle, initProgress, initRingbaHero, initDecision, initLeadFlow, initPlatformFlow,
       initBottomWaves, initPingPostDemos, initProductTour, initAiAtWork, initHowFlow, initBento, initFeatureDemos, initMiniPreviews,
       initBackLinks, initZoom, initNavScroll, initPalette, initWindows, initSignature, initAuthRing, initIntegrationsHub, initIntegrationsBackdrop,
       initPricingHorizon, initIntegrationWaves, initFlowSequences, initTables, initCounters,
-      initOffscreenPause, initScrollHints];
+      initOffscreenPause, initScrollHints, initAnchors];
     if (!reduced) steps.push(initReveal);
     // apply a saved pause to scenes built after the toggle
     steps.push(function () { setPaused(motionPaused()); });

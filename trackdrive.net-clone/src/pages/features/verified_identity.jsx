@@ -14,7 +14,7 @@ export default function VerifiedIdentity() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#security-compliance-tools" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Security & Compliance Tools{" "}
             </a>
           </div>
@@ -35,19 +35,19 @@ export default function VerifiedIdentity() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-user-check" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-user-check" aria-hidden="true" /></div>
                   <div className="flow-node-label">Verify Identity (KYC)</div>
                   <div className="flow-node-desc">Complete Stripe Identity verification</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-building-circle-check" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-building-circle-check" aria-hidden="true" /></div>
                   <div className="flow-node-label">KYB Business Profile</div>
                   <div className="flow-node-desc">One-time legal identity and signed attestations</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-tower-cell" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-tower-cell" aria-hidden="true" /></div>
                   <div className="flow-node-label">Registered with Carriers</div>
                   <div className="flow-node-desc">Your numbers registered and branded, calls connecting</div>
                 </div>

@@ -7,7 +7,7 @@ export default function FeatureModal({ fullPageHref }) {
         <div className="modal-content">
           <div className="feature-modal-actions">
             <a className="feature-modal-fullpage" href={fullPageHref} target="_blank" rel="noopener">
-              {' '}<i className="fa-solid fa-up-right-from-square me-1" />Open full page{' '}
+              {' '}<i className="fa-solid fa-up-right-from-square me-1" aria-hidden="true" />Open full page{' '}
             </a>
             {' '}
             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />

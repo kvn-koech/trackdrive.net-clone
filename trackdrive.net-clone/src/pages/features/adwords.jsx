@@ -14,7 +14,7 @@ export default function Adwords() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features/integrations.html" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Integrations{" "}
             </a>
           </div>
@@ -37,31 +37,31 @@ export default function Adwords() {
               <h5 className="fw-bold text-center mb-3">How the Google Ads Integration Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-link" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-link" aria-hidden="true" /></div>
                   <div className="flow-node-label">Connect</div>
                   <div className="flow-node-desc">Link your Google account</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-building" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-building" aria-hidden="true" /></div>
                   <div className="flow-node-label">Choose Account</div>
                   <div className="flow-node-desc">Pick a Google Ads client account</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-arrows-left-right" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-arrows-left-right" aria-hidden="true" /></div>
                   <div className="flow-node-label">Map Offers</div>
                   <div className="flow-node-desc">Offer to conversion action</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-phone-flip" /></div>
+                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-phone-flip" aria-hidden="true" /></div>
                   <div className="flow-node-label">Call Finishes</div>
                   <div className="flow-node-desc">Click ID read from its token</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-chart-line" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-chart-line" aria-hidden="true" /></div>
                   <div className="flow-node-label">Conversion Reported</div>
                   <div className="flow-node-desc">Valued at the call revenue</div>
                 </div>

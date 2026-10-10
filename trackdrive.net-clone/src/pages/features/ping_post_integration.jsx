@@ -14,7 +14,7 @@ export default function PingPostIntegration() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#ping-post" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Ping/Post{" "}
             </a>
           </div>

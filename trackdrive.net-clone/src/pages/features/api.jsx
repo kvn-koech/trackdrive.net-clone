@@ -14,7 +14,7 @@ export default function Api() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#tracking-attribution" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Tracking & Attribution{" "}
             </a>
           </div>

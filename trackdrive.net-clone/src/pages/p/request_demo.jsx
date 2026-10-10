@@ -26,27 +26,27 @@ export default function RequestDemo() {
                   <h5 className="fw-bold mb-4">What You'll See</h5>
                   <ul className="list-unstyled">
                     <li className="d-flex align-items-start mb-3">
-                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" />
+                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" aria-hidden="true" />
                       {" "}
                       <span>Live platform walkthrough tailored to your use case</span>
                     </li>
                     <li className="d-flex align-items-start mb-3">
-                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" />
+                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" aria-hidden="true" />
                       {" "}
                       <span>Real-time call routing and tracking in action</span>
                     </li>
                     <li className="d-flex align-items-start mb-3">
-                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" />
+                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" aria-hidden="true" />
                       {" "}
                       <span>Integration options with your existing tools</span>
                     </li>
                     <li className="d-flex align-items-start mb-3">
-                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" />
+                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" aria-hidden="true" />
                       {" "}
                       <span>Reporting and analytics dashboard overview</span>
                     </li>
                     <li className="d-flex align-items-start">
-                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" />
+                      <i className="fa-solid fa-check-circle text-success me-2 mt-1" aria-hidden="true" />
                       {" "}
                       <span>Custom pricing based on your volume</span>
                     </li>

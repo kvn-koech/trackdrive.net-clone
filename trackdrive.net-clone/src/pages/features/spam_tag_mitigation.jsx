@@ -14,7 +14,7 @@ export default function SpamTagMitigation() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#phone-numbers" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Phone Numbers{" "}
             </a>
           </div>
@@ -33,19 +33,19 @@ export default function SpamTagMitigation() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-building-circle-check" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-building-circle-check" aria-hidden="true" /></div>
                   <div className="flow-node-label">Business Profile</div>
                   <div className="flow-node-desc">Complete a one-time verified profile</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-toggle-on" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-toggle-on" aria-hidden="true" /></div>
                   <div className="flow-node-label">Enable Mitigation</div>
                   <div className="flow-node-desc">Turn it on for the numbers you select</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-heart-pulse" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-heart-pulse" aria-hidden="true" /></div>
                   <div className="flow-node-label">Monitor Number Health</div>
                   <div className="flow-node-desc">Track spam-label status across carriers over time</div>
                 </div>

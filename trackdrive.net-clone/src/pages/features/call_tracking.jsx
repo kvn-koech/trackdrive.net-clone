@@ -14,7 +14,7 @@ export default function CallTracking() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#call-management" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Call Management{" "}
             </a>
           </div>
@@ -33,25 +33,25 @@ export default function CallTracking() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-hashtag" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-hashtag" aria-hidden="true" /></div>
                   <div className="flow-node-label">Tracking Number</div>
                   <div className="flow-node-desc">Assign a local or toll-free number to a campaign</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-phone-volume" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-phone-volume" aria-hidden="true" /></div>
                   <div className="flow-node-label">Caller Dials</div>
                   <div className="flow-node-desc">Call attributed to its traffic source and tokens</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-list-check" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-list-check" aria-hidden="true" /></div>
                   <div className="flow-node-label">Logged</div>
                   <div className="flow-node-desc">Duration, status, revenue, recording, and disposition</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-chart-column" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-chart-column" aria-hidden="true" /></div>
                   <div className="flow-node-label">Reported</div>
                   <div className="flow-node-desc">Summary reports and CSV exports by any dimension</div>
                 </div>

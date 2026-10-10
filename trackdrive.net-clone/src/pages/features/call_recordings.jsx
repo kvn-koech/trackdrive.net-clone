@@ -14,7 +14,7 @@ export default function CallRecordings() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#call-management" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Call Management{" "}
             </a>
           </div>

@@ -14,7 +14,7 @@ export default function PiiRedaction() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#security-compliance-tools" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Security & Compliance Tools{" "}
             </a>
           </div>
@@ -33,19 +33,19 @@ export default function PiiRedaction() {
               <h5 className="fw-bold text-center mb-3">How Auto-Redaction Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-clock" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-clock" aria-hidden="true" /></div>
                   <div className="flow-node-label">Data Ages</div>
                   <div className="flow-node-desc">Calls and archived leads pass your retention period</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-eraser" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-eraser" aria-hidden="true" /></div>
                   <div className="flow-node-label">PII Redacted</div>
                   <div className="flow-node-desc">The fields you select are cleared or hashed</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-chart-line" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-chart-line" aria-hidden="true" /></div>
                   <div className="flow-node-label">Reporting Intact</div>
                   <div className="flow-node-desc">Timestamps, offer IDs, and phone numbers are not affected</div>
                 </div>

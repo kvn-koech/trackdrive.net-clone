@@ -14,7 +14,7 @@ export default function ApiWhitelist() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#security-compliance-tools" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Security & Compliance Tools{" "}
             </a>
           </div>
@@ -33,25 +33,25 @@ export default function ApiWhitelist() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-list-check" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-list-check" aria-hidden="true" /></div>
                   <div className="flow-node-label">Add Trusted IPs</div>
                   <div className="flow-node-desc">List approved IPs company-wide or per access token</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-toggle-on" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-toggle-on" aria-hidden="true" /></div>
                   <div className="flow-node-label">Turn On Enforcement</div>
                   <div className="flow-node-desc">Each list stays off until you enforce it</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-shield-halved" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-shield-halved" aria-hidden="true" /></div>
                   <div className="flow-node-label">Source IP Checked</div>
                   <div className="flow-node-desc">Every API call is matched against your lists</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-circle-check" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-circle-check" aria-hidden="true" /></div>
                   <div className="flow-node-label">Allowed or Denied</div>
                   <div className="flow-node-desc">Unlisted IPs are refused before reaching your data</div>
                 </div>

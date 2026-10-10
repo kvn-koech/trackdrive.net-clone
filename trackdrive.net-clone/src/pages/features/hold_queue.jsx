@@ -14,7 +14,7 @@ export default function HoldQueue() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#call-management" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Call Management{" "}
             </a>
           </div>
@@ -33,25 +33,25 @@ export default function HoldQueue() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-phone-volume" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-phone-volume" aria-hidden="true" /></div>
                   <div className="flow-node-label">All Buyers Busy</div>
                   <div className="flow-node-desc">No buyer is immediately available</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-music" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-music" aria-hidden="true" /></div>
                   <div className="flow-node-label">On Hold</div>
                   <div className="flow-node-desc">Caller parked with hold music</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-rotate" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-rotate" aria-hidden="true" /></div>
                   <div className="flow-node-label">Re-Check Capacity</div>
                   <div className="flow-node-desc">System polls for an open buyer</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" aria-hidden="true" /></div>
                   <div className="flow-node-label">Connected</div>
                   <div className="flow-node-desc">First open buyer takes the call</div>
                 </div>

@@ -182,7 +182,7 @@ export default function Pricing() {
             <div className="pricing-highlight-card">
               <h2 className="fw-bold mb-2">Enterprise</h2>
               <p className="text-muted mx-auto pricing-enterprise-desc">Need a strategic partner, not a transactional vendor? We apply decades of market experience to help you meet your goals.</p>
-              <a className="btn btn-td-green btn-lg" href="/p/contact.html"> <i className="fa-solid fa-envelope me-2" />Contact Sales </a>
+              <a className="btn btn-td-green btn-lg" href="/p/contact.html"> <i className="fa-solid fa-envelope me-2" aria-hidden="true" />Contact Sales </a>
             </div>
           </div>
           <div className="pricing-breakdown-showcase">
@@ -255,17 +255,17 @@ export default function Pricing() {
             <h3 className="fw-bold mt-5">Ping/Post Cost Calculator</h3>
             <ul className="list-unstyled text-muted pricing-calculator-intro">
               <li className="d-flex mb-2">
-                <i className="fa-solid fa-check text-success me-2 mt-1" />
+                <i className="fa-solid fa-check text-success me-2 mt-1" aria-hidden="true" />
                 {" "}
                 <span><strong>Duplicate pings are free.</strong> The same ping repeated within 15 seconds counts once.</span>
               </li>
               <li className="d-flex mb-2">
-                <i className="fa-solid fa-check text-success me-2 mt-1" />
+                <i className="fa-solid fa-check text-success me-2 mt-1" aria-hidden="true" />
                 {" "}
                 <span><strong>You pay per 1,000 unique pings.</strong> Posts are billed at the same rate.</span>
               </li>
               <li className="d-flex mb-2">
-                <i className="fa-solid fa-check text-success me-2 mt-1" />
+                <i className="fa-solid fa-check text-success me-2 mt-1" aria-hidden="true" />
                 {" "}
                 <span>
                   <strong>Rate limits protect your bill.</strong>

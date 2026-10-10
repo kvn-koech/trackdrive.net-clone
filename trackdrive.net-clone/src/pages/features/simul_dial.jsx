@@ -14,7 +14,7 @@ export default function SimulDial() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#call-management" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Call Management{" "}
             </a>
           </div>
@@ -33,25 +33,25 @@ export default function SimulDial() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-phone-volume" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-phone-volume" aria-hidden="true" /></div>
                   <div className="flow-node-label">Call Arrives</div>
                   <div className="flow-node-desc">Routed to a buyer group</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-users" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-users" aria-hidden="true" /></div>
                   <div className="flow-node-label">Ring All</div>
                   <div className="flow-node-desc">Every buyer in the group rings at once</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-hand-pointer" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-hand-pointer" aria-hidden="true" /></div>
                   <div className="flow-node-label">First to Answer</div>
                   <div className="flow-node-desc">Answer and press 1 to win the call</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" aria-hidden="true" /></div>
                   <div className="flow-node-label">Connected</div>
                   <div className="flow-node-desc">Caller bridged to the winner</div>
                 </div>

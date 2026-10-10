@@ -12,7 +12,7 @@ export default function VoiceAgents() {
       <section className="mktg-subpage-hero">
         <div className="container">
           <div className="mktg-subpage-hero-nav">
-            <a href="/features.html#ai" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" /> Back to AI </a>
+            <a href="/features.html#ai" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Back to AI </a>
           </div>
           <p className="mktg-subpage-hero-eyebrow">AI</p>
           <h1 className="fw-bold mb-2">AI Voice Agents</h1>
@@ -29,25 +29,25 @@ export default function VoiceAgents() {
               <h5 className="fw-bold text-center mb-3">How It Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-plug" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-plug" aria-hidden="true" /></div>
                   <div className="flow-node-label">Connect</div>
                   <div className="flow-node-desc">Add your AI voice provider on Integrations</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-download" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-download" aria-hidden="true" /></div>
                   <div className="flow-node-label">Import</div>
                   <div className="flow-node-desc">Bring in any agent; we provision the SIP trunk</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-diagram-project" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-diagram-project" aria-hidden="true" /></div>
                   <div className="flow-node-label">Route</div>
                   <div className="flow-node-desc">Add the agent to any call flow and routing rule</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-flip" aria-hidden="true" /></div>
                   <div className="flow-node-label">Call</div>
                   <div className="flow-node-desc">Calls dial straight into the agent over SIP</div>
                 </div>

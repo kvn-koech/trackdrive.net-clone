@@ -14,7 +14,7 @@ export default function LeadAutomation() {
           <div className="mktg-subpage-hero-nav">
             <a href="/features.html#automation" className="mktg-subpage-back">
               {" "}
-              <i className="fa-solid fa-arrow-left" />
+              <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               {" "}Back to Automation{" "}
             </a>
           </div>
@@ -33,31 +33,31 @@ export default function LeadAutomation() {
               <h5 className="fw-bold text-center mb-3">Automated Lead Follow-Up Example</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-user-plus" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-user-plus" aria-hidden="true" /></div>
                   <div className="flow-node-label">Lead Enters</div>
                   <div className="flow-node-desc">Via web form, API, or import</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-comment-sms" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-comment-sms" aria-hidden="true" /></div>
                   <div className="flow-node-label">Outreach</div>
                   <div className="flow-node-desc">Optional SMS, email, or webhook actions</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-clock" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-clock" aria-hidden="true" /></div>
                   <div className="flow-node-label">Wait</div>
                   <div className="flow-node-desc">Configurable delay between steps</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-volume" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-phone-volume" aria-hidden="true" /></div>
                   <div className="flow-node-label">Call</div>
                   <div className="flow-node-desc">Optionally call the lead, route to a buyer</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-rotate" /></div>
+                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-rotate" aria-hidden="true" /></div>
                   <div className="flow-node-label">Repeat</div>
                   <div className="flow-node-desc">More attempts, or complete</div>
                 </div>

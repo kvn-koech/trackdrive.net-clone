@@ -12,7 +12,7 @@ export default function Transcriptions() {
       <section className="mktg-subpage-hero">
         <div className="container">
           <div className="mktg-subpage-hero-nav">
-            <a href="/features.html#ai" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" /> Back to AI </a>
+            <a href="/features.html#ai" className="mktg-subpage-back"> <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Back to AI </a>
           </div>
           <p className="mktg-subpage-hero-eyebrow">AI</p>
           <h1 className="fw-bold mb-2">AI Transcriptions</h1>
@@ -29,31 +29,31 @@ export default function Transcriptions() {
               <h5 className="fw-bold text-center mb-3">How Transcription Works</h5>
               <div className="flow-diagram">
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-phone-flip" /></div>
+                  <div className="flow-node-icon bg-secondary text-white"><i className="fa-solid fa-phone-flip" aria-hidden="true" /></div>
                   <div className="flow-node-label">Call Ends</div>
                   <div className="flow-node-desc">Recording captured, both channels</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-file-lines" /></div>
+                  <div className="flow-node-icon bg-primary text-white"><i className="fa-solid fa-file-lines" aria-hidden="true" /></div>
                   <div className="flow-node-label">Transcribed</div>
                   <div className="flow-node-desc">Speaker-labeled transcript in minutes</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-wand-magic-sparkles" /></div>
+                  <div className="flow-node-icon bg-info text-white"><i className="fa-solid fa-wand-magic-sparkles" aria-hidden="true" /></div>
                   <div className="flow-node-label">AI Enrichment</div>
                   <div className="flow-node-desc">Summary, sentiment, topics, entities</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-magnifying-glass" /></div>
+                  <div className="flow-node-icon bg-warning text-white"><i className="fa-solid fa-magnifying-glass" aria-hidden="true" /></div>
                   <div className="flow-node-label">Keyword Spotting</div>
                   <div className="flow-node-desc">Scanned against your keyword groups</div>
                 </div>
-                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" /></div>
+                <div className="flow-arrow"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                 <div className="flow-node">
-                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-bolt" /></div>
+                  <div className="flow-node-icon bg-success text-white"><i className="fa-solid fa-bolt" aria-hidden="true" /></div>
                   <div className="flow-node-label">Act & Analyze</div>
                   <div className="flow-node-desc">Webhooks fire, dashboards update, every word searchable</div>
                 </div>

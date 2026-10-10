@@ -40,7 +40,12 @@
   <meta name="msapplication-TileImage" content="/favicon-192.png?v=3" />
   <meta name="msapplication-TileColor" content="#1d4ed8">
   <meta name="theme-color" content="#06071a">
-  <script defer="" src="https://kit.fontawesome.com/97f7211792.js"></script>
+  <!-- Font Awesome Pro: the kit's stylesheets loaded directly. The kit script itself re-scanned
+       the whole page on every DOM change (the live demos change it constantly), which stalled scrolling. -->
+  <link rel="preconnect" href="https://ka-p.fontawesome.com" crossorigin>
+  <link rel="preload" as="style" href="https://ka-p.fontawesome.com/assets/97f7211792/37312945/kit.css?token=97f7211792" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" as="style" href="https://ka-p.fontawesome.com/releases/v6.7.2/css/pro-v4-shims.min.css?token=97f7211792" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" as="style" href="https://ka-p.fontawesome.com/releases/v6.7.2/css/pro-v4-font-face.min.css?token=97f7211792" onload="this.onload=null;this.rel='stylesheet'">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">

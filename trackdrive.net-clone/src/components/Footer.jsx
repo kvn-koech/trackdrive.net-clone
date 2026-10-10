@@ -38,9 +38,9 @@ export default function Footer() {
             <p className="footer-muted small">Call tracking and lead-to-call automation for performance marketers.</p>
             <ul className="list-unstyled small">
               <li className="mb-2">
-                <a href="mailto:support@avortyx.com"> <i className="fa-solid fa-envelope me-2" />support@avortyx.com </a>
+                <a href="mailto:support@avortyx.com"> <i className="fa-solid fa-envelope me-2" aria-hidden="true" />support@avortyx.com </a>
               </li>
-              <li><a href="/p/contact.html"> <i className="fa-solid fa-ticket me-2" />Submit a Ticket </a></li>
+              <li><a href="/p/contact.html"> <i className="fa-solid fa-ticket me-2" aria-hidden="true" />Submit a Ticket </a></li>
             </ul>
           </div>
           {COLUMNS.map(([title, links]) => (
